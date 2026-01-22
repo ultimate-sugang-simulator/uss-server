@@ -1,0 +1,26 @@
+name: "🧪 test"
+description: "테스트 코드 작성 및 개선"
+labels: ["test"]
+body:
+  - type: textarea
+    attributes:
+      label: 📄 설명
+      description: 어떤 테스트가 필요한지 설명해 주세요.
+      placeholder: 단위 테스트, 통합 테스트, E2E 테스트 등
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: ✅ 작업할 내용
+      description: 테스트 작업 내용을 체크박스 형태로 작성해주세요.
+      placeholder: |
+        - [ ] 정상 케이스 테스트
+        - [ ] 예외 케이스 테스트
+        - [ ] 경계값 테스트
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 💬 논의해볼 사항
+      description: 추후 논의가 필요한 사항이 있다면 작성해 주세요.
+      placeholder: 테스트 범위, 테스트 전략, 커버리지 목표 등

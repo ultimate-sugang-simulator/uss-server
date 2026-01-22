@@ -1,0 +1,26 @@
+name: "📝 docs"
+description: "문서 작업"
+labels: ["docs"]
+body:
+  - type: textarea
+    attributes:
+      label: 📄 설명
+      description: 어떤 문서 작업이 필요한지 설명해 주세요.
+      placeholder: README 업데이트, API 문서 작성, 주석 추가 등
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: ✅ 작업할 내용
+      description: 문서 작업 내용을 체크박스 형태로 작성해주세요.
+      placeholder: |
+        - [ ] 작업 1
+        - [ ] 작업 2
+        - [ ] 작업 3
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 💬 논의해볼 사항
+      description: 추후 논의가 필요한 사항이 있다면 작성해 주세요.
+      placeholder: 문서 구조, 작성 범위, 형식 등

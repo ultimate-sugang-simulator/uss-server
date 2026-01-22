@@ -1,0 +1,36 @@
+name: "🚨 hotfix"
+description: "긴급 버그 수정"
+labels: ["hotfix"]
+body:
+  - type: textarea
+    attributes:
+      label: 🔥 긴급 이슈 설명
+      description: 긴급하게 수정이 필요한 이슈를 설명해 주세요.
+      placeholder: 프로덕션 환경에서 발생한 심각한 버그
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 🔍 재현 방법
+      description: 이슈를 재현할 수 있는 방법을 작성해 주세요.
+      placeholder: |
+        1. 어떤 페이지로 이동
+        2. 어떤 버튼 클릭
+        3. 어떤 에러 발생
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: ✅ 작업할 내용
+      description: 긴급 수정 작업 내용을 체크박스 형태로 작성해주세요.
+      placeholder: |
+        - [ ] 긴급 수정 1
+        - [ ] 긴급 수정 2
+        - [ ] 회귀 테스트
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 💬 논의해볼 사항
+      description: 추후 논의가 필요한 사항이 있다면 작성해 주세요.
+      placeholder: 근본 원인 분석, 재발 방지 대책, 모니터링 개선 등
