@@ -20,7 +20,7 @@ public class Course {
     @Column(nullable = false, name = "title_en")
     private String titleEn;
 
-    @Column(nullable = false, name = "course_code")
+    @Column(nullable = false, unique = true, name = "course_code")
     private String courseCode;
 
     @Enumerated(EnumType.STRING)

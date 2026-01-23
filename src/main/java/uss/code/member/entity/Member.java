@@ -19,8 +19,8 @@ public class Member {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true, name = "student_number")
-    private int studentNumber;
+    @Column(nullable = false, unique = true, name = "student_id")
+    private String studentId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
