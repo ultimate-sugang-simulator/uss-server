@@ -1,24 +1,24 @@
-package uss.code.registration.entity;
+package uss.code.cart.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import uss.code.course.entity.Course;
-import uss.code.member.entity.Member;
+import uss.code.course.domain.Course;
+import uss.code.member.domain.Member;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Entity
 @Table(
-        name = "registrations",
+        name = "carts",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"member_id", "course_id"})
         }
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Registration {
+public class Cart {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,7 +28,7 @@ public class Registration {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "course_id")
+    @JoinColumn(nullable = false,name = "course_id")
     private Course course;
 
     @Column(nullable = false, name = "created_at")

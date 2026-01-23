@@ -1,11 +1,11 @@
-package uss.code.course.entity;
+package uss.code.member.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum CourseCollege {
+public enum MemberCollege {
     HUMANITIES("인문대학"),
     NATURAL_SCIENCES("자연과학대학"),
     SOCIAL_SCIENCES("사회과학대학"),
@@ -19,12 +19,7 @@ public enum CourseCollege {
     LIFE_SCIENCES_BIOENGINEERING("생명과학기술대학"),
     LIBERAL_ARTS_COLLEGE("융합자유전공대학"),
     NORTHEAST_ASIAN_STUDIES("동북아국제통상물류학부"),
-    LAW("단과대구분없음(법학)"),
-    GENERAL_ELECTIVE("일선"),
-    GENERAL_EDUCATION("교양"),
-    MILITARY("군사학"),
-    TEACHING("교직"),
-    ETC("기타");
+    LAW("법학부");
 
     private final String name;
 }

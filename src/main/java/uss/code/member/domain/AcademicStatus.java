@@ -1,4 +1,4 @@
-package uss.code.member.entity;
+package uss.code.member.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

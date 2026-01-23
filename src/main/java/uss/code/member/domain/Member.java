@@ -1,4 +1,4 @@
-package uss.code.member.entity;
+package uss.code.member.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -32,7 +32,7 @@ public class Member {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Grade grade;
+    private MemberGrade memberGrade;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "academic_status")

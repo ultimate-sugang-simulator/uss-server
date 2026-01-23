@@ -1,10 +1,10 @@
-package uss.code.challengeCode.entity;
+package uss.code.challengeCode.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import uss.code.member.entity.Member;
+import uss.code.member.domain.Member;
 
 @Getter
 @Entity

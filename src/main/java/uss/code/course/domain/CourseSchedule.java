@@ -1,4 +1,4 @@
-package uss.code.course.entity;
+package uss.code.course.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
