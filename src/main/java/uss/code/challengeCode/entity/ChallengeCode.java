@@ -16,7 +16,7 @@ public class ChallengeCode {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn( nullable = false, name = "member_id")
     private Member member;
 
     @Column(nullable = false)
