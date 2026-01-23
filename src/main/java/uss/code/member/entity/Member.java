@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Table(name = "member")
+@Table(name = "members")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
 
@@ -24,11 +24,11 @@ public class Member {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private College college;
+    private MemberCollege memberCollege;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Department department;
+    private MemberDepartment memberDepartment;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
