@@ -3,6 +3,8 @@ package uss.code.member.domain;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+
 @Getter
 @RequiredArgsConstructor
 public enum MemberDepartment {
@@ -98,4 +100,11 @@ public enum MemberDepartment {
 
     private final MemberCollege memberCollege;
     private final String name;
+
+    public static MemberDepartment from(String value){
+        return Arrays.stream(values())
+                .filter(md -> md.name().equalsIgnoreCase(value))
+                .findAny()
+                .orElse(null);
+    }
 }

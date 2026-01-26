@@ -3,6 +3,8 @@ package uss.code.member.domain;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+
 @Getter
 @RequiredArgsConstructor
 public enum MemberGrade {
@@ -13,4 +15,11 @@ public enum MemberGrade {
 
     private final String name;
     private final int year;
+
+    public static MemberGrade from(String value){
+        return Arrays.stream(values())
+                .filter(mg -> mg.name().equalsIgnoreCase(value))
+                .findAny()
+                .orElse(null);
+    }
 }
