@@ -4,7 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class JwtAuthenticationException extends RuntimeException {
-
     private final int code;
     private final String message;
 

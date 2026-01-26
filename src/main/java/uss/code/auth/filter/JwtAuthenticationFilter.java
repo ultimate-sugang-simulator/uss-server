@@ -23,19 +23,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final FilterChain filterChain
     ) throws ServletException, IOException {
 
-            String accessToken = request.getHeader("access-token").substring(7);
-            String refreshToken = request.getHeader("refresh-token").substring(7);
+            final String accessToken = request.getHeader("access-token").substring(7);
+            final String refreshToken = request.getHeader("refresh-token").substring(7);
 
             jwtProvider.validateTokens(accessToken, refreshToken);
 
-            Long memberId = jwtProvider.getMemberId(accessToken);
+            final Long memberId = jwtProvider.getMemberId(accessToken);
             request.setAttribute("member-id", memberId);
 
             filterChain.doFilter(request, response);
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    protected boolean shouldNotFilter(final HttpServletRequest request) throws ServletException {
         return WhitelistEndpoint.isWhitelisted(
                 request.getRequestURI(),
                 request.getMethod()

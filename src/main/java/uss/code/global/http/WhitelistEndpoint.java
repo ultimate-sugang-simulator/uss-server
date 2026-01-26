@@ -14,8 +14,8 @@ public final class WhitelistEndpoint {
     private WhitelistEndpoint() {}
 
     public static boolean isWhitelisted(
-            String path,
-            String method
+            final String path,
+            final String method
     ) {
         return WHITELIST.stream()
                 .anyMatch(endpoint -> endpoint.matches(path, method));

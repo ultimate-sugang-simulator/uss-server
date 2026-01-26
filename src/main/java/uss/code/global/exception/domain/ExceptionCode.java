@@ -9,7 +9,6 @@ import static org.springframework.http.HttpStatus.*;
 @Getter
 @RequiredArgsConstructor
 public enum ExceptionCode {
-
     // 전역
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 9999, "예기치 못한 예외 발생"),
 

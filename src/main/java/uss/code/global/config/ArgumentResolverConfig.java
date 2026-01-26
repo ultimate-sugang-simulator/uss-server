@@ -15,7 +15,7 @@ public class ArgumentResolverConfig implements WebMvcConfigurer {
     private final AuthArgumentResolver authArgumentResolver;
 
     @Override
-    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+    public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(authArgumentResolver);
     }
 }

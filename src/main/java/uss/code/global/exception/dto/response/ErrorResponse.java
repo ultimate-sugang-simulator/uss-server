@@ -8,9 +8,9 @@ public record ErrorResponse(
         String message
 ) {
     public static ErrorResponse of(
-            HttpStatus status,
-            int code,
-            String message
+            final HttpStatus status,
+            final int code,
+            final String message
     ){
         return new ErrorResponse(status, code, message);
     }

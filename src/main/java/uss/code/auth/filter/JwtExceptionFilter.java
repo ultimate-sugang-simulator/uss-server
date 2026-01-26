@@ -28,14 +28,14 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         try{
             filterChain.doFilter(request, response);
-        }catch (JwtAuthenticationException e){
+        }catch (final JwtAuthenticationException e){
             setErrorResponse(response, e);
         }
     }
 
     private void setErrorResponse(
             HttpServletResponse response,
-            JwtAuthenticationException e
+            final JwtAuthenticationException e
     )throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(SC_UNAUTHORIZED);

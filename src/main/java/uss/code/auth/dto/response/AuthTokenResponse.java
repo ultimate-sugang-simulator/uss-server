@@ -9,8 +9,8 @@ public record AuthTokenResponse(
         String refreshToken
 ) {
     public static AuthTokenResponse of(
-            String accessToken,
-            String refreshToken
+            final String accessToken,
+            final String refreshToken
     ){
         return AuthTokenResponse.builder()
                 .accessToken(accessToken)
