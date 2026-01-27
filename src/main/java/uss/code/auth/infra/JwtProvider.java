@@ -98,7 +98,7 @@ public class JwtProvider {
         try {
             parseJwt(accessToken);
         } catch (ExpiredJwtException e) {
-            throw new JwtTokenExpiredException(EXPIRED_PERIOD_ACCESS_TOKEN);
+            throw new JwtTokenExpiredException(EXPIRED_ACCESS_TOKEN);
         } catch (MalformedJwtException e) {
             throw new JwtTokenInvalidException(INVALID_FORM_ACCESS_TOKEN);
         } catch (SignatureException e) {
@@ -112,7 +112,7 @@ public class JwtProvider {
         try {
             parseJwt(refreshToken);
         } catch (ExpiredJwtException e) {
-            throw new JwtTokenExpiredException(EXPIRED_PERIOD_REFRESH_TOKEN);
+            throw new JwtTokenExpiredException(EXPIRED_REFRESH_TOKEN);
         } catch (MalformedJwtException e) {
             throw new JwtTokenInvalidException(INVALID_FORM_REFRESH_TOKEN);
         } catch (SignatureException e) {

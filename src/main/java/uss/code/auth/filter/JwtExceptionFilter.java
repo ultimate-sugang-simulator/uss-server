@@ -12,7 +12,7 @@ import uss.code.global.exception.dto.response.ErrorResponse;
 
 import java.io.IOException;
 
-import static jakarta.servlet.http.HttpServletResponse.*;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @RequiredArgsConstructor

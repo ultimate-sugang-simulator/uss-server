@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import uss.code.global.infra.RandomCodeGenerator;
 
+import java.time.LocalDateTime;
+
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -32,6 +34,15 @@ public class EmailVerificationCode {
     @Column(nullable = false)
     private boolean verified;
 
+    @Column(nullable = false)
+    private int failedCount;
+
+    @Column(nullable = false)
+    private int resendCount;
+
+    @Column(nullable = false)
+    private LocalDateTime expiresAt;
+
     @Builder(access = PRIVATE)
     private EmailVerificationCode(
             final String email,
@@ -40,6 +51,9 @@ public class EmailVerificationCode {
         this.email = email;
         this.code = code;
         this.verified = false;
+        this.failedCount = 0;
+        this.resendCount = 0;
+        this.expiresAt = LocalDateTime.now().plusMinutes(10);
     }
 
     public static EmailVerificationCode create(final String email){
@@ -47,5 +61,20 @@ public class EmailVerificationCode {
                 .email(email)
                 .code(RandomCodeGenerator.generateCode())
                 .build();
+    }
+
+    public void markAsVerified() {
+        this.verified = true;
+    }
+
+    public void reissueCode() {
+        this.code = RandomCodeGenerator.generateCode();
+        this.failedCount = 0;
+        this.resendCount++;
+        this.expiresAt = LocalDateTime.now().plusMinutes(10);
+    }
+
+    public void increaseFailedAttempts() {
+        this.failedCount++;
     }
 }

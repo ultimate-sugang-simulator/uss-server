@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(final Exception e){
-        return makeExceptionResponse(ExceptionCode.INTERNAL_SERVER_ERROR);
+        return makeExceptionResponse(ExceptionCode.UNEXPECTED_SERVER_ERROR);
     }
 
     private ResponseEntity<ErrorResponse> makeExceptionResponse(final ExceptionCode exceptionCode) {

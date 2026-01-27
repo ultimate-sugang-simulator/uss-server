@@ -25,7 +25,7 @@ public class EmailSender {
             final MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(email);
-            helper.setSubject("[궁극의 수강신청 시뮬레이터] 이메일 인증코드가 도착하였습니다.");
+            helper.setSubject("[궁극의 수강신청 시뮬레이터] 인증코드가 도착하였습니다.");
             helper.setText(EmailTemplateGenerator.generateVerificationCodeTemplate(code), true);
 
             javaMailSender.send(message);
