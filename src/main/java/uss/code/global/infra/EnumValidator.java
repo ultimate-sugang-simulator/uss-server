@@ -1,4 +1,4 @@
-package uss.code.global.util;
+package uss.code.global.infra;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

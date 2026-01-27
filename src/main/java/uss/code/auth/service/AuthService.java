@@ -35,7 +35,11 @@ public class AuthService {
 
     @Transactional
     public void signUp(final SignUpRequest request) {
-        if (validateUserExists(request.studentId()))
+        /**
+         * 이메일 인증 여부 체크하기
+         */
+
+        if (validateUserExists(request.email()))
             throw new RestApiException(MEMBER_ALREADY_EXISTS);
 
         final Member member = Member.signUp(
@@ -46,7 +50,7 @@ public class AuthService {
         memberRepository.save(member);
     }
 
-    private boolean validateUserExists(final String studentId){
-        return memberRepository.existsByStudentId(studentId);
+    private boolean validateUserExists(final String email){
+        return memberRepository.existsByEmail(email);
     }
 }

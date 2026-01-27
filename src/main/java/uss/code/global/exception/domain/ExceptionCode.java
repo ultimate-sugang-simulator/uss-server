@@ -32,7 +32,10 @@ public enum ExceptionCode {
 
     // 맴버
     MEMBER_NOT_FOUND(NOT_FOUND, 1012, "사용자 조회에 실패하였습니다."),
-    MEMBER_ALREADY_EXISTS(BAD_REQUEST, 1013, "이미 존재하는 사용자입니다.");
+    MEMBER_ALREADY_EXISTS(BAD_REQUEST, 1013, "이미 존재하는 사용자입니다."),
+
+    // 메일
+    EMAIL_SENDING_FAILED(SERVICE_UNAVAILABLE, 1014, "이메일 인증코드 전송에 실패하였습니다.");
 
     private final HttpStatus status;
     private final int code;

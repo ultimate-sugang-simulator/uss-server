@@ -27,7 +27,10 @@ public class Member {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, name = "student_id")
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false, name = "student_id")
     private String studentId;
 
     @Column(nullable = false)
@@ -66,6 +69,7 @@ public class Member {
             final String studentId,
             final String password,
             final String name,
+            final String email,
             final MemberCollege memberCollege,
             final MemberDepartment memberDepartment,
             final MemberGrade memberGrade,
@@ -75,6 +79,7 @@ public class Member {
         this.studentId = studentId;
         this.password = password;
         this.name = name;
+        this.email = email;
         this.memberCollege = memberCollege;
         this.memberDepartment = memberDepartment;
         this.memberGrade = memberGrade;
@@ -92,6 +97,7 @@ public class Member {
                 .studentId(request.studentId())
                 .password(encodedPassword)
                 .name(request.name())
+                .email(request.email())
                 .memberCollege(MemberCollege.from(request.memberCollege()))
                 .memberDepartment(MemberDepartment.from(request.memberDepartment()))
                 .memberGrade(MemberGrade.from(request.memberGrade()))

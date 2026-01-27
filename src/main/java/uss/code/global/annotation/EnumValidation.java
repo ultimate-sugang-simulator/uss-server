@@ -2,7 +2,7 @@ package uss.code.global.annotation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import uss.code.global.util.EnumValidator;
+import uss.code.global.infra.EnumValidator;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
