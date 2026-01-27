@@ -25,7 +25,10 @@ public final class WhitelistEndpoint {
             String path,
             HttpMethod httpMethod
     ) {
-        boolean matches(String uri, String method) {
+        boolean matches(
+                final String uri,
+                final String method
+        ) {
             return path.equals(uri) && httpMethod.name().equalsIgnoreCase(method);
         }
     }

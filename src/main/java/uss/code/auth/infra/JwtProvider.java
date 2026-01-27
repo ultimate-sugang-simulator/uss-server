@@ -24,7 +24,7 @@ import static uss.code.global.exception.domain.ExceptionCode.*;
 @Component
 public class JwtProvider {
 
-    private static final int NON_SUBJECT = -1;
+    private static final int NO_SUBJECT = -1;
 
     private final SecretKey secretKey;
     private final long accessTokenExpirationTime;
@@ -40,9 +40,9 @@ public class JwtProvider {
         this.refreshTokenExpirationTime = refreshTokenExpirationTime;
     }
 
-    public AuthTokenResponse generateAuthToken(final long memberId) {
+    public AuthTokenResponse generateAuthTokens(final long memberId) {
         final String accessToken = generateToken(memberId, accessTokenExpirationTime);
-        final String refreshToken = generateToken(NON_SUBJECT, refreshTokenExpirationTime);
+        final String refreshToken = generateToken(NO_SUBJECT, refreshTokenExpirationTime);
 
         return AuthTokenResponse.of(
                 accessToken,

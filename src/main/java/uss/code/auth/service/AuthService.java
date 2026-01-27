@@ -30,7 +30,7 @@ public class AuthService {
         if (!passwordEncoder.matches(request.password(), member.getPassword()))
             throw new RestApiException(PASSWORD_NOT_CORRECT);
 
-        return jwtProvider.generateAuthToken(member.getId());
+        return jwtProvider.generateAuthTokens(member.getId());
     }
 
     @Transactional

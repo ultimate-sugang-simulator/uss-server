@@ -13,16 +13,16 @@ import uss.code.auth.annotation.Auth;
 public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
-    public boolean supportsParameter(MethodParameter parameter) {
+    public boolean supportsParameter(final MethodParameter parameter) {
         return parameter.hasParameterAnnotation(Auth.class);
     }
 
     @Override
     public Object resolveArgument(
-            MethodParameter parameter,
-            ModelAndViewContainer mavContainer,
-            NativeWebRequest webRequest,
-            WebDataBinderFactory binderFactory
+            final MethodParameter parameter,
+            final ModelAndViewContainer mavContainer,
+            final NativeWebRequest webRequest,
+            final WebDataBinderFactory binderFactory
     ) throws Exception {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         return request.getAttribute("member-id");

@@ -13,7 +13,6 @@ import uss.code.member.domain.MemberDepartment;
 import uss.code.member.domain.MemberGrade;
 
 public record SignUpRequest(
-
         @NotBlank(message = "학번이 비어있습니다.")
         @Pattern(regexp = "^\\d{9}$", message = "학번은 9자리 숫자여야 합니다.")
         String studentId,
