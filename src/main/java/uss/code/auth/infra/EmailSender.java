@@ -3,6 +3,7 @@ package uss.code.auth.infra;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import uss.code.global.exception.domain.RestApiException;
 
 import static uss.code.global.exception.domain.ExceptionCode.EMAIL_SENDING_FAILED;
 
+@Log4j2
 @Component
 @RequiredArgsConstructor
 public class EmailSender {
@@ -30,6 +32,7 @@ public class EmailSender {
 
             javaMailSender.send(message);
         } catch (MessagingException e) {
+            log.error(e.getMessage(), e);
             throw new RestApiException(EMAIL_SENDING_FAILED);
         }
     }

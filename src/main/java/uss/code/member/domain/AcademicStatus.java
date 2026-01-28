@@ -2,8 +2,11 @@ package uss.code.member.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import uss.code.global.exception.domain.RestApiException;
 
 import java.util.Arrays;
+
+import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
 
 @Getter
 @RequiredArgsConstructor
@@ -17,6 +20,6 @@ public enum AcademicStatus {
         return Arrays.stream(values())
                 .filter(as -> as.name().equalsIgnoreCase(value))
                 .findAny()
-                .orElse(null);
+                .orElseThrow(() -> new RestApiException(INVALID_ENUM_TYPE));
     }
 }

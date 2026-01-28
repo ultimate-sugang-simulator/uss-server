@@ -23,8 +23,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final FilterChain filterChain
     ) throws ServletException, IOException {
 
-            final String accessToken = request.getHeader("access-token").substring(7);
-            final String refreshToken = request.getHeader("refresh-token").substring(7);
+            final String accessToken = request.getHeader("access-token");
+            final String refreshToken = request.getHeader("refresh-token");
 
             jwtProvider.validateTokens(accessToken, refreshToken);
 
