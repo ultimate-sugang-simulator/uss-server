@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import uss.code.global.exception.domain.RestApiException;
 
@@ -18,6 +19,7 @@ public class EmailSender {
 
     private final JavaMailSender javaMailSender;
 
+    @Async
     public void sendVerificationCode(
             final String email,
             final String code
