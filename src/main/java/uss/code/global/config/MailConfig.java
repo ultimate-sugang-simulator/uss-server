@@ -52,12 +52,12 @@ public class MailConfig {
         mailSender.setDefaultEncoding("UTF-8");
 
         Properties props = mailSender.getJavaMailProperties();
-        props.put("mail.smtp.auth", auth);
-        props.put("mail.smtp.starttls.enable", starttlsEnable);
-        props.put("mail.smtp.starttls.required", starttlsRequired);
-        props.put("mail.smtp.connectiontimeout", connectionTimeout);
-        props.put("mail.smtp.timeout", timeout);
-        props.put("mail.smtp.writetimeout", writeTimeout);
+        props.setProperty("mail.smtp.auth", Boolean.toString(auth));
+        props.setProperty("mail.smtp.starttls.enable", Boolean.toString(starttlsEnable));
+        props.setProperty("mail.smtp.starttls.required", Boolean.toString(starttlsRequired));
+        props.setProperty("mail.smtp.connectiontimeout", Integer.toString(connectionTimeout));
+        props.setProperty("mail.smtp.timeout", Integer.toString(timeout));
+        props.setProperty("mail.smtp.writetimeout", Integer.toString(writeTimeout));
 
         return mailSender;
     }
