@@ -2,6 +2,11 @@ package uss.code.member.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import uss.code.global.exception.domain.RestApiException;
+
+import java.util.Arrays;
+
+import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
 
 @Getter
 @RequiredArgsConstructor
@@ -22,4 +27,11 @@ public enum MemberCollege {
     LAW("법학부");
 
     private final String name;
+
+    public static MemberCollege from(String value){
+        return Arrays.stream(values())
+                .filter(mc -> mc.name().equalsIgnoreCase(value))
+                .findAny()
+                .orElseThrow(() -> new RestApiException(INVALID_ENUM_TYPE));
+    }
 }
