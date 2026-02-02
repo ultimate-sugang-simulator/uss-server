@@ -14,8 +14,6 @@ public final class WhitelistEndpoint {
             new EndPoint("/api/v1/email-verification-codes", HttpMethod.PATCH)
     );
 
-    private WhitelistEndpoint() {}
-
     public static boolean isWhitelisted(
             final String path,
             final String method

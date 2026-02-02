@@ -13,7 +13,6 @@ import uss.code.global.exception.dto.response.ErrorResponse;
 import java.io.IOException;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @RequiredArgsConstructor
 public class JwtExceptionFilter extends OncePerRequestFilter {
@@ -41,7 +40,6 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         response.setStatus(SC_UNAUTHORIZED);
 
         ErrorResponse errorResponse = ErrorResponse.of(
-                UNAUTHORIZED,
                 e.getCode(),
                 e.getMessage()
         );
