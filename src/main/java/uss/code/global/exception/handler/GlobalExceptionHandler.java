@@ -52,7 +52,6 @@ public class GlobalExceptionHandler {
 
     private ErrorResponse makeErrorResponse(final ExceptionCode exceptionCode) {
         return ErrorResponse.of(
-                exceptionCode.getStatus(),
                 exceptionCode.getCode(),
                 exceptionCode.getMessage()
         );
@@ -60,8 +59,7 @@ public class GlobalExceptionHandler {
 
     private ErrorResponse makeErrorResponse(final String message) {
         return ErrorResponse.of(
-                BAD_REQUEST,
-                BAD_REQUEST.value(),
+                400,
                 message
         );
     }
