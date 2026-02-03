@@ -2,6 +2,7 @@ package uss.code.course.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import uss.code.member.domain.MemberDepartment;
 
 @Getter
 @RequiredArgsConstructor
@@ -121,4 +122,8 @@ public enum CourseDepartment {
 
     private final CourseCollege courseCollege;
     private final String name;
+
+    public static CourseDepartment fromMemberDepartment(final MemberDepartment memberDepartment){
+        return CourseDepartment.valueOf(memberDepartment.name());
+    }
 }

@@ -1,4 +1,4 @@
-package uss.code.infra;
+package uss.code.global.infra;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;

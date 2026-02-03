@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uss.code.auth.dto.request.SignUpRequest;
 import uss.code.global.exception.domain.RestApiException;
-import uss.code.infra.IntegrationTest;
+import uss.code.global.infra.IntegrationTest;
 import uss.code.member.domain.Member;
 import uss.code.member.dto.res.MemberProfileResponse;
 import uss.code.member.repository.MemberRepository;
