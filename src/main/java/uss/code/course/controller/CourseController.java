@@ -27,4 +27,9 @@ public class CourseController {
     public ResponseEntity<GeneralEducationCoursesResponse> getGeneralEducationCourses(@RequestParam("course-area") final String courseArea){
         return ResponseEntity.ok(courseService.getGeneralEducationCourses(courseArea));
     }
+
+    @GetMapping("/other-department")
+    public ResponseEntity<MajorCoursesResponse> getOtherDepartmentCourses(@RequestParam("department") final String department){
+        return ResponseEntity.ok(courseService.getOtherDepartmentCourses(department));
+    }
 }

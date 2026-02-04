@@ -39,7 +39,7 @@ public enum CourseArea {
 
     public static CourseArea from(final String courseArea) {
         try{
-            return CourseArea.valueOf(courseArea);
+            return CourseArea.valueOf(courseArea.toUpperCase());
         }catch(IllegalArgumentException e){
             throw new RestApiException(INVALID_ENUM_TYPE);
         }

@@ -2,9 +2,10 @@ package uss.code.course.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import uss.code.global.exception.domain.ExceptionCode;
 import uss.code.global.exception.domain.RestApiException;
 import uss.code.member.domain.MemberDepartment;
+
+import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
 
 @Getter
 @RequiredArgsConstructor
@@ -137,11 +138,19 @@ public enum CourseDepartment {
     private final CourseCollege courseCollege;
     private final String name;
 
+    public static CourseDepartment from(final String courseDepartment) {
+        try{
+            return CourseDepartment.valueOf(courseDepartment.toUpperCase());
+        }catch (IllegalArgumentException e){
+            throw new RestApiException(INVALID_ENUM_TYPE);
+        }
+    }
+
     public static CourseDepartment fromMemberDepartment(final MemberDepartment memberDepartment){
         try{
             return CourseDepartment.valueOf(memberDepartment.name());
         }catch (IllegalArgumentException e){
-            throw new RestApiException(ExceptionCode.INVALID_ENUM_TYPE);
+            throw new RestApiException(INVALID_ENUM_TYPE);
         }
     }
 }

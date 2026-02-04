@@ -425,4 +425,159 @@ class CourseServiceTest {
                     .hasFieldOrPropertyWithValue("exceptionCode", INVALID_GENERAL_EDUCATION_AREA);
         }
     }
+
+    @Nested
+    class 타학과_전공과목_조회_테스트 {
+
+        @BeforeEach
+        void setUp() {
+            // 수학과 과목들
+            // 전학년 과목 2개
+            Course mathAllGrade1 = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "미적분학", "Calculus", "MATH101",
+                    CourseDepartment.MATHEMATICS,
+                    CourseGrade.ALL, "김교수", "자연관101"
+            );
+            Course mathAllGrade2 = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "선형대수", "Linear Algebra", "MATH102",
+                    CourseDepartment.MATHEMATICS,
+                    CourseGrade.ALL, null, null
+            );
+
+            // 1학년 과목 2개
+            Course mathFreshman1 = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "수학의이해", "Understanding Mathematics", "MATH201",
+                    CourseDepartment.MATHEMATICS,
+                    CourseGrade.FRESHMAN, "이교수", "자연관201"
+            );
+            Course mathFreshman2 = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "기초수학", "Basic Mathematics", "MATH202",
+                    CourseDepartment.MATHEMATICS,
+                    CourseGrade.FRESHMAN, "박교수", null
+            );
+
+            // 2학년 과목 2개
+            Course mathSophomore1 = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "해석학", "Analysis", "MATH301",
+                    CourseDepartment.MATHEMATICS,
+                    CourseGrade.SOPHOMORE, null, "자연관301"
+            );
+            Course mathSophomore2 = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "정수론", "Number Theory", "MATH302",
+                    CourseDepartment.MATHEMATICS,
+                    CourseGrade.SOPHOMORE, "최교수", "자연관302"
+            );
+
+            // 컴퓨터공학부 과목 (다른 학과)
+            Course cseCourse = CourseFixture.createCourseWithDetails(
+                    "자료구조", "Data Structure", "CSE101",
+                    CourseGrade.SOPHOMORE, "정교수", "공학관101"
+            );
+
+            // 스케줄 추가
+            CourseSchedule schedule1 = CourseScheduleFixture.createCourseSchedule(
+                    mathAllGrade1, "월1,2", CourseDay.MONDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+            );
+            CourseSchedule schedule2 = CourseScheduleFixture.createCourseSchedule(
+                    mathAllGrade1, "수1,2", CourseDay.WEDNESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+            );
+            CourseSchedule schedule3 = CourseScheduleFixture.createCourseSchedule(
+                    mathFreshman1, "화3,4", CourseDay.TUESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+            );
+
+            mathAllGrade1.addCourseSchedule(schedule1);
+            mathAllGrade1.addCourseSchedule(schedule2);
+            mathFreshman1.addCourseSchedule(schedule3);
+
+            courseRepository.saveAll(List.of(
+                    mathAllGrade1, mathAllGrade2,
+                    mathFreshman1, mathFreshman2,
+                    mathSophomore1, mathSophomore2,
+                    cseCourse
+            ));
+        }
+
+        @Test
+        void 수학과_학과코드로_조회하면_수학과_과목만_반환된다() {
+            //given
+            final String department = "MATHEMATICS";
+
+            //when
+            final MajorCoursesResponse response = courseService.getOtherDepartmentCourses(department);
+
+            //then
+            assertThat(response.majorCourses()).hasSize(6);
+            assertThat(response.majorCourses())
+                    .extracting(MajorCourseResponse::department)
+                    .containsOnly("수학과");
+        }
+
+        @Test
+        void 전학년_1학년_2학년_순서로_정렬되어_조회된다() {
+            //given
+            final String department = "MATHEMATICS";
+
+            //when
+            final MajorCoursesResponse response = courseService.getOtherDepartmentCourses(department);
+            final List<String> grades = response.majorCourses().stream()
+                    .map(MajorCourseResponse::courseGrade)
+                    .toList();
+
+            //then
+            assertThat(grades).containsExactly(
+                    "전학년", "전학년",  // MATH101, MATH102
+                    "1학년", "1학년",    // MATH201, MATH202
+                    "2학년", "2학년"     // MATH301, MATH302
+            );
+        }
+
+        @Test
+        void 스케줄이_있는_과목은_요일순으로_정렬되어_반환된다() {
+            //given
+            final String department = "MATHEMATICS";
+
+            //when
+            final MajorCoursesResponse response = courseService.getOtherDepartmentCourses(department);
+
+            //then
+            // MATH101: 월1,2, 수1,2
+            final MajorCourseResponse mathAllGrade1 = response.majorCourses().stream()
+                    .filter(c -> c.courseCode().equals("MATH101"))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(mathAllGrade1.schedule()).isEqualTo("월1,2, 수1,2");
+
+            // MATH201: 화3,4
+            final MajorCourseResponse mathFreshman1 = response.majorCourses().stream()
+                    .filter(c -> c.courseCode().equals("MATH201"))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(mathFreshman1.schedule()).isEqualTo("화3,4");
+        }
+
+        @Test
+        void 다른_학과_과목은_조회되지_않는다() {
+            //given
+            final String department = "MATHEMATICS";
+
+            //when
+            final MajorCoursesResponse response = courseService.getOtherDepartmentCourses(department);
+
+            //then
+            assertThat(response.majorCourses())
+                    .extracting(MajorCourseResponse::courseCode)
+                    .doesNotContain("CSE101");
+        }
+
+        @Test
+        void 잘못된_학과_코드로_조회하면_예외가_발생한다() {
+            //given
+            final String invalidDepartment = "INVALID_DEPARTMENT";
+
+            //when & then
+            assertThatThrownBy(() -> courseService.getOtherDepartmentCourses(invalidDepartment))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", INVALID_ENUM_TYPE);
+        }
+    }
 }

@@ -52,4 +52,17 @@ public class CourseService {
 
         return GeneralEducationCoursesResponse.of(generalEducationCourseResponses);
     }
+
+    @Transactional(readOnly = true)
+    public MajorCoursesResponse getOtherDepartmentCourses(final String department) {
+        final CourseDepartment courseDepartment = CourseDepartment.from(department);
+
+        final List<Course> courses = courseRepository.findByCourseDepartment(courseDepartment);
+
+        final List<MajorCourseResponse> majorCourseResponses = courses.stream()
+                .map(MajorCourseResponse::from)
+                .toList();
+
+        return MajorCoursesResponse.of(majorCourseResponses);
+    }
 }
