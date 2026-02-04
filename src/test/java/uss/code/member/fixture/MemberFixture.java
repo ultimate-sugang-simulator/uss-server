@@ -39,7 +39,6 @@ public class MemberFixture {
     ) {
         Member member = new Member();
 
-        ReflectionTestUtils.setField(member, "id", UUID.randomUUID());
         ReflectionTestUtils.setField(member, "email", email);
         ReflectionTestUtils.setField(member, "studentId", studentId);
         ReflectionTestUtils.setField(member, "password", password);
@@ -54,4 +53,5 @@ public class MemberFixture {
 
         return member;
     }
+
 }

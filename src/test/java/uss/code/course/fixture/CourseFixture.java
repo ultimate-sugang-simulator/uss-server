@@ -11,7 +11,6 @@ import uss.code.course.domain.CourseSchedule;
 import uss.code.course.domain.CourseType;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 public class CourseFixture {
 
@@ -126,7 +125,6 @@ public class CourseFixture {
     ) {
         Course course = new Course();
 
-        ReflectionTestUtils.setField(course, "id", UUID.randomUUID());
         ReflectionTestUtils.setField(course, "courseSchedules", new ArrayList<CourseSchedule>());
         ReflectionTestUtils.setField(course, "titleKr", titleKr);
         ReflectionTestUtils.setField(course, "titleEn", titleEn);
@@ -146,4 +144,5 @@ public class CourseFixture {
 
         return course;
     }
+
 }

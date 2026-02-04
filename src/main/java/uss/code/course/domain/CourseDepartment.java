@@ -2,6 +2,8 @@ package uss.code.course.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import uss.code.global.exception.domain.ExceptionCode;
+import uss.code.global.exception.domain.RestApiException;
 import uss.code.member.domain.MemberDepartment;
 
 @Getter
@@ -32,19 +34,23 @@ public enum CourseDepartment {
     PUBLIC_ADMINISTRATION(CourseCollege.COMMERCE_PUBLIC_AFFAIRS, "행정학과"),
     POLITICS_DIPLOMACY(CourseCollege.COMMERCE_PUBLIC_AFFAIRS, "정치외교학과"),
     ECONOMICS(CourseCollege.COMMERCE_PUBLIC_AFFAIRS, "경제학과"),
+    ECONOMICS_NIGHT(CourseCollege.COMMERCE_PUBLIC_AFFAIRS, "경제학과(야)"),
     TRADE(CourseCollege.COMMERCE_PUBLIC_AFFAIRS, "무역학부"),
+    TRADE_NIGHT(CourseCollege.COMMERCE_PUBLIC_AFFAIRS, "무역학부(야)"),
     CONSUMER_SCIENCE(CourseCollege.COMMERCE_PUBLIC_AFFAIRS, "소비자학과"),
 
     // 공과대학
-    ENERGY_CHEMICAL(CourseCollege.ENGINEERING, "에너지화학공학과"),
+    MECHANICAL_ENGINEERING(CourseCollege.ENGINEERING, "기계공학과"),
     ELECTRICAL_ENGINEERING(CourseCollege.ENGINEERING, "전기공학과"),
     ELECTRONICS_ENGINEERING(CourseCollege.ENGINEERING, "전자공학과"),
+    ELECTRONICS_ENGINEERING_DEPARTMENT(CourseCollege.ENGINEERING, "전자공학부"),
+    ELECTRONICS_ENGINEERING_MAJOR(CourseCollege.ENGINEERING, "전자공학전공"),
+    SEMICONDUCTOR_CONVERGENCE(CourseCollege.ENGINEERING, "반도체융합전공"),
     INDUSTRIAL_MANAGEMENT(CourseCollege.ENGINEERING, "산업경영공학과"),
     MATERIAL_SCIENCE(CourseCollege.ENGINEERING, "신소재공학과"),
-    MECHANICAL_ENGINEERING(CourseCollege.ENGINEERING, "기계공학과"),
-    BIO_ROBOTICS_ENGINEERING(CourseCollege.ENGINEERING, "바이오-로봇 시스템 공학과"),
     SAFETY_ENGINEERING(CourseCollege.ENGINEERING, "안전공학과"),
-    MECHATRONICS_ENGINEERING(CourseCollege.ENGINEERING, "메카트로닉스공학과"),
+    ENERGY_CHEMICAL(CourseCollege.ENGINEERING, "에너지화학공학과"),
+    BIO_ROBOTICS_ENGINEERING(CourseCollege.ENGINEERING, "바이오-로봇시스템공학과"),
 
     // 정보기술대학
     COMPUTER_ENGINEERING(CourseCollege.INFORMATION_TECHNOLOGY, "컴퓨터공학부"),
@@ -55,10 +61,11 @@ public enum CourseDepartment {
     BUSINESS_ADMINISTRATION(CourseCollege.BUSINESS, "경영학부"),
     DATA_SCIENCE(CourseCollege.BUSINESS, "데이터과학과"),
     TAX_ACCOUNTING(CourseCollege.BUSINESS, "세무회계학과"),
-    TECHNO_MANAGEMENT(CourseCollege.BUSINESS, "테크노경영학과"),
 
     // 예술체육대학
     FINE_ARTS(CourseCollege.ARTS_PHYSICAL_EDUCATION, "조형예술학부"),
+    KOREAN_PAINTING(CourseCollege.ARTS_PHYSICAL_EDUCATION, "한국화전공"),
+    WESTERN_PAINTING(CourseCollege.ARTS_PHYSICAL_EDUCATION, "서양화전공"),
     DESIGN(CourseCollege.ARTS_PHYSICAL_EDUCATION, "디자인학부"),
     PERFORMING_ART(CourseCollege.ARTS_PHYSICAL_EDUCATION, "공연예술학과"),
     SPORTS_SCIENCE(CourseCollege.ARTS_PHYSICAL_EDUCATION, "스포츠과학부"),
@@ -76,54 +83,65 @@ public enum CourseDepartment {
 
     // 도시과학대학
     URBAN_ADMINISTRATION(CourseCollege.URBAN_SCIENCE, "도시행정학과"),
-    CIVIL_ENVIRONMENT_ENGINEERING(CourseCollege.URBAN_SCIENCE, "도시환경학부"),
+    URBAN_ENVIRONMENT_ENGINEERING_DEPARTMENT(CourseCollege.URBAN_SCIENCE, "도시환경공학부"),
+    CIVIL_ENVIRONMENT_ENGINEERING(CourseCollege.URBAN_SCIENCE, "건설환경공학전공"),
+    ENVIRONMENT_ENGINEERING(CourseCollege.URBAN_SCIENCE, "환경공학전공"),
     URBAN_ENGINEERING(CourseCollege.URBAN_SCIENCE, "도시공학과"),
-    URBAN_ARCHITECTURE(CourseCollege.URBAN_SCIENCE, "도시건축학부"),
+    URBAN_ARCHITECTURE_DEPARTMENT(CourseCollege.URBAN_SCIENCE, "도시건축학부"),
+    ARCHITECTURE_ENGINEERING(CourseCollege.URBAN_SCIENCE, "건축공학전공"),
+    URBAN_ARCHITECTURE(CourseCollege.URBAN_SCIENCE, "도시건축학전공"),
 
     // 생명과학기술대학
-    LIFE_SCIENCE(CourseCollege.LIFE_SCIENCES_BIOENGINEERING, "생명과학부"),
-    BIOENGINEERING(CourseCollege.LIFE_SCIENCES_BIOENGINEERING, "생명공학부"),
+    LIFE_SCIENCE_DEPARTMENT(CourseCollege.LIFE_SCIENCES_BIOENGINEERING, "생명과학부"),
+    LIFE_SCIENCE(CourseCollege.LIFE_SCIENCES_BIOENGINEERING, "생명과학전공"),
+    MOLECULAR_LIFE_SCIENCE(CourseCollege.LIFE_SCIENCES_BIOENGINEERING, "분자의생명전공"),
+    BIOENGINEERING_DEPARTMENT(CourseCollege.LIFE_SCIENCES_BIOENGINEERING, "생명공학부"),
+    BIOENGINEERING(CourseCollege.LIFE_SCIENCES_BIOENGINEERING, "생명공학전공"),
+    NANO_BIOENGINEERING(CourseCollege.LIFE_SCIENCES_BIOENGINEERING, "나노바이오공학전공"),
+
+    // 단과대구분없음
+    NORTHEAST_ASIAN_TRADE(CourseCollege.NONE, "동북아국제통상전공"),
+    SMART_LOGISTICS_ENGINEERING(CourseCollege.NONE, "스마트물류공학전공"),
+    IBE(CourseCollege.NONE, "IBE전공"),
 
     // 융합자유전공대학
     LIBERAL_ARTS(CourseCollege.LIBERAL_ARTS_COLLEGE, "자유전공학부"),
-    INTERNATIONAL_LIBERAL_ARTS(CourseCollege.LIBERAL_ARTS_COLLEGE, "국제자유전공학부"),
-    CONVERGENCE(CourseCollege.LIBERAL_ARTS_COLLEGE, "융합학부"),
-
-    // 동북아국제통상학부
-    NORTHEAST_ASIAN_TRADE(CourseCollege.NORTHEAST_ASIAN_STUDIES, "동북아국제통상전공"),
-    SMART_LOGISTICS_ENGINEERING(CourseCollege.NORTHEAST_ASIAN_STUDIES, "스마트물류공학전공"),
-    IBE(CourseCollege.NORTHEAST_ASIAN_STUDIES, "IBE전공"),
 
     // 법학부
     LAW(CourseCollege.LAW, "법학부"),
 
-    // 일선
-    GENERAL_ELECTIVE(CourseCollege.GENERAL_ELECTIVE, "일선"),
-
     // 교양
     GENERAL_EDUCATION(CourseCollege.GENERAL_EDUCATION, "교양"),
-
-    // 군사학
-    MILITARY(CourseCollege.MILITARY, "군사학"),
 
     // 교직
     TEACHING(CourseCollege.TEACHING, "교직"),
 
+    // 일선
+    GENERAL_ELECTIVE(CourseCollege.GENERAL_ELECTIVE, "일선"),
+
+    // 군사학
+    MILITARY(CourseCollege.MILITARY, "군사학"),
+
     // 기타
     OPTOELECTRONICS(CourseCollege.ETC, "광전자공학전공(연계)"),
-    FUTURE_AUTOMOBILE(CourseCollege.ETC, "미래자동차연계전공"),
-    SOCIAL_DATA_SCIENCE(CourseCollege.ETC, "소셜데이터사이언스연계전공"),
+    LOGISTICS(CourseCollege.ETC, "물류학전공(연계)"),
+    INTERNATIONAL_DEVELOPMENT_COOPERATION(CourseCollege.ETC, "국제개발협력연계전공"),
     CREATIVE_DESIGN(CourseCollege.ETC, "창의적디자인연계전공"),
     HUMANITIES_CULTURE_ART_PLANNING(CourseCollege.ETC, "인문문화예술기획연계전공"),
-    LOGISTICS(CourseCollege.ETC, "물류학전공(연계)"),
-    BEAUTY_INDUSTRY(CourseCollege.ETC, "뷰티산업연계전공"),
+    SOCIAL_DATA_SCIENCE(CourseCollege.ETC, "소셜데이터사이언스연계전공"),
+    FUTURE_AUTOMOBILE(CourseCollege.ETC, "미래자동차연계전공"),
     FUTURE_EDUCATION_DESIGN(CourseCollege.ETC, "미래교육디자인연계전공"),
-    INTERNATIONAL_DEVELOPMENT_COOPERATION(CourseCollege.ETC, "국제개발협력연계전공");
+    HUSS_INCLUSIVE_SOCIETY_INITIATIVE(CourseCollege.ETC, "HUSS포용사회이니셔티브학부"),
+    HUSS_OTHER_UNIVERSITY(CourseCollege.ETC, "HUSS(타대학)");
 
     private final CourseCollege courseCollege;
     private final String name;
 
     public static CourseDepartment fromMemberDepartment(final MemberDepartment memberDepartment){
-        return CourseDepartment.valueOf(memberDepartment.name());
+        try{
+            return CourseDepartment.valueOf(memberDepartment.name());
+        }catch (IllegalArgumentException e){
+            throw new RestApiException(ExceptionCode.INVALID_ENUM_TYPE);
+        }
     }
 }

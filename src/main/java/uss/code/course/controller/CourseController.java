@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uss.code.auth.annotation.Auth;
+import uss.code.course.dto.response.GeneralEducationCoursesResponse;
 import uss.code.course.dto.response.MajorCoursesResponse;
 import uss.code.course.service.CourseService;
 
@@ -22,4 +23,8 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getMajorCourses(memberId));
     }
 
+    @GetMapping("/general-education")
+    public ResponseEntity<GeneralEducationCoursesResponse> getGeneralEducationCourses(@RequestParam("course-area") final String courseArea){
+        return ResponseEntity.ok(courseService.getGeneralEducationCourses(courseArea));
+    }
 }

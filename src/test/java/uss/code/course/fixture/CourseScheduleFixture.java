@@ -6,7 +6,6 @@ import uss.code.course.domain.CourseDay;
 import uss.code.course.domain.CourseSchedule;
 
 import java.time.LocalTime;
-import java.util.UUID;
 
 public class CourseScheduleFixture {
 
@@ -28,7 +27,6 @@ public class CourseScheduleFixture {
             final LocalTime endTime
     ) {
         CourseSchedule courseSchedule = new CourseSchedule();
-        ReflectionTestUtils.setField(courseSchedule, "id", UUID.randomUUID());
         ReflectionTestUtils.setField(courseSchedule, "course", course);
         ReflectionTestUtils.setField(courseSchedule, "scheduleText", scheduleText);
         ReflectionTestUtils.setField(courseSchedule, "courseDay", courseDay);
@@ -36,4 +34,5 @@ public class CourseScheduleFixture {
         ReflectionTestUtils.setField(courseSchedule, "endTime", endTime);
         return courseSchedule;
     }
+
 }

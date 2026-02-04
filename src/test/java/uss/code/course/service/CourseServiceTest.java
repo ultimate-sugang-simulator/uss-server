@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uss.code.auth.dto.request.SignUpRequest;
 import uss.code.course.domain.*;
+import uss.code.course.dto.response.GeneralEducationCourseResponse;
+import uss.code.course.dto.response.GeneralEducationCoursesResponse;
 import uss.code.course.dto.response.MajorCourseResponse;
 import uss.code.course.dto.response.MajorCoursesResponse;
 import uss.code.course.fixture.CourseFixture;
@@ -21,6 +23,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
 import static uss.code.global.exception.domain.ExceptionCode.MEMBER_NOT_FOUND;
 
 @IntegrationTest
@@ -204,6 +207,210 @@ class CourseServiceTest {
             assertThatThrownBy(() -> courseService.getMajorCourses(invalidMemberId))
                     .isInstanceOf(RestApiException.class)
                     .hasFieldOrPropertyWithValue("exceptionCode", MEMBER_NOT_FOUND);
+        }
+    }
+
+    @Nested
+    class 교양_과목_조회_테스트 {
+
+        @BeforeEach
+        void setUp() {
+            // 핵심교양 과목 2개
+            Course coreLiberalArts1 = CourseFixture.createCourse(
+                    "글쓰기", "Writing", "GEN101",
+                    CourseCollege.GENERAL_EDUCATION, CourseDepartment.GENERAL_EDUCATION,
+                    CourseClassification.CORE_LIBERAL_ARTS, CourseArea.CORE_LIBERAL_ARTS,
+                    CourseType.LECTURE, CourseGrade.ALL,
+                    "이교수", "인문관101",
+                    3, false, 50, 30
+            );
+            Course coreLiberalArts2 = CourseFixture.createCourse(
+                    "영어회화", "English Conversation", "GEN102",
+                    CourseCollege.GENERAL_EDUCATION, CourseDepartment.GENERAL_EDUCATION,
+                    CourseClassification.CORE_LIBERAL_ARTS, CourseArea.CORE_LIBERAL_ARTS,
+                    CourseType.LECTURE, CourseGrade.ALL,
+                    null, null,
+                    2, true, 40, 20
+            );
+
+            // 기초교양 과목 2개
+            Course basicLiberalArts1 = CourseFixture.createCourse(
+                    "인간과철학", "Human and Philosophy", "GEN201",
+                    CourseCollege.GENERAL_EDUCATION, CourseDepartment.GENERAL_EDUCATION,
+                    CourseClassification.BASIC_LIBERAL_ARTS, CourseArea.BASIC_LIBERAL_ARTS,
+                    CourseType.LECTURE, CourseGrade.ALL,
+                    "박교수", "인문관201",
+                    3, false, 45, 25
+            );
+            Course basicLiberalArts2 = CourseFixture.createCourse(
+                    "수학의이해", "Understanding Mathematics", "GEN202",
+                    CourseCollege.GENERAL_EDUCATION, CourseDepartment.GENERAL_EDUCATION,
+                    CourseClassification.BASIC_LIBERAL_ARTS, CourseArea.BASIC_LIBERAL_ARTS,
+                    CourseType.LECTURE, CourseGrade.ALL,
+                    "최교수", "자연관101",
+                    3, false, 40, 15
+            );
+
+            // 심화교양 과목 1개
+            Course advancedLiberalArts = CourseFixture.createCourse(
+                    "현대사회와윤리", "Modern Society and Ethics", "GEN301",
+                    CourseCollege.GENERAL_EDUCATION, CourseDepartment.GENERAL_EDUCATION,
+                    CourseClassification.ADVANCED_LIBERAL_ARTS, CourseArea.ADVANCED_LIBERAL_ARTS,
+                    CourseType.LECTURE, CourseGrade.ALL,
+                    "김교수", "인문관301",
+                    3, false, 35, 20
+            );
+
+            // 전공 과목 (교양이 아님)
+            Course majorCourse = CourseFixture.createCourse(
+                    "데이터구조", "Data Structure", "COM101",
+                    CourseCollege.INFORMATION_TECHNOLOGY, CourseDepartment.COMPUTER_ENGINEERING,
+                    CourseClassification.MAJOR_CORE, CourseArea.MAJOR_CORE,
+                    CourseType.LECTURE, CourseGrade.SOPHOMORE,
+                    "홍교수", "공학관101",
+                    3, false, 50, 40
+            );
+
+            // 스케줄 추가
+            CourseSchedule schedule1 = CourseScheduleFixture.createCourseSchedule(
+                    coreLiberalArts1, "월1,2", CourseDay.MONDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+            );
+            CourseSchedule schedule2 = CourseScheduleFixture.createCourseSchedule(
+                    coreLiberalArts1, "수1,2", CourseDay.WEDNESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+            );
+            CourseSchedule schedule3 = CourseScheduleFixture.createCourseSchedule(
+                    basicLiberalArts1, "화3,4", CourseDay.TUESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+            );
+
+            coreLiberalArts1.addCourseSchedule(schedule1);
+            coreLiberalArts1.addCourseSchedule(schedule2);
+            basicLiberalArts1.addCourseSchedule(schedule3);
+
+            courseRepository.saveAll(List.of(
+                    coreLiberalArts1, coreLiberalArts2,
+                    basicLiberalArts1, basicLiberalArts2,
+                    advancedLiberalArts,
+                    majorCourse
+            ));
+        }
+
+        @Test
+        void 핵심교양_영역으로_조회하면_해당_영역의_과목만_반환된다() {
+            //given
+            final String courseArea = "CORE_LIBERAL_ARTS";
+
+            //when
+            final GeneralEducationCoursesResponse response = courseService.getGeneralEducationCourses(courseArea);
+
+            //then
+            assertThat(response.generalEducationCourseResponses()).hasSize(2);
+            assertThat(response.generalEducationCourseResponses())
+                    .extracting(GeneralEducationCourseResponse::courseArea)
+                    .containsOnly("핵심교양");
+        }
+
+        @Test
+        void 기초교양_영역으로_조회하면_해당_영역의_과목만_반환된다() {
+            //given
+            final String courseArea = "BASIC_LIBERAL_ARTS";
+
+            //when
+            final GeneralEducationCoursesResponse response = courseService.getGeneralEducationCourses(courseArea);
+
+            //then
+            assertThat(response.generalEducationCourseResponses()).hasSize(2);
+            assertThat(response.generalEducationCourseResponses())
+                    .extracting(GeneralEducationCourseResponse::courseArea)
+                    .containsOnly("기초교양");
+        }
+
+        @Test
+        void 심화교양_영역으로_조회하면_해당_영역의_과목만_반환된다() {
+            //given
+            final String courseArea = "ADVANCED_LIBERAL_ARTS";
+
+            //when
+            final GeneralEducationCoursesResponse response = courseService.getGeneralEducationCourses(courseArea);
+
+            //then
+            assertThat(response.generalEducationCourseResponses()).hasSize(1);
+            assertThat(response.generalEducationCourseResponses())
+                    .extracting(GeneralEducationCourseResponse::courseArea)
+                    .containsOnly("심화교양");
+        }
+
+        @Test
+        void 스케줄이_있는_교양_과목은_요일순으로_정렬되어_반환된다() {
+            //given
+            final String courseArea = "CORE_LIBERAL_ARTS";
+
+            //when
+            final GeneralEducationCoursesResponse response = courseService.getGeneralEducationCourses(courseArea);
+
+            //then
+            final GeneralEducationCourseResponse coreLiberalArts1 = response.generalEducationCourseResponses().stream()
+                    .filter(c -> c.courseCode().equals("GEN101"))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(coreLiberalArts1.schedule()).isEqualTo("월1,2, 수1,2");
+        }
+
+        @Test
+        void 스케줄이_없는_교양_과목은_하이픈으로_반환된다() {
+            //given
+            final String courseArea = "CORE_LIBERAL_ARTS";
+
+            //when
+            final GeneralEducationCoursesResponse response = courseService.getGeneralEducationCourses(courseArea);
+
+            //then
+            final GeneralEducationCourseResponse coreLiberalArts2 = response.generalEducationCourseResponses().stream()
+                    .filter(c -> c.courseCode().equals("GEN102"))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(coreLiberalArts2.schedule()).isEqualTo("-");
+        }
+
+        @Test
+        void null값인_교수명과_강의실은_하이픈으로_반환된다() {
+            //given
+            final String courseArea = "CORE_LIBERAL_ARTS";
+
+            //when
+            final GeneralEducationCoursesResponse response = courseService.getGeneralEducationCourses(courseArea);
+
+            //then
+            final GeneralEducationCourseResponse coreLiberalArts2 = response.generalEducationCourseResponses().stream()
+                    .filter(c -> c.courseCode().equals("GEN102"))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(coreLiberalArts2.professor()).isEqualTo("-");
+            assertThat(coreLiberalArts2.classroom()).isEqualTo("-");
+        }
+
+        @Test
+        void 전공_과목은_교양_조회시_포함되지_않는다() {
+            //given
+            final String courseArea = "CORE_LIBERAL_ARTS";
+
+            //when
+            final GeneralEducationCoursesResponse response = courseService.getGeneralEducationCourses(courseArea);
+
+            //then
+            assertThat(response.generalEducationCourseResponses())
+                    .extracting(GeneralEducationCourseResponse::courseCode)
+                    .doesNotContain("COM101");
+        }
+
+        @Test
+        void 잘못된_교양_영역으로_조회하면_예외가_발생한다() {
+            //given
+            final String invalidCourseArea = "INVALID_AREA";
+
+            //when & then
+            assertThatThrownBy(() -> courseService.getGeneralEducationCourses(invalidCourseArea))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", INVALID_ENUM_TYPE);
         }
     }
 }

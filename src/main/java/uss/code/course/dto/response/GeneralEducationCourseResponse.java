@@ -6,9 +6,9 @@ import uss.code.course.domain.Course;
 import static lombok.AccessLevel.PRIVATE;
 
 @Builder(access = PRIVATE)
-public record MajorCourseResponse(
-        String courseGrade,
+public record GeneralEducationCourseResponse(
         String courseClassification,
+        String courseArea,
         String courseCode,
         String courseTitleKr,
         String courseTitleEn,
@@ -16,14 +16,13 @@ public record MajorCourseResponse(
         boolean isEnglishCourse,
         String schedule,
         String classroom,
-        String department,
         String professor,
         boolean isRegisterable
 ) {
-    public static MajorCourseResponse from(final Course course) {
-        return MajorCourseResponse.builder()
-                .courseGrade(course.getCourseGrade().getName())
+    public static GeneralEducationCourseResponse from(final Course course) {
+        return GeneralEducationCourseResponse.builder()
                 .courseClassification(course.getCourseClassification().getName())
+                .courseArea(course.getCourseArea().getName())
                 .courseCode(course.getCourseCode())
                 .courseTitleKr(course.getTitleKr())
                 .courseTitleEn(course.getTitleEn())
@@ -31,7 +30,6 @@ public record MajorCourseResponse(
                 .isEnglishCourse(course.isEnglishCourse())
                 .schedule(course.getFormattedCourseSchedules())
                 .classroom(course.getClassroom() != null ? course.getClassroom() : "-")
-                .department(course.getCourseDepartment().getName())
                 .professor(course.getProfessorName() != null ? course.getProfessorName() : "-")
                 .isRegisterable(course.isRegisterable())
                 .build();

@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uss.code.course.domain.Course;
+import uss.code.course.domain.CourseArea;
 import uss.code.course.domain.CourseDepartment;
+import uss.code.course.dto.response.GeneralEducationCourseResponse;
+import uss.code.course.dto.response.GeneralEducationCoursesResponse;
 import uss.code.course.dto.response.MajorCourseResponse;
 import uss.code.course.dto.response.MajorCoursesResponse;
 import uss.code.course.repository.CourseRepository;
@@ -37,5 +40,16 @@ public class CourseService {
                 .toList();
 
         return MajorCoursesResponse.of(majorCourseResponses);
+    }
+
+    @Transactional(readOnly = true)
+    public GeneralEducationCoursesResponse getGeneralEducationCourses(final String courseArea) {
+        final List<Course> courses = courseRepository.findByCourseArea(CourseArea.from(courseArea));
+
+        final List<GeneralEducationCourseResponse> generalEducationCourseResponses = courses.stream()
+                .map(GeneralEducationCourseResponse::from)
+                .toList();
+
+        return GeneralEducationCoursesResponse.of(generalEducationCourseResponses);
     }
 }

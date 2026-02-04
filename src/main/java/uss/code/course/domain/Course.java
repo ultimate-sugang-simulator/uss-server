@@ -97,4 +97,8 @@ public class Course {
         this.courseSchedules.add(courseSchedule);
     }
 
+    public boolean isRegisterable(){
+        return (currentEnrollment < maxCapacity);
+    }
+
 }
