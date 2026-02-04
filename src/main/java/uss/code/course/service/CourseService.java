@@ -44,7 +44,7 @@ public class CourseService {
 
     @Transactional(readOnly = true)
     public GeneralEducationCoursesResponse getGeneralEducationCourses(final String courseArea) {
-        final List<Course> courses = courseRepository.findByCourseArea(CourseArea.from(courseArea));
+        final List<Course> courses = courseRepository.findByCourseArea(CourseArea.fromGeneralEducation(courseArea));
 
         final List<GeneralEducationCourseResponse> generalEducationCourseResponses = courses.stream()
                 .map(GeneralEducationCourseResponse::from)

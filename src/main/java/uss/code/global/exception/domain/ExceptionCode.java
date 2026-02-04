@@ -42,7 +42,10 @@ public enum ExceptionCode {
     VERIFICATION_CODE_EXPIRED(BAD_REQUEST, 1019, "인증코드가 만료되었습니다."),
     VERIFICATION_CODE_NOT_MATCH(BAD_REQUEST, 1020, "인증코드가 일치하지 않습니다."),
     VERIFICATION_RESEND_LIMIT_EXCEEDED(BAD_REQUEST, 1021, "인증코드 재전송 횟수를 초과했습니다."),
-    VERIFICATION_FAILED_LIMIT_EXCEEDED(BAD_REQUEST, 1022, "인증 실패 횟수를 초과했습니다.");
+    VERIFICATION_FAILED_LIMIT_EXCEEDED(BAD_REQUEST, 1022, "인증 실패 횟수를 초과했습니다."),
+
+    // 과목
+    INVALID_GENERAL_EDUCATION_AREA(BAD_REQUEST, 2000, "유효하지 않은 교양 영역입니다.");
 
     private final HttpStatus status;
     private final int code;
