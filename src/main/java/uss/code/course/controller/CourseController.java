@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uss.code.auth.annotation.Auth;
 import uss.code.course.dto.response.GeneralEducationCoursesResponse;
+import uss.code.course.dto.response.InterdisciplinaryMajorCoursesResponse;
 import uss.code.course.dto.response.MajorCoursesResponse;
 import uss.code.course.service.CourseService;
 
@@ -31,5 +32,10 @@ public class CourseController {
     @GetMapping("/other-department")
     public ResponseEntity<MajorCoursesResponse> getOtherDepartmentCourses(@RequestParam("department") final String department){
         return ResponseEntity.ok(courseService.getOtherDepartmentCourses(department));
+    }
+
+    @GetMapping("/interdisciplinary-major")
+    public ResponseEntity<InterdisciplinaryMajorCoursesResponse> getInterdisciplinaryMajorCourses(@RequestParam("department") final String department){
+        return ResponseEntity.ok(courseService.getInterdisciplinaryMajorCourses(department));
     }
 }

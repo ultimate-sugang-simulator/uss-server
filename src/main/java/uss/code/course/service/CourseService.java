@@ -8,6 +8,8 @@ import uss.code.course.domain.CourseArea;
 import uss.code.course.domain.CourseDepartment;
 import uss.code.course.dto.response.GeneralEducationCourseResponse;
 import uss.code.course.dto.response.GeneralEducationCoursesResponse;
+import uss.code.course.dto.response.InterdisciplinaryMajorCourseResponse;
+import uss.code.course.dto.response.InterdisciplinaryMajorCoursesResponse;
 import uss.code.course.dto.response.MajorCourseResponse;
 import uss.code.course.dto.response.MajorCoursesResponse;
 import uss.code.course.repository.CourseRepository;
@@ -32,7 +34,7 @@ public class CourseService {
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
         final List<Course> courses = courseRepository.findByCourseDepartment(
-                CourseDepartment.fromMemberDepartment(member.getMemberDepartment())
+                CourseDepartment.from(member.getMemberDepartment())
         );
 
         final List<MajorCourseResponse> majorCourseResponses = courses.stream()
@@ -64,5 +66,18 @@ public class CourseService {
                 .toList();
 
         return MajorCoursesResponse.of(majorCourseResponses);
+    }
+
+    @Transactional(readOnly = true)
+    public InterdisciplinaryMajorCoursesResponse getInterdisciplinaryMajorCourses(final String department) {
+        final CourseDepartment courseDepartment = CourseDepartment.fromInterdisciplinary(department);
+
+        final List<Course> courses = courseRepository.findByCourseDepartment(courseDepartment);
+
+        final List<InterdisciplinaryMajorCourseResponse> interdisciplinaryMajorCoursesResponses = courses.stream()
+                .map(InterdisciplinaryMajorCourseResponse::from)
+                .toList();
+
+        return InterdisciplinaryMajorCoursesResponse.of(interdisciplinaryMajorCoursesResponses);
     }
 }

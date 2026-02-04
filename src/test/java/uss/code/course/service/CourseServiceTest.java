@@ -8,6 +8,8 @@ import uss.code.auth.dto.request.SignUpRequest;
 import uss.code.course.domain.*;
 import uss.code.course.dto.response.GeneralEducationCourseResponse;
 import uss.code.course.dto.response.GeneralEducationCoursesResponse;
+import uss.code.course.dto.response.InterdisciplinaryMajorCourseResponse;
+import uss.code.course.dto.response.InterdisciplinaryMajorCoursesResponse;
 import uss.code.course.dto.response.MajorCourseResponse;
 import uss.code.course.dto.response.MajorCoursesResponse;
 import uss.code.course.fixture.CourseFixture;
@@ -25,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
 import static uss.code.global.exception.domain.ExceptionCode.INVALID_GENERAL_EDUCATION_AREA;
+import static uss.code.global.exception.domain.ExceptionCode.INVALID_INTERDISCIPLINARY_DEPARTMENT;
 import static uss.code.global.exception.domain.ExceptionCode.MEMBER_NOT_FOUND;
 
 @IntegrationTest
@@ -578,6 +581,227 @@ class CourseServiceTest {
             assertThatThrownBy(() -> courseService.getOtherDepartmentCourses(invalidDepartment))
                     .isInstanceOf(RestApiException.class)
                     .hasFieldOrPropertyWithValue("exceptionCode", INVALID_ENUM_TYPE);
+        }
+    }
+
+    @Nested
+    class 학제간융합전공_과목_조회_테스트 {
+
+        @BeforeEach
+        void setUp() {
+            // 소셜데이터사이언스 연계전공 과목들
+            // 전학년 과목 2개
+            Course socialDataAllGrade1 = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "빅데이터분석", "Big Data Analysis", "SDS101",
+                    CourseDepartment.SOCIAL_DATA_SCIENCE,
+                    CourseGrade.ALL, "김교수", "융합관101"
+            );
+            Course socialDataAllGrade2 = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "데이터사이언스개론", "Intro to Data Science", "SDS102",
+                    CourseDepartment.SOCIAL_DATA_SCIENCE,
+                    CourseGrade.ALL, null, null
+            );
+
+            // 1학년 과목 2개
+            Course socialDataFreshman1 = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "통계학기초", "Basic Statistics", "SDS201",
+                    CourseDepartment.SOCIAL_DATA_SCIENCE,
+                    CourseGrade.FRESHMAN, "이교수", "융합관201"
+            );
+            Course socialDataFreshman2 = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "프로그래밍입문", "Programming Intro", "SDS202",
+                    CourseDepartment.SOCIAL_DATA_SCIENCE,
+                    CourseGrade.FRESHMAN, "박교수", null
+            );
+
+            // 2학년 과목 2개
+            Course socialDataSophomore1 = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "머신러닝", "Machine Learning", "SDS301",
+                    CourseDepartment.SOCIAL_DATA_SCIENCE,
+                    CourseGrade.SOPHOMORE, null, "융합관301"
+            );
+            Course socialDataSophomore2 = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "데이터시각화", "Data Visualization", "SDS302",
+                    CourseDepartment.SOCIAL_DATA_SCIENCE,
+                    CourseGrade.SOPHOMORE, "최교수", "융합관302"
+            );
+
+            // 미래자동차 연계전공 과목 (다른 연계전공)
+            Course futureAutoCourse = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "자율주행개론", "Intro to Autonomous Driving", "FA101",
+                    CourseDepartment.FUTURE_AUTOMOBILE,
+                    CourseGrade.SOPHOMORE, "정교수", "융합관401"
+            );
+
+            // 일반 학과 과목 (컴퓨터공학부)
+            Course cseCourse = CourseFixture.createCourseWithDetails(
+                    "자료구조", "Data Structure", "CSE101",
+                    CourseGrade.SOPHOMORE, "홍교수", "공학관101"
+            );
+
+            // 스케줄 추가
+            CourseSchedule schedule1 = CourseScheduleFixture.createCourseSchedule(
+                    socialDataAllGrade1, "월1,2", CourseDay.MONDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+            );
+            CourseSchedule schedule2 = CourseScheduleFixture.createCourseSchedule(
+                    socialDataAllGrade1, "수1,2", CourseDay.WEDNESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+            );
+            CourseSchedule schedule3 = CourseScheduleFixture.createCourseSchedule(
+                    socialDataFreshman1, "화3,4", CourseDay.TUESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+            );
+
+            socialDataAllGrade1.addCourseSchedule(schedule1);
+            socialDataAllGrade1.addCourseSchedule(schedule2);
+            socialDataFreshman1.addCourseSchedule(schedule3);
+
+            courseRepository.saveAll(List.of(
+                    socialDataAllGrade1, socialDataAllGrade2,
+                    socialDataFreshman1, socialDataFreshman2,
+                    socialDataSophomore1, socialDataSophomore2,
+                    futureAutoCourse,
+                    cseCourse
+            ));
+        }
+
+        @Test
+        void 소셜데이터사이언스_학과코드로_조회하면_해당_연계전공_과목만_반환된다() {
+            //given
+            final String department = "SOCIAL_DATA_SCIENCE";
+
+            //when
+            final InterdisciplinaryMajorCoursesResponse response = courseService.getInterdisciplinaryMajorCourses(department);
+
+            //then
+            assertThat(response.interdisciplinaryMajorCourseResponses()).hasSize(6);
+            assertThat(response.interdisciplinaryMajorCourseResponses())
+                    .extracting(InterdisciplinaryMajorCourseResponse::courseCode)
+                    .containsExactlyInAnyOrder("SDS101", "SDS102", "SDS201", "SDS202", "SDS301", "SDS302");
+        }
+
+        @Test
+        void 전학년_1학년_2학년_순서로_정렬되어_조회된다() {
+            //given
+            final String department = "SOCIAL_DATA_SCIENCE";
+
+            //when
+            final InterdisciplinaryMajorCoursesResponse response = courseService.getInterdisciplinaryMajorCourses(department);
+            final List<String> grades = response.interdisciplinaryMajorCourseResponses().stream()
+                    .map(InterdisciplinaryMajorCourseResponse::courseGrade)
+                    .toList();
+
+            //then
+            assertThat(grades).containsExactly(
+                    "전학년", "전학년",  // SDS101, SDS102
+                    "1학년", "1학년",    // SDS201, SDS202
+                    "2학년", "2학년"     // SDS301, SDS302
+            );
+        }
+
+        @Test
+        void 스케줄이_있는_과목은_요일순으로_정렬되어_반환된다() {
+            //given
+            final String department = "SOCIAL_DATA_SCIENCE";
+
+            //when
+            final InterdisciplinaryMajorCoursesResponse response = courseService.getInterdisciplinaryMajorCourses(department);
+
+            //then
+            // SDS101: 월1,2, 수1,2
+            final InterdisciplinaryMajorCourseResponse allGrade1 = response.interdisciplinaryMajorCourseResponses().stream()
+                    .filter(c -> c.courseCode().equals("SDS101"))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(allGrade1.schedule()).isEqualTo("월1,2, 수1,2");
+
+            // SDS201: 화3,4
+            final InterdisciplinaryMajorCourseResponse freshman1 = response.interdisciplinaryMajorCourseResponses().stream()
+                    .filter(c -> c.courseCode().equals("SDS201"))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(freshman1.schedule()).isEqualTo("화3,4");
+        }
+
+        @Test
+        void 스케줄이_없는_과목은_하이픈으로_반환된다() {
+            //given
+            final String department = "SOCIAL_DATA_SCIENCE";
+
+            //when
+            final InterdisciplinaryMajorCoursesResponse response = courseService.getInterdisciplinaryMajorCourses(department);
+
+            //then
+            final InterdisciplinaryMajorCourseResponse allGrade2 = response.interdisciplinaryMajorCourseResponses().stream()
+                    .filter(c -> c.courseCode().equals("SDS102"))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(allGrade2.schedule()).isEqualTo("-");
+        }
+
+        @Test
+        void null값인_교수명과_강의실은_하이픈으로_반환된다() {
+            //given
+            final String department = "SOCIAL_DATA_SCIENCE";
+
+            //when
+            final InterdisciplinaryMajorCoursesResponse response = courseService.getInterdisciplinaryMajorCourses(department);
+
+            //then
+            final InterdisciplinaryMajorCourseResponse allGrade2 = response.interdisciplinaryMajorCourseResponses().stream()
+                    .filter(c -> c.courseCode().equals("SDS102"))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(allGrade2.professor()).isEqualTo("-");
+            assertThat(allGrade2.classroom()).isEqualTo("-");
+        }
+
+        @Test
+        void 다른_연계전공_과목은_조회되지_않는다() {
+            //given
+            final String department = "SOCIAL_DATA_SCIENCE";
+
+            //when
+            final InterdisciplinaryMajorCoursesResponse response = courseService.getInterdisciplinaryMajorCourses(department);
+
+            //then
+            assertThat(response.interdisciplinaryMajorCourseResponses())
+                    .extracting(InterdisciplinaryMajorCourseResponse::courseCode)
+                    .doesNotContain("FA101");
+        }
+
+        @Test
+        void 일반_학과_과목은_조회되지_않는다() {
+            //given
+            final String department = "SOCIAL_DATA_SCIENCE";
+
+            //when
+            final InterdisciplinaryMajorCoursesResponse response = courseService.getInterdisciplinaryMajorCourses(department);
+
+            //then
+            assertThat(response.interdisciplinaryMajorCourseResponses())
+                    .extracting(InterdisciplinaryMajorCourseResponse::courseCode)
+                    .doesNotContain("CSE101");
+        }
+
+        @Test
+        void 잘못된_학과_코드로_조회하면_예외가_발생한다() {
+            //given
+            final String invalidDepartment = "INVALID_DEPARTMENT";
+
+            //when & then
+            assertThatThrownBy(() -> courseService.getInterdisciplinaryMajorCourses(invalidDepartment))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", INVALID_ENUM_TYPE);
+        }
+
+        @Test
+        void 일반_학과_코드로_조회하면_예외가_발생한다() {
+            //given
+            final String normalDepartment = "COMPUTER_ENGINEERING";
+
+            //when & then
+            assertThatThrownBy(() -> courseService.getInterdisciplinaryMajorCourses(normalDepartment))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", INVALID_INTERDISCIPLINARY_DEPARTMENT);
         }
     }
 }

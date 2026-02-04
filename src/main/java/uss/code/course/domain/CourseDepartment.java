@@ -6,6 +6,7 @@ import uss.code.global.exception.domain.RestApiException;
 import uss.code.member.domain.MemberDepartment;
 
 import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
+import static uss.code.global.exception.domain.ExceptionCode.INVALID_INTERDISCIPLINARY_DEPARTMENT;
 
 @Getter
 @RequiredArgsConstructor
@@ -146,11 +147,35 @@ public enum CourseDepartment {
         }
     }
 
-    public static CourseDepartment fromMemberDepartment(final MemberDepartment memberDepartment){
+    public static CourseDepartment from(final MemberDepartment memberDepartment){
         try{
             return CourseDepartment.valueOf(memberDepartment.name());
         }catch (IllegalArgumentException e){
             throw new RestApiException(INVALID_ENUM_TYPE);
         }
+    }
+
+    public static CourseDepartment fromInterdisciplinary(final String department){
+        final CourseDepartment courseDepartment = CourseDepartment.from(department);
+
+        if(!courseDepartment.isInterdisciplinary()){
+            throw new RestApiException(INVALID_INTERDISCIPLINARY_DEPARTMENT);
+        }
+
+        return courseDepartment;
+    }
+
+
+    private boolean isInterdisciplinary(){
+        return this == OPTOELECTRONICS ||
+                this == LOGISTICS ||
+                this == INTERNATIONAL_DEVELOPMENT_COOPERATION ||
+                this == CREATIVE_DESIGN ||
+                this == HUMANITIES_CULTURE_ART_PLANNING ||
+                this == SOCIAL_DATA_SCIENCE ||
+                this == FUTURE_AUTOMOBILE ||
+                this == FUTURE_EDUCATION_DESIGN ||
+                this == HUSS_INCLUSIVE_SOCIETY_INITIATIVE ||
+                this == HUSS_OTHER_UNIVERSITY;
     }
 }

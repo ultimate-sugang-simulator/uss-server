@@ -2,10 +2,10 @@ package uss.code.course.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import uss.code.global.exception.domain.ExceptionCode;
 import uss.code.global.exception.domain.RestApiException;
 
 import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
+import static uss.code.global.exception.domain.ExceptionCode.INVALID_GENERAL_EDUCATION_AREA;
 
 @Getter
 @RequiredArgsConstructor
@@ -49,13 +49,13 @@ public enum CourseArea {
         final CourseArea area = from(courseArea);
 
         if (!area.isGeneralEducationArea()) {
-            throw new RestApiException(ExceptionCode.INVALID_GENERAL_EDUCATION_AREA);
+            throw new RestApiException(INVALID_GENERAL_EDUCATION_AREA);
         }
 
         return area;
     }
 
-    public boolean isGeneralEducationArea() {
+    private boolean isGeneralEducationArea() {
         return this == CORE_INU_SEMINAR ||
                 this == CORE_HUMANITIES ||
                 this == CORE_SOCIAL ||

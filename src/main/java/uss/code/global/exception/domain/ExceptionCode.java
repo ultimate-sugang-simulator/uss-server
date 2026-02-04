@@ -45,7 +45,8 @@ public enum ExceptionCode {
     VERIFICATION_FAILED_LIMIT_EXCEEDED(BAD_REQUEST, 1022, "인증 실패 횟수를 초과했습니다."),
 
     // 과목
-    INVALID_GENERAL_EDUCATION_AREA(BAD_REQUEST, 2000, "유효하지 않은 교양 영역입니다.");
+    INVALID_GENERAL_EDUCATION_AREA(BAD_REQUEST, 2000, "유효하지 않은 교양 영역입니다."),
+    INVALID_INTERDISCIPLINARY_DEPARTMENT(BAD_REQUEST, 2001, "유효하지 않은 연계전공과목입니다.");
 
     private final HttpStatus status;
     private final int code;
