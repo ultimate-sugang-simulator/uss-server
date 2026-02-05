@@ -29,17 +29,26 @@ public class CourseController {
     }
 
     @GetMapping("/general-education")
-    public ResponseEntity<GeneralEducationCoursesResponse> getGeneralEducationCourses(@RequestParam("course-area") final String courseArea){
+    public ResponseEntity<GeneralEducationCoursesResponse> getGeneralEducationCourses(
+            @ParamValidation(maxLength = 30)
+            @RequestParam("course-area") final String courseArea
+    ){
         return ResponseEntity.ok(courseService.getGeneralEducationCourses(courseArea));
     }
 
     @GetMapping("/other-department")
-    public ResponseEntity<MajorCoursesResponse> getOtherDepartmentCourses(@RequestParam("department") final String department){
+    public ResponseEntity<MajorCoursesResponse> getOtherDepartmentCourses(
+            @ParamValidation(maxLength = 30)
+            @RequestParam("department") final String department
+    ){
         return ResponseEntity.ok(courseService.getOtherDepartmentCourses(department));
     }
 
     @GetMapping("/interdisciplinary-major")
-    public ResponseEntity<InterdisciplinaryMajorCoursesResponse> getInterdisciplinaryMajorCourses(@RequestParam("department") final String department){
+    public ResponseEntity<InterdisciplinaryMajorCoursesResponse> getInterdisciplinaryMajorCourses(
+            @ParamValidation(maxLength = 30)
+            @RequestParam("department") final String department
+    ){
         return ResponseEntity.ok(courseService.getInterdisciplinaryMajorCourses(department));
     }
 
