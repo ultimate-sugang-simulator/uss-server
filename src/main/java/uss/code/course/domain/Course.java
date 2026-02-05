@@ -90,7 +90,7 @@ public class Course {
         return courseSchedules.stream()
                 .sorted(Comparator.comparing(CourseSchedule::getCourseDay))
                 .map(CourseSchedule::getScheduleText)
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(" "));
     }
 
     public void addCourseSchedule(CourseSchedule courseSchedule) {

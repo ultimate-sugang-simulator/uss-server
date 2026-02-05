@@ -12,6 +12,8 @@ import uss.code.course.dto.response.InterdisciplinaryMajorCourseResponse;
 import uss.code.course.dto.response.InterdisciplinaryMajorCoursesResponse;
 import uss.code.course.dto.response.MajorCourseResponse;
 import uss.code.course.dto.response.MajorCoursesResponse;
+import uss.code.course.dto.response.SearchedCourseResponse;
+import uss.code.course.dto.response.SearchedCoursesResponse;
 import uss.code.course.repository.CourseRepository;
 import uss.code.global.exception.domain.RestApiException;
 import uss.code.member.domain.Member;
@@ -79,5 +81,16 @@ public class CourseService {
                 .toList();
 
         return InterdisciplinaryMajorCoursesResponse.of(interdisciplinaryMajorCoursesResponses);
+    }
+
+    @Transactional(readOnly = true)
+    public SearchedCoursesResponse searchCourses(final String keyword) {
+        final List<Course> courses = courseRepository.findByKeyword(keyword);
+
+        final List<SearchedCourseResponse> searchedCourseResponses = courses.stream()
+                .map(SearchedCourseResponse::from)
+                .toList();
+
+        return SearchedCoursesResponse.of(searchedCourseResponses);
     }
 }

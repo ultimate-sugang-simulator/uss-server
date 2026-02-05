@@ -10,6 +10,7 @@ import uss.code.auth.annotation.Auth;
 import uss.code.course.dto.response.GeneralEducationCoursesResponse;
 import uss.code.course.dto.response.InterdisciplinaryMajorCoursesResponse;
 import uss.code.course.dto.response.MajorCoursesResponse;
+import uss.code.course.dto.response.SearchedCoursesResponse;
 import uss.code.course.service.CourseService;
 
 @RestController
@@ -37,5 +38,10 @@ public class CourseController {
     @GetMapping("/interdisciplinary-major")
     public ResponseEntity<InterdisciplinaryMajorCoursesResponse> getInterdisciplinaryMajorCourses(@RequestParam("department") final String department){
         return ResponseEntity.ok(courseService.getInterdisciplinaryMajorCourses(department));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<SearchedCoursesResponse> searchCourses(@RequestParam("keyword") final String keyword){
+        return ResponseEntity.ok(courseService.searchCourses(keyword));
     }
 }

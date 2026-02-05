@@ -15,9 +15,27 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         FROM Course c
         LEFT JOIN FETCH c.courseSchedules
         WHERE c.courseDepartment = :course_department
-        ORDER BY c.courseGrade, c.courseCode
+        ORDER BY c.courseGrade
     """)
     List<Course> findByCourseDepartment(@Param("course_department") final CourseDepartment courseDepartment);
 
-    List<Course> findByCourseArea(CourseArea courseArea);
+    @Query("""
+        SELECT DISTINCT c
+        FROM Course c
+        LEFT JOIN FETCH c.courseSchedules
+        WHERE c.courseArea = :course_area
+        ORDER BY c.courseGrade
+    """)
+    List<Course> findByCourseArea(@Param("course_area") final CourseArea courseArea);
+
+    @Query("""
+        SELECT DISTINCT c
+        FROM Course c
+        LEFT JOIN FETCH c.courseSchedules
+        WHERE LOWER(c.titleKr) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(c.titleEn) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(c.courseCode) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        ORDER BY c.courseGrade, c.courseCode
+    """)
+    List<Course> findByKeyword(@Param("keyword") final String keyword);
 }
