@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,8 +18,8 @@ import java.time.LocalTime;
 
 @Getter
 @Entity
+@NoArgsConstructor
 @Table(name = "course_schedules")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CourseSchedule {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,4 +42,7 @@ public class CourseSchedule {
     @Column(nullable = false, name = "end_time")
     private LocalTime endTime;
 
+    public void addCourse(final Course course) {
+        this.course = course;
+    }
 }

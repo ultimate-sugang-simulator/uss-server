@@ -16,12 +16,11 @@ import uss.code.auth.dto.request.SignUpRequest;
 import java.time.LocalDateTime;
 
 import static lombok.AccessLevel.PRIVATE;
-import static lombok.AccessLevel.PROTECTED;
 
 @Getter
 @Entity
+@NoArgsConstructor
 @Table(name = "members")
-@NoArgsConstructor(access = PROTECTED)
 public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

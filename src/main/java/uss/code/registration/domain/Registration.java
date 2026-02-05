@@ -10,7 +10,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import uss.code.course.domain.Course;
@@ -20,13 +19,13 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
+@NoArgsConstructor
 @Table(
         name = "registrations",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"member_id", "course_id"})
         }
 )
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Registration {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

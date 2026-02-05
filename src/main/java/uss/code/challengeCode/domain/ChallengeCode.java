@@ -9,15 +9,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import uss.code.member.domain.Member;
 
 @Getter
 @Entity
+@NoArgsConstructor
 @Table(name = "challenge_codes")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChallengeCode {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

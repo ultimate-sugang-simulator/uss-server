@@ -12,7 +12,7 @@ public enum ExceptionCode {
     // 전역
     UNEXPECTED_SERVER_ERROR(INTERNAL_SERVER_ERROR, 9999, "서버 내부 오류가 발생했습니다."),
     INVALID_ENUM_TYPE(BAD_REQUEST, 8888, "유효하지 않은 열거타입입니다."),
-
+    INVALID_REQUEST_PARAMETER(BAD_REQUEST, 7777, "유효하지 않은 입력 파라미터입니다."),
     // 액세스 토큰
     MISSING_ACCESS_TOKEN(UNAUTHORIZED, 1000, "액세스 토큰이 누락되었습니다."),
     INVALID_ACCESS_TOKEN(UNAUTHORIZED, 1001, "액세스 토큰이 유효하지 않습니다."),
@@ -42,7 +42,11 @@ public enum ExceptionCode {
     VERIFICATION_CODE_EXPIRED(BAD_REQUEST, 1019, "인증코드가 만료되었습니다."),
     VERIFICATION_CODE_NOT_MATCH(BAD_REQUEST, 1020, "인증코드가 일치하지 않습니다."),
     VERIFICATION_RESEND_LIMIT_EXCEEDED(BAD_REQUEST, 1021, "인증코드 재전송 횟수를 초과했습니다."),
-    VERIFICATION_FAILED_LIMIT_EXCEEDED(BAD_REQUEST, 1022, "인증 실패 횟수를 초과했습니다.");
+    VERIFICATION_FAILED_LIMIT_EXCEEDED(BAD_REQUEST, 1022, "인증 실패 횟수를 초과했습니다."),
+
+    // 과목
+    INVALID_GENERAL_EDUCATION_AREA(BAD_REQUEST, 2000, "유효하지 않은 교양 영역입니다."),
+    INVALID_INTERDISCIPLINARY_DEPARTMENT(BAD_REQUEST, 2001, "유효하지 않은 연계전공과목입니다.");
 
     private final HttpStatus status;
     private final int code;

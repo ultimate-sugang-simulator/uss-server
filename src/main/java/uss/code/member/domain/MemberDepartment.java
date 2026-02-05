@@ -40,15 +40,14 @@ public enum MemberDepartment {
     CONSUMER_SCIENCE(MemberCollege.COMMERCE_PUBLIC_AFFAIRS, "소비자학과"),
 
     // 공과대학
-    ENERGY_CHEMICAL(MemberCollege.ENGINEERING, "에너지화학공학과"),
+    MECHANICAL_ENGINEERING(MemberCollege.ENGINEERING, "기계공학과"),
     ELECTRICAL_ENGINEERING(MemberCollege.ENGINEERING, "전기공학과"),
     ELECTRONICS_ENGINEERING(MemberCollege.ENGINEERING, "전자공학과"),
     INDUSTRIAL_MANAGEMENT(MemberCollege.ENGINEERING, "산업경영공학과"),
     MATERIAL_SCIENCE(MemberCollege.ENGINEERING, "신소재공학과"),
-    MECHANICAL_ENGINEERING(MemberCollege.ENGINEERING, "기계공학과"),
-    BIO_ROBOTICS_ENGINEERING(MemberCollege.ENGINEERING, "바이오-로봇 시스템 공학과"),
     SAFETY_ENGINEERING(MemberCollege.ENGINEERING, "안전공학과"),
-    MECHATRONICS_ENGINEERING(MemberCollege.ENGINEERING, "메카트로닉스공학과"),
+    ENERGY_CHEMICAL(MemberCollege.ENGINEERING, "에너지화학공학과"),
+    BIO_ROBOTICS_ENGINEERING(MemberCollege.ENGINEERING, "바이오-로봇시스템공학과"),
 
     // 정보기술대학
     COMPUTER_ENGINEERING(MemberCollege.INFORMATION_TECHNOLOGY, "컴퓨터공학부"),
@@ -59,7 +58,6 @@ public enum MemberDepartment {
     BUSINESS_ADMINISTRATION(MemberCollege.BUSINESS, "경영학부"),
     DATA_SCIENCE(MemberCollege.BUSINESS, "데이터과학과"),
     TAX_ACCOUNTING(MemberCollege.BUSINESS, "세무회계학과"),
-    TECHNO_MANAGEMENT(MemberCollege.BUSINESS, "테크노경영학과"),
 
     // 예술체육대학
     FINE_ARTS(MemberCollege.ARTS_PHYSICAL_EDUCATION, "조형예술학부"),
@@ -80,7 +78,7 @@ public enum MemberDepartment {
 
     // 도시과학대학
     URBAN_ADMINISTRATION(MemberCollege.URBAN_SCIENCE, "도시행정학과"),
-    CIVIL_ENVIRONMENT_ENGINEERING(MemberCollege.URBAN_SCIENCE, "도시환경학부"),
+    CIVIL_ENVIRONMENT_ENGINEERING(MemberCollege.URBAN_SCIENCE, "도시환경공학부"),
     URBAN_ENGINEERING(MemberCollege.URBAN_SCIENCE, "도시공학과"),
     URBAN_ARCHITECTURE(MemberCollege.URBAN_SCIENCE, "도시건축학부"),
 
@@ -90,13 +88,6 @@ public enum MemberDepartment {
 
     // 융합자유전공대학
     LIBERAL_ARTS(MemberCollege.LIBERAL_ARTS_COLLEGE, "자유전공학부"),
-    INTERNATIONAL_LIBERAL_ARTS(MemberCollege.LIBERAL_ARTS_COLLEGE, "국제자유전공학부"),
-    CONVERGENCE(MemberCollege.LIBERAL_ARTS_COLLEGE, "융합학부"),
-
-    // 동북아국제통상학부
-    NORTHEAST_ASIAN_TRADE(MemberCollege.NORTHEAST_ASIAN_STUDIES, "동북아국제통상전공"),
-    SMART_LOGISTICS_ENGINEERING(MemberCollege.NORTHEAST_ASIAN_STUDIES, "스마트물류공학전공"),
-    IBE(MemberCollege.NORTHEAST_ASIAN_STUDIES, "IBE전공"),
 
     // 법학부
     LAW(MemberCollege.LAW, "법학부");

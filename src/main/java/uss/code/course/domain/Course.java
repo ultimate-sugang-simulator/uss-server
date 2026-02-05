@@ -7,19 +7,30 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static jakarta.persistence.CascadeType.PERSIST;
+import static jakarta.persistence.CascadeType.REMOVE;
+
 @Getter
 @Entity
+@NoArgsConstructor
 @Table(name = "courses")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Course {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToMany(mappedBy = "course", cascade = {PERSIST, REMOVE}, orphanRemoval = true)
+    private List<CourseSchedule> courseSchedules = new ArrayList<>();
 
     @Column(nullable = false, name = "title_kr")
     private String titleKr;
@@ -54,7 +65,7 @@ public class Course {
     @Column(nullable = false, name = "course_grade")
     private CourseGrade courseGrade;
 
-    @Column(nullable = false, name = "professor_name")
+    @Column(name = "professor_name")
     private String professorName;
 
     @Column
@@ -71,5 +82,24 @@ public class Course {
 
     @Column(nullable = false, name = "current_enrollment")
     private int currentEnrollment;
+
+    public String getFormattedCourseSchedules(){
+        if(courseSchedules.isEmpty())
+            return "-";
+
+        return courseSchedules.stream()
+                .sorted(Comparator.comparing(CourseSchedule::getCourseDay))
+                .map(CourseSchedule::getScheduleText)
+                .collect(Collectors.joining(" "));
+    }
+
+    public void addCourseSchedule(final CourseSchedule courseSchedule) {
+        this.courseSchedules.add(courseSchedule);
+        courseSchedule.addCourse(this);
+    }
+
+    public boolean isRegisterable(){
+        return (currentEnrollment < maxCapacity);
+    }
 
 }

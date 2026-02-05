@@ -1,5 +1,6 @@
 package uss.code.global.exception.handler;
 
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -11,6 +12,7 @@ import uss.code.global.exception.domain.RestApiException;
 import uss.code.global.exception.dto.response.ErrorResponse;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static uss.code.global.exception.domain.ExceptionCode.INVALID_REQUEST_PARAMETER;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -35,6 +37,11 @@ public class GlobalExceptionHandler {
         }
 
         return makeExceptionResponse(errorMessages.toString().trim());
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(final ConstraintViolationException e) {
+        return makeExceptionResponse(INVALID_REQUEST_PARAMETER);
     }
 
     @ExceptionHandler(Exception.class)
