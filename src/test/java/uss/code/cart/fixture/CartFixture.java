@@ -28,6 +28,6 @@ public class CartFixture {
     }
 
     private static Long generateRandomId() {
-        return Math.abs(UUID.randomUUID().getMostSignificantBits());
+        return UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
     }
 }

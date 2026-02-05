@@ -42,4 +42,7 @@ public class CourseSchedule {
     @Column(nullable = false, name = "end_time")
     private LocalTime endTime;
 
+    public void addCourse(final Course course) {
+        this.course = course;
+    }
 }

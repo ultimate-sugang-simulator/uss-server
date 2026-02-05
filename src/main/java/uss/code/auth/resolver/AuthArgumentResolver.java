@@ -24,7 +24,7 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
             final NativeWebRequest webRequest,
             final WebDataBinderFactory binderFactory
     ) throws Exception {
-        HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
+        final HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         return request.getAttribute("member-id");
     }
 }

@@ -93,8 +93,9 @@ public class Course {
                 .collect(Collectors.joining(" "));
     }
 
-    public void addCourseSchedule(CourseSchedule courseSchedule) {
+    public void addCourseSchedule(final CourseSchedule courseSchedule) {
         this.courseSchedules.add(courseSchedule);
+        courseSchedule.addCourse(this);
     }
 
     public boolean isRegisterable(){

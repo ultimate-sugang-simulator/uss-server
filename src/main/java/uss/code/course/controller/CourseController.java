@@ -2,6 +2,7 @@ package uss.code.course.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,7 +13,9 @@ import uss.code.course.dto.response.InterdisciplinaryMajorCoursesResponse;
 import uss.code.course.dto.response.MajorCoursesResponse;
 import uss.code.course.dto.response.SearchedCoursesResponse;
 import uss.code.course.service.CourseService;
+import uss.code.global.annotation.ParamValidation;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/courses")
@@ -41,7 +44,10 @@ public class CourseController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<SearchedCoursesResponse> searchCourses(@RequestParam("keyword") final String keyword){
-        return ResponseEntity.ok(courseService.searchCourses(keyword));
+    public ResponseEntity<SearchedCoursesResponse> searchCourses(
+            @ParamValidation(maxLength = 30)
+            @RequestParam("keyword") final String keyword
+    ){
+        return ResponseEntity.ok(courseService.searchCourses(keyword.trim()));
     }
 }
