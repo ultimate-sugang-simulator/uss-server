@@ -2,7 +2,9 @@ package uss.code.cart.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uss.code.auth.annotation.Auth;
@@ -17,7 +19,16 @@ public class CartController {
     private final CartService cartService;
 
     @GetMapping
-    public ResponseEntity<CartedCoursesResponse> getCart(@Auth final long memberId){
-        return ResponseEntity.ok(cartService.getCart(memberId));
+    public ResponseEntity<CartedCoursesResponse> getCartedCourse(@Auth final long memberId){
+        return ResponseEntity.ok(cartService.getCartedCourse(memberId));
+    }
+
+    @DeleteMapping("/{courseId}")
+    public ResponseEntity<Void> deleteCartedCourse(
+            @Auth final long memberId,
+            @PathVariable("courseId") final long courseId
+    ){
+        cartService.deleteCartedCourse(memberId, courseId);
+        return ResponseEntity.noContent().build();
     }
 }

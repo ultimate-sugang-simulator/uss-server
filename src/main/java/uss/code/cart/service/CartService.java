@@ -8,10 +8,13 @@ import uss.code.cart.dto.common.CartCount;
 import uss.code.cart.dto.response.CartedCourseResponse;
 import uss.code.cart.dto.response.CartedCoursesResponse;
 import uss.code.cart.repository.CartRepository;
+import uss.code.global.exception.domain.RestApiException;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static uss.code.global.exception.domain.ExceptionCode.CARTED_COURSE_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +25,7 @@ public class CartService {
     private final CartRepository cartRepository;
 
     @Transactional(readOnly = true)
-    public CartedCoursesResponse getCart(final long memberId) {
+    public CartedCoursesResponse getCartedCourse(final long memberId) {
         final List<Cart> carts = cartRepository.findCartedCoursesByMemberId(memberId);
 
         if (carts.isEmpty()) {
@@ -56,5 +59,16 @@ public class CartService {
                 .map(cart -> cart.getCourse().getId())
                 .distinct()
                 .toList();
+    }
+
+    @Transactional
+    public void deleteCartedCourse(
+            final long memberId,
+            final long courseId
+    ) {
+        final Cart cart = cartRepository.findByMemberIdAndCourseId(memberId, courseId)
+                .orElseThrow(() -> new RestApiException(CARTED_COURSE_NOT_FOUND));
+
+        cartRepository.deleteById(cart.getId());
     }
 }
