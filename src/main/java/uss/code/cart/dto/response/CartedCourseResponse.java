@@ -1,8 +1,13 @@
 package uss.code.cart.dto.response;
 
+import lombok.Builder;
 import uss.code.course.domain.Course;
 
+import static lombok.AccessLevel.PRIVATE;
+
+@Builder(access = PRIVATE)
 public record CartedCourseResponse(
+        Long id,
         String courseClassification,
         String courseCode,
         String courseTitleKr,
@@ -16,18 +21,19 @@ public record CartedCourseResponse(
         String professor
 ) {
     public static CartedCourseResponse of(final Course course, final Long cartCount) {
-        return new CartedCourseResponse(
-                course.getCourseClassification().getName(),
-                course.getCourseCode(),
-                course.getTitleKr(),
-                course.getTitleEn(),
-                course.getCredits(),
-                course.isEnglishCourse(),
-                course.getFormattedCourseSchedules(),
-                course.getClassroom() != null ? course.getClassroom() : "-",
-                course.getCourseDepartment().getName(),
-                cartCount.intValue(),
-                course.getProfessorName() != null ? course.getProfessorName() : "-"
-        );
+        return CartedCourseResponse.builder()
+                .id(course.getId())
+                .courseClassification(course.getCourseClassification().getName())
+                .courseCode(course.getCourseCode())
+                .courseTitleKr(course.getTitleKr())
+                .courseTitleEn(course.getTitleEn())
+                .credits(course.getCredits())
+                .isEnglishCourse(course.isEnglishCourse())
+                .schedule(course.getFormattedCourseSchedules())
+                .classroom(course.getClassroom() != null ? course.getClassroom() : "-")
+                .courseDepartment(course.getCourseDepartment().getName())
+                .cartCount(cartCount.intValue())
+                .professor(course.getProfessorName() != null ? course.getProfessorName() : "-")
+                .build();
     }
 }

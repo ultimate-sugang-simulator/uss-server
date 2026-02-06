@@ -7,6 +7,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Builder(access = PRIVATE)
 public record GeneralEducationCourseResponse(
+        Long id,
         String courseClassification,
         String courseArea,
         String courseCode,
@@ -21,6 +22,7 @@ public record GeneralEducationCourseResponse(
 ) {
     public static GeneralEducationCourseResponse from(final Course course) {
         return GeneralEducationCourseResponse.builder()
+                .id(course.getId())
                 .courseClassification(course.getCourseClassification().getName())
                 .courseArea(course.getCourseArea().getName())
                 .courseCode(course.getCourseCode())
