@@ -46,5 +46,5 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         LEFT JOIN FETCH c.courseSchedules
         WHERE c.id = :id
     """)
-    Optional<Course> findById(@Param("id") final long id);
+    Optional<Course> findByIdWithSchedules(@Param("id") final long id);
 }

@@ -14,7 +14,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
         SELECT c
         FROM Cart c
         JOIN FETCH c.course course
-        LEFT JOIN FETCH  course.courseSchedules
+        LEFT JOIN FETCH course.courseSchedules
         WHERE c.member.id = :memberId
         ORDER BY c.createdAt
     """)
@@ -36,12 +36,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     """)
     Optional<Cart> findByMemberIdAndCourseId(
             @Param("memberId") final long memberId,
-            @Param("courseId") final Long courseId
-    );
-
-    boolean existsByMemberIdAndCourseId(
-            final long memberId,
-            final long courseId
+            @Param("courseId") final long courseId
     );
 
     @Query("""

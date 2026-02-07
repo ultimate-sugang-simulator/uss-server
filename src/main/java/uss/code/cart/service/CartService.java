@@ -55,17 +55,16 @@ public class CartService {
             final long memberId,
             final long courseId
     ) {
-        validateCartLimit(memberId);
-        validateDuplicateCourse(memberId, courseId);
-
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
         final List<Cart> carts = cartRepository.findByMemberId(memberId);
 
-        Course course = courseRepository.findById(courseId)
+        Course course = courseRepository.findByIdWithSchedules(courseId)
                 .orElseThrow(() -> new RestApiException(COURSE_NOT_FOUND));
 
+        validateCartLimit(carts);
+        validateDuplicateCourse(carts, courseId);
         validateCourseScheduleConflict(carts, course);
         validateCourseTypeLimit(carts, course);
 
@@ -103,10 +102,8 @@ public class CartService {
                 .toList();
     }
 
-    private void validateCartLimit(final long memberId) {
-        final int cartedCourseCount = cartRepository.countByMemberId(memberId);
-
-        if (cartedCourseCount >= 10) {
+    private void validateCartLimit(List<Cart> carts) {
+        if (carts.size() >= 10) {
             throw new RestApiException(CARTED_COURSE_LIMIT_EXCEEDED);
         }
     }
@@ -130,10 +127,13 @@ public class CartService {
     }
 
     private void validateDuplicateCourse(
-            final long memberId,
+            final List<Cart> carts,
             final long courseId
     ) {
-        if (cartRepository.existsByMemberIdAndCourseId(memberId, courseId)) {
+        boolean exists = carts.stream()
+                .anyMatch(cart -> cart.getCourse().getId().equals(courseId));
+
+        if (exists) {
             throw new RestApiException(COURSE_ALREADY_IN_CART);
         }
     }
