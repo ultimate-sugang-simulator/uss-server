@@ -1,4 +1,4 @@
-package uss.code.course.dto.response;
+package uss.code.cart.dto.response;
 
 import lombok.Builder;
 import uss.code.course.domain.Course;
@@ -6,9 +6,8 @@ import uss.code.course.domain.Course;
 import static lombok.AccessLevel.PRIVATE;
 
 @Builder(access = PRIVATE)
-public record MajorCourseResponse(
+public record CartedCourseResponse(
         Long id,
-        String courseGrade,
         String courseClassification,
         String courseCode,
         String courseTitleKr,
@@ -17,14 +16,13 @@ public record MajorCourseResponse(
         boolean isEnglishCourse,
         String schedule,
         String classroom,
-        String department,
-        String professor,
-        boolean isRegisterable
+        String courseDepartment,
+        int cartCount,
+        String professor
 ) {
-    public static MajorCourseResponse from(final Course course) {
-        return MajorCourseResponse.builder()
+    public static CartedCourseResponse of(final Course course, final Long cartCount) {
+        return CartedCourseResponse.builder()
                 .id(course.getId())
-                .courseGrade(course.getCourseGrade().getName())
                 .courseClassification(course.getCourseClassification().getName())
                 .courseCode(course.getCourseCode())
                 .courseTitleKr(course.getTitleKr())
@@ -33,9 +31,9 @@ public record MajorCourseResponse(
                 .isEnglishCourse(course.isEnglishCourse())
                 .schedule(course.getFormattedCourseSchedules())
                 .classroom(course.getClassroom() != null ? course.getClassroom() : "-")
-                .department(course.getCourseDepartment().getName())
+                .courseDepartment(course.getCourseDepartment().getName())
+                .cartCount(cartCount.intValue())
                 .professor(course.getProfessorName() != null ? course.getProfessorName() : "-")
-                .isRegisterable(course.isRegisterable())
                 .build();
     }
 }
