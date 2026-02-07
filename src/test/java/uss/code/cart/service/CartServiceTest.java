@@ -13,6 +13,7 @@ import uss.code.course.domain.Course;
 import uss.code.course.domain.CourseDay;
 import uss.code.course.domain.CourseGrade;
 import uss.code.course.domain.CourseSchedule;
+import uss.code.course.domain.CourseType;
 import uss.code.course.fixture.CourseFixture;
 import uss.code.course.fixture.CourseScheduleFixture;
 import uss.code.course.repository.CourseRepository;
@@ -28,7 +29,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static uss.code.global.exception.domain.ExceptionCode.CARTED_COURSE_NOT_FOUND;
+import static uss.code.global.exception.domain.ExceptionCode.*;
 
 @IntegrationTest
 class CartServiceTest {
@@ -279,7 +280,7 @@ class CartServiceTest {
             cartService.deleteCartedCourse(testMemberId, course1Id);
 
             //then
-            final List<Cart> carts = cartRepository.findCartedCoursesByMemberId(testMemberId);
+            final List<Cart> carts = cartRepository.findByMemberId(testMemberId);
             assertThat(carts).hasSize(1);
             assertThat(carts)
                     .extracting(cart -> cart.getCourse().getId())
@@ -295,7 +296,7 @@ class CartServiceTest {
 
             //then
             // otherMember의 장바구니는 그대로 (course3)
-            final List<Cart> otherCarts = cartRepository.findCartedCoursesByMemberId(otherMemberId);
+            final List<Cart> otherCarts = cartRepository.findByMemberId(otherMemberId);
             assertThat(otherCarts).hasSize(1);
             assertThat(otherCarts.get(0).getCourse().getId()).isEqualTo(course3Id);
         }
@@ -323,7 +324,7 @@ class CartServiceTest {
                     .hasFieldOrPropertyWithValue("exceptionCode", CARTED_COURSE_NOT_FOUND);
 
             // otherMember의 장바구니는 그대로
-            final List<Cart> otherCarts = cartRepository.findCartedCoursesByMemberId(otherMemberId);
+            final List<Cart> otherCarts = cartRepository.findByMemberId(otherMemberId);
             assertThat(otherCarts).hasSize(1);
             assertThat(otherCarts.get(0).getCourse().getId()).isEqualTo(course3Id);
         }
@@ -337,8 +338,337 @@ class CartServiceTest {
             cartService.deleteCartedCourse(testMemberId, course2Id);
 
             //then
-            final List<Cart> carts = cartRepository.findCartedCoursesByMemberId(testMemberId);
+            final List<Cart> carts = cartRepository.findByMemberId(testMemberId);
             assertThat(carts).isEmpty();
+        }
+    }
+
+    @Nested
+    class 장바구니_추가_테스트 {
+
+        private Long testMemberId;
+        private Long course1Id;
+        private Long course2Id;
+
+        @BeforeEach
+        void setUp() {
+            // 회원 생성
+            final Member testMember = MemberFixture.createMember();
+            memberRepository.save(testMember);
+            testMemberId = testMember.getId();
+
+            // 과목 생성
+            Course course1 = CourseFixture.createCourseWithDetails(
+                    "자료구조", "Data Structure", "CSE101",
+                    CourseGrade.SOPHOMORE, "김교수", "공학관101"
+            );
+            Course course2 = CourseFixture.createCourseWithDetails(
+                    "알고리즘", "Algorithm", "CSE201",
+                    CourseGrade.SOPHOMORE, "이교수", "공학관201"
+            );
+
+            // 스케줄 추가
+            CourseSchedule schedule1 = CourseScheduleFixture.createCourseSchedule(
+                    course1, "월3,4", CourseDay.MONDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+            );
+            course1.addCourseSchedule(schedule1);
+
+            CourseSchedule schedule2 = CourseScheduleFixture.createCourseSchedule(
+                    course2, "화1,2", CourseDay.TUESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+            );
+            course2.addCourseSchedule(schedule2);
+
+            courseRepository.saveAll(List.of(course1, course2));
+            course1Id = course1.getId();
+            course2Id = course2.getId();
+        }
+
+        @Test
+        void 장바구니에_과목을_추가하면_성공한다() {
+            //given
+
+            //when
+            cartService.addCart(testMemberId, course1Id);
+
+            //then
+            final List<Cart> carts = cartRepository.findByMemberId(testMemberId);
+            assertThat(carts).hasSize(1);
+            assertThat(carts.get(0).getCourse().getId()).isEqualTo(course1Id);
+        }
+
+        @Test
+        void 장바구니가_10개_미만이면_추가할_수_있다() {
+            //given
+            // 9개의 과목을 미리 추가
+            for (int i = 0; i < 9; i++) {
+                Course course = CourseFixture.createCourseWithDetails(
+                        "과목" + i, "Course" + i, "CSE30" + i,
+                        CourseGrade.SOPHOMORE, "교수" + i, "강의실" + i
+                );
+                courseRepository.save(course);
+
+                Member member = memberRepository.findById(testMemberId).orElseThrow();
+                Cart cart = CartFixture.createCart(member, course);
+                cartRepository.save(cart);
+            }
+
+            //when & then
+            // 10번째 추가는 성공해야 함
+            cartService.addCart(testMemberId, course1Id);
+
+            final List<Cart> carts = cartRepository.findByMemberId(testMemberId);
+            assertThat(carts).hasSize(10);
+        }
+
+        @Test
+        void 장바구니가_10개_이상이면_추가할_수_없다() {
+            //given
+            // 10개의 과목을 미리 추가
+            for (int i = 0; i < 10; i++) {
+                Course course = CourseFixture.createCourseWithDetails(
+                        "과목" + i, "Course" + i, "CSE30" + i,
+                        CourseGrade.SOPHOMORE, "교수" + i, "강의실" + i
+                );
+                courseRepository.save(course);
+
+                Member member = memberRepository.findById(testMemberId).orElseThrow();
+                Cart cart = CartFixture.createCart(member, course);
+                cartRepository.save(cart);
+            }
+
+            //when & then
+            assertThatThrownBy(() -> cartService.addCart(testMemberId, course1Id))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", CARTED_COURSE_LIMIT_EXCEEDED);
+        }
+
+        @Test
+        void 이미_장바구니에_담긴_과목을_다시_추가하면_예외가_발생한다() {
+            //given
+            cartService.addCart(testMemberId, course1Id);
+
+            //when & then
+            assertThatThrownBy(() -> cartService.addCart(testMemberId, course1Id))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", COURSE_ALREADY_IN_CART);
+        }
+
+        @Test
+        void 존재하지_않는_회원이_장바구니에_추가하면_예외가_발생한다() {
+            //given
+            final Long nonExistentMemberId = 99999L;
+
+            //when & then
+            assertThatThrownBy(() -> cartService.addCart(nonExistentMemberId, course1Id))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", MEMBER_NOT_FOUND);
+        }
+
+        @Test
+        void 존재하지_않는_과목을_장바구니에_추가하면_예외가_발생한다() {
+            //given
+            final Long nonExistentCourseId = 99999L;
+
+            //when & then
+            assertThatThrownBy(() -> cartService.addCart(testMemberId, nonExistentCourseId))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", COURSE_NOT_FOUND);
+        }
+
+        @Test
+        void 시간표가_겹치는_과목을_추가하면_예외가_발생한다() {
+            //given
+            // course1을 먼저 추가 (월 13:00-15:00)
+            cartService.addCart(testMemberId, course1Id);
+
+            // 겹치는 시간대의 새 과목 생성 (월 14:00-16:00)
+            Course conflictCourse = CourseFixture.createCourseWithDetails(
+                    "운영체제", "Operating System", "CSE301",
+                    CourseGrade.JUNIOR, "박교수", "공학관301"
+            );
+            CourseSchedule conflictSchedule = CourseScheduleFixture.createCourseSchedule(
+                    conflictCourse, "월5,6", CourseDay.MONDAY, LocalTime.of(14, 0), LocalTime.of(16, 0)
+            );
+            conflictCourse.addCourseSchedule(conflictSchedule);
+            courseRepository.save(conflictCourse);
+
+            //when & then
+            assertThatThrownBy(() -> cartService.addCart(testMemberId, conflictCourse.getId()))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", COURSE_SCHEDULE_CONFLICT);
+        }
+
+        @Test
+        void 시간표가_겹치지_않으면_추가할_수_있다() {
+            //given
+            // course1을 먼저 추가 (월 13:00-15:00)
+            cartService.addCart(testMemberId, course1Id);
+
+            // 겹치지 않는 시간대의 새 과목 생성 (월 15:00-17:00)
+            Course nonConflictCourse = CourseFixture.createCourseWithDetails(
+                    "운영체제", "Operating System", "CSE301",
+                    CourseGrade.JUNIOR, "박교수", "공학관301"
+            );
+            CourseSchedule nonConflictSchedule = CourseScheduleFixture.createCourseSchedule(
+                    nonConflictCourse, "월5,6", CourseDay.MONDAY, LocalTime.of(15, 0), LocalTime.of(17, 0)
+            );
+            nonConflictCourse.addCourseSchedule(nonConflictSchedule);
+            courseRepository.save(nonConflictCourse);
+
+            //when
+            cartService.addCart(testMemberId, nonConflictCourse.getId());
+
+            //then
+            final List<Cart> carts = cartRepository.findByMemberId(testMemberId);
+            assertThat(carts).hasSize(2);
+        }
+
+        @Test
+        void OCU_과목이_2개_있으면_추가할_수_없다() {
+            //given
+            // OCU 과목 2개 생성 및 추가
+            Course ocu1 = CourseFixture.createCourse(
+                    "OCU과목1", "OCU Course 1", "OCU001",
+                    CourseFixture.createCourse().getCourseCollege(),
+                    CourseFixture.createCourse().getCourseDepartment(),
+                    CourseFixture.createCourse().getCourseClassification(),
+                    CourseFixture.createCourse().getCourseArea(),
+                    CourseType.OCU,
+                    CourseGrade.SOPHOMORE,
+                    "교수1", "강의실1", 3, false, 50, 30
+            );
+            Course ocu2 = CourseFixture.createCourse(
+                    "OCU과목2", "OCU Course 2", "OCU002",
+                    CourseFixture.createCourse().getCourseCollege(),
+                    CourseFixture.createCourse().getCourseDepartment(),
+                    CourseFixture.createCourse().getCourseClassification(),
+                    CourseFixture.createCourse().getCourseArea(),
+                    CourseType.OCU,
+                    CourseGrade.SOPHOMORE,
+                    "교수2", "강의실2", 3, false, 50, 30
+            );
+            Course ocu3 = CourseFixture.createCourse(
+                    "OCU과목3", "OCU Course 3", "OCU003",
+                    CourseFixture.createCourse().getCourseCollege(),
+                    CourseFixture.createCourse().getCourseDepartment(),
+                    CourseFixture.createCourse().getCourseClassification(),
+                    CourseFixture.createCourse().getCourseArea(),
+                    CourseType.OCU,
+                    CourseGrade.SOPHOMORE,
+                    "교수3", "강의실3", 3, false, 50, 30
+            );
+
+            courseRepository.saveAll(List.of(ocu1, ocu2, ocu3));
+
+            Member member = memberRepository.findById(testMemberId).orElseThrow();
+            Cart cart1 = CartFixture.createCart(member, ocu1);
+            Cart cart2 = CartFixture.createCart(member, ocu2);
+            cartRepository.saveAll(List.of(cart1, cart2));
+
+            //when & then
+            assertThatThrownBy(() -> cartService.addCart(testMemberId, ocu3.getId()))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", COURSE_TYPE_LIMIT_EXCEEDED);
+        }
+
+        @Test
+        void OCU_과목이_1개_있으면_추가할_수_있다() {
+            //given
+            // OCU 과목 1개 생성 및 추가
+            Course ocu1 = CourseFixture.createCourse(
+                    "OCU과목1", "OCU Course 1", "OCU001",
+                    CourseFixture.createCourse().getCourseCollege(),
+                    CourseFixture.createCourse().getCourseDepartment(),
+                    CourseFixture.createCourse().getCourseClassification(),
+                    CourseFixture.createCourse().getCourseArea(),
+                    CourseType.OCU,
+                    CourseGrade.SOPHOMORE,
+                    "교수1", "강의실1", 3, false, 50, 30
+            );
+            Course ocu2 = CourseFixture.createCourse(
+                    "OCU과목2", "OCU Course 2", "OCU002",
+                    CourseFixture.createCourse().getCourseCollege(),
+                    CourseFixture.createCourse().getCourseDepartment(),
+                    CourseFixture.createCourse().getCourseClassification(),
+                    CourseFixture.createCourse().getCourseArea(),
+                    CourseType.OCU,
+                    CourseGrade.SOPHOMORE,
+                    "교수2", "강의실2", 3, false, 50, 30
+            );
+
+            courseRepository.saveAll(List.of(ocu1, ocu2));
+
+            Member member = memberRepository.findById(testMemberId).orElseThrow();
+            Cart cart1 = CartFixture.createCart(member, ocu1);
+            cartRepository.save(cart1);
+
+            //when
+            cartService.addCart(testMemberId, ocu2.getId());
+
+            //then
+            final List<Cart> carts = cartRepository.findByMemberId(testMemberId);
+            assertThat(carts).hasSize(2);
+        }
+
+        @Test
+        void K_MOOC_과목이_1개_있으면_추가할_수_없다() {
+            //given
+            // K-MOOC 과목 1개 생성 및 추가
+            Course kMooc1 = CourseFixture.createCourse(
+                    "K-MOOC과목1", "K-MOOC Course 1", "KMOOC001",
+                    CourseFixture.createCourse().getCourseCollege(),
+                    CourseFixture.createCourse().getCourseDepartment(),
+                    CourseFixture.createCourse().getCourseClassification(),
+                    CourseFixture.createCourse().getCourseArea(),
+                    CourseType.K_MOOC,
+                    CourseGrade.SOPHOMORE,
+                    "교수1", "강의실1", 3, false, 50, 30
+            );
+            Course kMooc2 = CourseFixture.createCourse(
+                    "K-MOOC과목2", "K-MOOC Course 2", "KMOOC002",
+                    CourseFixture.createCourse().getCourseCollege(),
+                    CourseFixture.createCourse().getCourseDepartment(),
+                    CourseFixture.createCourse().getCourseClassification(),
+                    CourseFixture.createCourse().getCourseArea(),
+                    CourseType.K_MOOC,
+                    CourseGrade.SOPHOMORE,
+                    "교수2", "강의실2", 3, false, 50, 30
+            );
+
+            courseRepository.saveAll(List.of(kMooc1, kMooc2));
+
+            Member member = memberRepository.findById(testMemberId).orElseThrow();
+            Cart cart1 = CartFixture.createCart(member, kMooc1);
+            cartRepository.save(cart1);
+
+            //when & then
+            assertThatThrownBy(() -> cartService.addCart(testMemberId, kMooc2.getId()))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", COURSE_TYPE_LIMIT_EXCEEDED);
+        }
+
+        @Test
+        void 일반_과목은_타입_제한이_없다() {
+            //given
+            // 일반 과목 여러 개 추가
+            for (int i = 0; i < 5; i++) {
+                Course course = CourseFixture.createCourseWithDetails(
+                        "과목" + i, "Course" + i, "CSE30" + i,
+                        CourseGrade.SOPHOMORE, "교수" + i, "강의실" + i
+                );
+                courseRepository.save(course);
+
+                Member member = memberRepository.findById(testMemberId).orElseThrow();
+                Cart cart = CartFixture.createCart(member, course);
+                cartRepository.save(cart);
+            }
+
+            //when
+            cartService.addCart(testMemberId, course1Id);
+
+            //then
+            final List<Cart> carts = cartRepository.findByMemberId(testMemberId);
+            assertThat(carts).hasSize(6);
         }
     }
 }

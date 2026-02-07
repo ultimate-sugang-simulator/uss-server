@@ -18,7 +18,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
         WHERE c.member.id = :memberId
         ORDER BY c.createdAt
     """)
-    List<Cart> findCartedCoursesByMemberId(@Param("memberId") final long memberId);
+    List<Cart> findByMemberId(@Param("memberId") final long memberId);
 
     @Query("""
         SELECT new uss.code.cart.dto.common.CartCount(c.course.id, COUNT(c))
@@ -38,4 +38,16 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
             @Param("memberId") final long memberId,
             @Param("courseId") final Long courseId
     );
+
+    boolean existsByMemberIdAndCourseId(
+            final long memberId,
+            final long courseId
+    );
+
+    @Query("""
+        SELECT count(c)
+        FROM Cart c
+        WHERE c.member.id = :memberId
+    """)
+    int countByMemberId(@Param("memberId") final long memberId);
 }

@@ -8,6 +8,7 @@ import uss.code.course.domain.CourseArea;
 import uss.code.course.domain.CourseDepartment;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query("""
@@ -38,4 +39,12 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         ORDER BY c.courseGrade, c.courseCode
     """)
     List<Course> findByKeyword(@Param("keyword") final String keyword);
+
+    @Query("""
+        SELECT c
+        FROM Course c
+        LEFT JOIN FETCH c.courseSchedules
+        WHERE c.id = :id
+    """)
+    Optional<Course> findById(@Param("id") final long id);
 }

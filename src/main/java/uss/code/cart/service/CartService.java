@@ -8,13 +8,18 @@ import uss.code.cart.dto.common.CartCount;
 import uss.code.cart.dto.response.CartedCourseResponse;
 import uss.code.cart.dto.response.CartedCoursesResponse;
 import uss.code.cart.repository.CartRepository;
+import uss.code.course.domain.Course;
+import uss.code.course.infra.CourseValidator;
+import uss.code.course.repository.CourseRepository;
 import uss.code.global.exception.domain.RestApiException;
+import uss.code.member.domain.Member;
+import uss.code.member.repository.MemberRepository;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static uss.code.global.exception.domain.ExceptionCode.CARTED_COURSE_NOT_FOUND;
+import static uss.code.global.exception.domain.ExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -23,10 +28,12 @@ public class CartService {
     private static final long DEFAULT_CART_COUNT = 0L;
 
     private final CartRepository cartRepository;
+    private final CourseRepository courseRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional(readOnly = true)
     public CartedCoursesResponse getCartedCourse(final long memberId) {
-        final List<Cart> carts = cartRepository.findCartedCoursesByMemberId(memberId);
+        final List<Cart> carts = cartRepository.findByMemberId(memberId);
 
         if (carts.isEmpty()) {
             return CartedCoursesResponse.of(List.of());
@@ -41,6 +48,41 @@ public class CartService {
                 .toList();
 
         return CartedCoursesResponse.of(cartedCourseResponses);
+    }
+
+    @Transactional
+    public void addCart(
+            final long memberId,
+            final long courseId
+    ) {
+        validateCartLimit(memberId);
+        validateDuplicateCourse(memberId, courseId);
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
+
+        final List<Cart> carts = cartRepository.findByMemberId(memberId);
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RestApiException(COURSE_NOT_FOUND));
+
+        validateCourseScheduleConflict(carts, course);
+        validateCourseTypeLimit(carts, course);
+
+        final Cart cart = Cart.create(member, course);
+
+        cartRepository.save(cart);
+    }
+
+    @Transactional
+    public void deleteCartedCourse(
+            final long memberId,
+            final long courseId
+    ) {
+        final Cart cart = cartRepository.findByMemberIdAndCourseId(memberId, courseId)
+                .orElseThrow(() -> new RestApiException(CARTED_COURSE_NOT_FOUND));
+
+        cartRepository.deleteById(cart.getId());
     }
 
     private Map<Long, Long> getCartCountByCourseId(final List<Cart> carts) {
@@ -61,14 +103,38 @@ public class CartService {
                 .toList();
     }
 
-    @Transactional
-    public void deleteCartedCourse(
+    private void validateCartLimit(final long memberId) {
+        final int cartedCourseCount = cartRepository.countByMemberId(memberId);
+
+        if (cartedCourseCount >= 10) {
+            throw new RestApiException(CARTED_COURSE_LIMIT_EXCEEDED);
+        }
+    }
+
+    private void validateCourseScheduleConflict(
+            final List<Cart> carts,
+            final Course course
+    ) {
+        if (!CourseValidator.validateCourseScheduleNotConflict(carts, course)) {
+            throw new RestApiException(COURSE_SCHEDULE_CONFLICT);
+        }
+    }
+
+    private void validateCourseTypeLimit(
+            final List<Cart> carts,
+            final Course course
+    ){
+        if(!CourseValidator.validateCourseTypeLimit(carts, course)) {
+            throw new RestApiException(COURSE_TYPE_LIMIT_EXCEEDED);
+        }
+    }
+
+    private void validateDuplicateCourse(
             final long memberId,
             final long courseId
     ) {
-        final Cart cart = cartRepository.findByMemberIdAndCourseId(memberId, courseId)
-                .orElseThrow(() -> new RestApiException(CARTED_COURSE_NOT_FOUND));
-
-        cartRepository.deleteById(cart.getId());
+        if (cartRepository.existsByMemberIdAndCourseId(memberId, courseId)) {
+            throw new RestApiException(COURSE_ALREADY_IN_CART);
+        }
     }
 }
