@@ -6,7 +6,6 @@ import uss.code.member.domain.Member;
 import uss.code.registration.domain.Registration;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class RegistrationFixture {
 
@@ -21,7 +20,6 @@ public class RegistrationFixture {
     ) {
         Registration registration = new Registration();
 
-        ReflectionTestUtils.setField(registration, "id", UUID.randomUUID());
         ReflectionTestUtils.setField(registration, "member", member);
         ReflectionTestUtils.setField(registration, "course", course);
         ReflectionTestUtils.setField(registration, "createdAt", createdAt);

@@ -7,7 +7,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Builder(access = PRIVATE)
 public record CartedCourseResponse(
-        Long id,
+        long id,
         String courseClassification,
         String courseCode,
         String courseTitleKr,
