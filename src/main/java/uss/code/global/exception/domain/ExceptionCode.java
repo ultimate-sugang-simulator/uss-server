@@ -55,7 +55,12 @@ public enum ExceptionCode {
     CARTED_COURSE_LIMIT_EXCEEDED(BAD_REQUEST, 3001, "장바구니는 최대 10개의 과목을 담을 수 있습니다."),
     COURSE_SCHEDULE_CONFLICT(CONFLICT, 3002, "과목 시간표가 겹칩니다."),
     COURSE_TYPE_LIMIT_EXCEEDED(BAD_REQUEST, 3003, "해당 과목 유형의 등록 제한을 초과했습니다."),
-    COURSE_ALREADY_IN_CART(BAD_REQUEST, 3004, "이미 장바구니에 담긴 과목입니다.");
+    COURSE_ALREADY_IN_CART(BAD_REQUEST, 3004, "이미 장바구니에 담긴 과목입니다."),
+
+    // 수강신청
+    COURSE_MAX_CAPACITY_EXCEEDED(BAD_REQUEST, 4000, "수강 정원이 마감되었습니다."),
+    CREDIT_LIMIT_EXCEEDED(BAD_REQUEST, 4001, "최대 이수 가능 학점을 초과하였습니다."),
+    COURSE_ALREADY_REGISTERED(BAD_REQUEST, 4002, "이미 신청된 과목입니다.");
 
     private final HttpStatus status;
     private final int code;
