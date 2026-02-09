@@ -6,8 +6,10 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import org.springdoc.core.utils.SpringDocUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import uss.code.auth.annotation.Auth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +23,14 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI() {
         final SecurityScheme accessTokenSecurityScheme = new SecurityScheme()
-                .type(SecurityScheme.Type.HTTP)
+                .type(SecurityScheme.Type.APIKEY)
                 .scheme("bearer")
                 .bearerFormat("JWT")
                 .in(SecurityScheme.In.HEADER)
                 .name(ACCESS_TOKEN_KEY);
 
         final SecurityScheme refreshTokenSecurityScheme = new SecurityScheme()
-                .type(SecurityScheme.Type.HTTP)
+                .type(SecurityScheme.Type.APIKEY)
                 .scheme("bearer")
                 .bearerFormat("JWT")
                 .in(SecurityScheme.In.HEADER)
@@ -60,5 +62,9 @@ public class SwaggerConfig {
         List<Server> servers = new ArrayList<>();
         servers.add(new Server().url("http://localhost:8080").description("Dev env"));
         return servers;
+    }
+
+    static {
+        SpringDocUtils.getConfig().addAnnotationsToIgnore(Auth.class);
     }
 }
