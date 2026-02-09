@@ -60,7 +60,8 @@ public enum ExceptionCode {
     // 수강신청
     COURSE_MAX_CAPACITY_EXCEEDED(BAD_REQUEST, 4000, "수강 정원이 마감되었습니다."),
     CREDIT_LIMIT_EXCEEDED(BAD_REQUEST, 4001, "최대 이수 가능 학점을 초과하였습니다."),
-    COURSE_ALREADY_REGISTERED(BAD_REQUEST, 4002, "이미 신청된 과목입니다.");
+    COURSE_ALREADY_REGISTERED(BAD_REQUEST, 4002, "이미 신청된 과목입니다."),
+    REGISTERED_COURSE_NOT_FOUND(NOT_FOUND, 4003, "수강신청한 과목을 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final int code;

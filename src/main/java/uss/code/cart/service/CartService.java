@@ -81,7 +81,7 @@ public class CartService {
         final Cart cart = cartRepository.findByMemberIdAndCourseId(memberId, courseId)
                 .orElseThrow(() -> new RestApiException(CARTED_COURSE_NOT_FOUND));
 
-        cartRepository.deleteById(cart.getId());
+        cartRepository.delete(cart);
     }
 
     private Map<Long, Long> getCartCountByCourseId(final List<Cart> carts) {

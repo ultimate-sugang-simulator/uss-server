@@ -38,11 +38,4 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
             @Param("memberId") final long memberId,
             @Param("courseId") final long courseId
     );
-
-    @Query("""
-        SELECT count(c)
-        FROM Cart c
-        WHERE c.member.id = :memberId
-    """)
-    int countByMemberId(@Param("memberId") final long memberId);
 }

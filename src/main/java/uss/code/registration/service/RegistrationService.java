@@ -51,7 +51,7 @@ public class RegistrationService {
 
         final List<Registration> registrations = registrationRepository.findByMemberId(memberId);
 
-        final Course course = courseRepository.findById(courseId)
+        Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RestApiException(COURSE_NOT_FOUND));
 
         validateCourseCapacity(course);
@@ -62,7 +62,25 @@ public class RegistrationService {
 
         final Registration registration = Registration.create(member, course);
 
+        course.incrementEnrollment();
+
         registrationRepository.save(registration);
+    }
+
+    @Transactional
+    public void deleteRegisteredCourse(
+            final long memberId,
+            final long courseId
+    ) {
+        final Registration registration = registrationRepository.findByMemberIdAndCourseId(memberId, courseId)
+                .orElseThrow(() -> new RestApiException(REGISTERED_COURSE_NOT_FOUND));
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RestApiException(COURSE_NOT_FOUND));
+
+        course.decrementEnrollment();
+
+        registrationRepository.delete(registration);
     }
 
     private void validateCreditLimit(

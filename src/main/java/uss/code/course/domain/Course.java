@@ -102,4 +102,11 @@ public class Course {
         return (currentEnrollment < maxCapacity);
     }
 
+    public void incrementEnrollment(){
+        currentEnrollment++;
+    }
+
+    public void decrementEnrollment(){
+        currentEnrollment--;
+    }
 }

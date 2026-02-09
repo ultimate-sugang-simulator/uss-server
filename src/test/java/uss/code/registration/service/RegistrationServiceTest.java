@@ -690,4 +690,123 @@ class RegistrationServiceTest {
             assertThat(totalCredits).isLessThanOrEqualTo(maxCredit);
         }
     }
+
+    @Nested
+    class 수강신청_삭제_테스트 {
+
+        private Long testMemberId;
+        private Long otherMemberId;
+        private Long course1Id;
+        private Long course2Id;
+        private Long course3Id;
+
+        @BeforeEach
+        void setUp() {
+            // 회원 생성
+            final Member testMember = MemberFixture.createMember();
+            final Member otherMember = MemberFixture.createMember();
+            memberRepository.saveAll(List.of(testMember, otherMember));
+            testMemberId = testMember.getId();
+            otherMemberId = otherMember.getId();
+
+            // 과목 생성
+            Course course1 = CourseFixture.createCourseWithDetails(
+                    "자료구조", "Data Structure", "CSE101",
+                    CourseGrade.SOPHOMORE, "김교수", "공학관101"
+            );
+            Course course2 = CourseFixture.createCourseWithDetails(
+                    "알고리즘", "Algorithm", "CSE201",
+                    CourseGrade.SOPHOMORE, "이교수", "공학관201"
+            );
+            Course course3 = CourseFixture.createCourseWithDetails(
+                    "데이터베이스", "Database", "CSE301",
+                    CourseGrade.JUNIOR, null, null
+            );
+
+            courseRepository.saveAll(List.of(course1, course2, course3));
+            course1Id = course1.getId();
+            course2Id = course2.getId();
+            course3Id = course3.getId();
+
+            // 수강신청 생성
+            // testMember: course1, course2
+            Registration registration1 = RegistrationFixture.createRegistration(testMember, course1);
+            Registration registration2 = RegistrationFixture.createRegistration(testMember, course2);
+
+            // otherMember: course3 (testMember와 겹치지 않음)
+            Registration registration3 = RegistrationFixture.createRegistration(otherMember, course3);
+
+            registrationRepository.saveAll(List.of(registration1, registration2, registration3));
+        }
+
+        @Test
+        void 수강신청_내역에서_과목을_삭제하면_성공한다() {
+            //given
+
+            //when
+            registrationService.deleteRegisteredCourse(testMemberId, course1Id);
+
+            //then
+            final List<Registration> registrations = registrationRepository.findByMemberId(testMemberId);
+            assertThat(registrations).hasSize(1);
+            assertThat(registrations)
+                    .extracting(registration -> registration.getCourse().getId())
+                    .containsExactly(course2Id);
+        }
+
+        @Test
+        void 수강신청_삭제_후_다른_회원의_수강신청은_영향받지_않는다() {
+            //given
+
+            //when
+            registrationService.deleteRegisteredCourse(testMemberId, course1Id);
+
+            //then
+            // otherMember의 수강신청은 그대로 (course3)
+            final List<Registration> otherRegistrations = registrationRepository.findByMemberId(otherMemberId);
+            assertThat(otherRegistrations).hasSize(1);
+            assertThat(otherRegistrations.get(0).getCourse().getId()).isEqualTo(course3Id);
+        }
+
+        @Test
+        void 존재하지_않는_수강신청을_삭제하면_예외가_발생한다() {
+            //given
+            final Long nonExistentCourseId = 99999L;
+
+            //when & then
+            assertThatThrownBy(() -> registrationService.deleteRegisteredCourse(testMemberId, nonExistentCourseId))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", REGISTERED_COURSE_NOT_FOUND);
+        }
+
+        @Test
+        void 다른_회원의_수강신청을_삭제하면_예외가_발생한다() {
+            //given
+            // course3은 otherMember만 수강신청 함
+
+            //when & then
+            // testMember가 otherMember의 수강신청(course3) 삭제 시도
+            assertThatThrownBy(() -> registrationService.deleteRegisteredCourse(testMemberId, course3Id))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", REGISTERED_COURSE_NOT_FOUND);
+
+            // otherMember의 수강신청은 그대로
+            final List<Registration> otherRegistrations = registrationRepository.findByMemberId(otherMemberId);
+            assertThat(otherRegistrations).hasSize(1);
+            assertThat(otherRegistrations.get(0).getCourse().getId()).isEqualTo(course3Id);
+        }
+
+        @Test
+        void 모든_수강신청을_삭제할_수_있다() {
+            //given
+
+            //when
+            registrationService.deleteRegisteredCourse(testMemberId, course1Id);
+            registrationService.deleteRegisteredCourse(testMemberId, course2Id);
+
+            //then
+            final List<Registration> registrations = registrationRepository.findByMemberId(testMemberId);
+            assertThat(registrations).isEmpty();
+        }
+    }
 }

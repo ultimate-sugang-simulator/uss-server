@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import uss.code.registration.domain.Registration;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RegistrationRepository extends JpaRepository<Registration, Long> {
 
@@ -16,4 +17,14 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
         WHERE r.member.id = :memberId
     """)
     List<Registration> findByMemberId(@Param("memberId") final long memberId);
+
+    @Query("""
+        SELECT r
+        FROM Registration r
+        WHERE r.member.id = :memberId AND r.course.id = :courseId
+    """)
+    Optional<Registration> findByMemberIdAndCourseId(
+            @Param("memberId") final long memberId,
+            @Param("courseId") final long courseId
+    );
 }
