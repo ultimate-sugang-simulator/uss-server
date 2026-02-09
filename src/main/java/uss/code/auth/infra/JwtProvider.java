@@ -75,8 +75,8 @@ public class JwtProvider {
         if(refreshToken == null)
             throw new JwtTokenMissingException(MISSING_REFRESH_TOKEN);
 
-        validateAccessToken(accessToken.substring(7));
-        validateRefreshToken(refreshToken.substring(7));
+        validateAccessToken(accessToken);
+        validateRefreshToken(refreshToken);
     }
 
     public Long getMemberId(final String token){

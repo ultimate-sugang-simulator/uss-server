@@ -19,7 +19,7 @@ import uss.code.global.annotation.ParamValidation;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/courses")
-public class CourseController {
+public class CourseController implements CourseControllerDocs {
 
     private final CourseService courseService;
 

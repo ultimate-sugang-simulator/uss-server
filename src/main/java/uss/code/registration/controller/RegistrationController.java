@@ -15,7 +15,7 @@ import uss.code.registration.service.RegistrationService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/registration")
-public class RegistrationController {
+public class RegistrationController implements RegistrationControllerDocs {
 
     private final RegistrationService registrationService;
 

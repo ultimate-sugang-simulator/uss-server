@@ -15,7 +15,7 @@ import uss.code.cart.service.CartService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/carts")
-public class CartController {
+public class CartController implements CartControllerDocs {
 
     private final CartService cartService;
 
