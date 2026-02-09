@@ -1,10 +1,11 @@
 package uss.code.course.infra;
 
 import lombok.experimental.UtilityClass;
-import uss.code.cart.domain.Cart;
 import uss.code.course.domain.Course;
 import uss.code.course.domain.CourseDay;
 import uss.code.course.domain.CourseSchedule;
+import uss.code.member.domain.Member;
+import uss.code.registration.domain.Registration;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -19,36 +20,36 @@ public class CourseValidator {
     private static final int MAX_K_MOOC_COURSE_COUNT = 1;
 
     public static boolean validateCourseScheduleNotConflict(
-            final List<Cart> carts,
-            final Course course
+            final List<Course> existingCourses,
+            final Course newCourse
     ) {
-        if(carts.isEmpty()){
+        if (existingCourses.isEmpty()) {
             return true;
         }
 
-        // 장바구니에 담으려고 하는 과목의 시간표 가져오기
-        List<CourseSchedule> courseSchedules = course.getCourseSchedules();
+        // 추가하려는 과목의 시간표 가져오기
+        List<CourseSchedule> newCourseSchedules = newCourse.getCourseSchedules();
 
-        if(courseSchedules.isEmpty()){
+        if (newCourseSchedules.isEmpty()) {
             return true;
         }
 
-        // 현재 장바구니에 있는 과목들의 시간표와 겹치는지 확인
-        for (final Cart cart : carts) {
-            List<CourseSchedule> cartedCourseSchedules = cart.getCourse().getCourseSchedules();
+        // 현재 등록된 과목들의 시간표와 겹치는지 확인
+        for (final Course existingCourse : existingCourses) {
+            List<CourseSchedule> existingCourseSchedules = existingCourse.getCourseSchedules();
 
-            for (final CourseSchedule courseSchedule : courseSchedules) {
-                final CourseDay courseDay = courseSchedule.getCourseDay();
-                final LocalTime courseStartTime = courseSchedule.getStartTime();
-                final LocalTime courseEndTime = courseSchedule.getEndTime();
+            for (final CourseSchedule newSchedule : newCourseSchedules) {
+                final CourseDay newCourseDay = newSchedule.getCourseDay();
+                final LocalTime newStartTime = newSchedule.getStartTime();
+                final LocalTime newEndTime = newSchedule.getEndTime();
 
-                for (final CourseSchedule cartedSchedule : cartedCourseSchedules) {
-                    final CourseDay cartedCourseDay = cartedSchedule.getCourseDay();
-                    final LocalTime cartedStartTime = cartedSchedule.getStartTime();
-                    final LocalTime cartedEndTime = cartedSchedule.getEndTime();
+                for (final CourseSchedule existingSchedule : existingCourseSchedules) {
+                    final CourseDay existingCourseDay = existingSchedule.getCourseDay();
+                    final LocalTime existingStartTime = existingSchedule.getStartTime();
+                    final LocalTime existingEndTime = existingSchedule.getEndTime();
 
                     // 같은 요일이고 시간이 겹치는지 확인
-                    if (courseDay == cartedCourseDay && isTimeOverlap(courseStartTime, courseEndTime, cartedStartTime, cartedEndTime)) {
+                    if (newCourseDay == existingCourseDay && isTimeOverlap(newStartTime, newEndTime, existingStartTime, existingEndTime)) {
                         return false;
                     }
                 }
@@ -58,13 +59,13 @@ public class CourseValidator {
     }
 
     public static boolean validateCourseTypeLimit(
-            final List<Cart> carts,
-            final Course course
+            final List<Course> existingCourses,
+            final Course newCourse
     ) {
-        final var courseType = course.getCourseType();
+        final var courseType = newCourse.getCourseType();
 
-        long sameTypeCount = carts.stream()
-                .filter(cart -> cart.getCourse().getCourseType() == courseType)
+        long sameTypeCount = existingCourses.stream()
+                .filter(course -> course.getCourseType() == courseType)
                 .count();
 
         if (courseType == OCU) {
@@ -76,6 +77,20 @@ public class CourseValidator {
         }
 
         return true;
+    }
+
+    public static boolean validateCreditLimit(
+            final List<Registration> registrations,
+            final Member member,
+            final Course newCourse
+    ) {
+        int maxCredit = member.getMaxCredit();
+
+        int currentCredit = registrations.stream()
+                .mapToInt(registration -> registration.getCourse().getCredits())
+                .sum();
+
+        return currentCredit + newCourse.getCredits() <= maxCredit;
     }
 
     private static boolean isTimeOverlap(

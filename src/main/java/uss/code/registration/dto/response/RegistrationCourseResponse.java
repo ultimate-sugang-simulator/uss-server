@@ -1,14 +1,15 @@
-package uss.code.course.dto.response;
+package uss.code.registration.dto.response;
 
 import lombok.Builder;
 import uss.code.course.domain.Course;
+import uss.code.course.domain.CourseClassification;
 
 import static lombok.AccessLevel.PRIVATE;
 
 @Builder(access = PRIVATE)
-public record InterdisciplinaryMajorCourseResponse(
+public record RegistrationCourseResponse(
         long id,
-        String courseGrade,
+        CourseClassification courseClassification,
         String courseCode,
         String courseTitleKr,
         String courseTitleEn,
@@ -16,13 +17,13 @@ public record InterdisciplinaryMajorCourseResponse(
         boolean isEnglishCourse,
         String schedule,
         String classroom,
-        String professor,
-        boolean isRegisterable
+        String courseDepartment,
+        String professor
 ) {
-    public static InterdisciplinaryMajorCourseResponse from(final Course course) {
-        return InterdisciplinaryMajorCourseResponse.builder()
+    public static RegistrationCourseResponse from(final Course course) {
+        return RegistrationCourseResponse.builder()
                 .id(course.getId())
-                .courseGrade(course.getCourseGrade().getName())
+                .courseDepartment(course.getCourseDepartment().getName())
                 .courseCode(course.getCourseCode())
                 .courseTitleKr(course.getTitleKr())
                 .courseTitleEn(course.getTitleEn())
@@ -30,8 +31,7 @@ public record InterdisciplinaryMajorCourseResponse(
                 .isEnglishCourse(course.isEnglishCourse())
                 .schedule(course.getFormattedCourseSchedules())
                 .classroom(course.getClassroom() != null ? course.getClassroom() : "-")
-                .professor(course.getProfessorName() != null ? course.getProfessorName() : "-")
-                .isRegisterable(course.isRegisterable())
+                .courseDepartment(course.getCourseDepartment().getName())
                 .build();
     }
 }

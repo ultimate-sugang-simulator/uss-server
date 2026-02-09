@@ -7,7 +7,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Builder(access = PRIVATE)
 public record MajorCourseResponse(
-        Long id,
+        long id,
         String courseGrade,
         String courseClassification,
         String courseCode,

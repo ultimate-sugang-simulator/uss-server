@@ -55,12 +55,12 @@ public class CartService {
             final long memberId,
             final long courseId
     ) {
-        Member member = memberRepository.findById(memberId)
+        final Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
         final List<Cart> carts = cartRepository.findByMemberId(memberId);
 
-        Course course = courseRepository.findByIdWithSchedules(courseId)
+        final Course course = courseRepository.findByIdWithSchedules(courseId)
                 .orElseThrow(() -> new RestApiException(COURSE_NOT_FOUND));
 
         validateCartLimit(carts);
@@ -81,7 +81,7 @@ public class CartService {
         final Cart cart = cartRepository.findByMemberIdAndCourseId(memberId, courseId)
                 .orElseThrow(() -> new RestApiException(CARTED_COURSE_NOT_FOUND));
 
-        cartRepository.deleteById(cart.getId());
+        cartRepository.delete(cart);
     }
 
     private Map<Long, Long> getCartCountByCourseId(final List<Cart> carts) {
@@ -112,7 +112,11 @@ public class CartService {
             final List<Cart> carts,
             final Course course
     ) {
-        if (!CourseValidator.validateCourseScheduleNotConflict(carts, course)) {
+        final List<Course> cartedCourses = carts.stream()
+                .map(Cart::getCourse)
+                .toList();
+
+        if (!CourseValidator.validateCourseScheduleNotConflict(cartedCourses, course)) {
             throw new RestApiException(COURSE_SCHEDULE_CONFLICT);
         }
     }
@@ -120,8 +124,12 @@ public class CartService {
     private void validateCourseTypeLimit(
             final List<Cart> carts,
             final Course course
-    ){
-        if(!CourseValidator.validateCourseTypeLimit(carts, course)) {
+    ) {
+        final List<Course> cartedCourses = carts.stream()
+                .map(Cart::getCourse)
+                .toList();
+
+        if (!CourseValidator.validateCourseTypeLimit(cartedCourses, course)) {
             throw new RestApiException(COURSE_TYPE_LIMIT_EXCEEDED);
         }
     }

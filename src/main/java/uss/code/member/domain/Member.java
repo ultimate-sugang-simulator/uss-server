@@ -104,4 +104,14 @@ public class Member {
                 .lastSemesterGPA(request.lastSemesterGPA())
                 .build();
     }
+
+    public int getMaxCredit(){
+        if (lastSemesterGPA >= 4.0) {
+            return 24;
+        } else if (lastSemesterGPA >= 3.5) {
+            return 21;
+        } else {
+            return 19;
+        }
+    }
 }
