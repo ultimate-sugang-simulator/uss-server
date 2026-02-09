@@ -18,7 +18,7 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/email-verification-codes")
-public class EmailVerificationCodeController {
+public class EmailVerificationCodeController implements EmailVerificationCodeControllerDocs {
 
     private final EmailVerificationCodeService emailVerificationCodeService;
 
