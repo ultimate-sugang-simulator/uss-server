@@ -15,6 +15,10 @@ public enum CourseArea {
     MAJOR_BASIC("전공기초"),
     MAJOR_CORE("전공핵심"),
 
+    // 기초 교양 영역
+    BASIC_SCIENCE_ENGINEERING("기초과학·공학"),
+    ACADEMIC_FOUNDATION("학문의기초"),
+
     // 핵심 교양 영역
     CORE_INU_SEMINAR("(핵심)INU세미나"),
     CORE_HUMANITIES("(핵심)인문"),
@@ -23,7 +27,7 @@ public enum CourseArea {
     CORE_ARTS_SPORTS("(핵심)예술체육"),
     CORE_FOREIGN_LANGUAGE("(핵심)외국어"),
 
-    // 일반 교양 영역
+    // 심화 교양 영역
     HUMANITIES("인문"),
     SOCIAL("사회"),
     SCIENCE_TECHNOLOGY("과학기술"),
@@ -56,7 +60,9 @@ public enum CourseArea {
     }
 
     private boolean isGeneralEducationArea() {
-        return this == CORE_INU_SEMINAR ||
+        return this == BASIC_SCIENCE_ENGINEERING ||
+                this == ACADEMIC_FOUNDATION ||
+                this == CORE_INU_SEMINAR ||
                 this == CORE_HUMANITIES ||
                 this == CORE_SOCIAL ||
                 this == CORE_SCIENCE_TECHNOLOGY ||
