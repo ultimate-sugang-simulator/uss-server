@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: uss-server-prod
+
+  datasource:
+    url: ${PROD_DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: false
+    show-sql: false
+    defer-datasource-initialization: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+    default-encoding: UTF-8
+
+security:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}
+    access-token-expiration-time: 21600000
+    refresh-token-expiration-time: 259200000
+
+logging:
+  level:
+    root: INFO
+    com.uss: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
