@@ -99,20 +99,20 @@ jobs:
 
             if [ -f "sql/schema.sql" ]; then
               echo "Executing schema.sql..."
-              mysql -h localhost -u ${{ secrets.MYSQL_USERNAME }} -p${{ secrets.MYSQL_PASSWORD }} uss_db_prod < sql/schema.sql
+              mysql -h localhost -u ${{ secrets.MYSQL_USERNAME }} -p${{ secrets.MYSQL_PASSWORD }} --default-character-set=utf8mb4 uss_db_prod < sql/schema.sql
             fi
 
             for file in sql/course_01.sql sql/course_02.sql sql/course_03.sql; do
               if [ -f "$file" ]; then
                 echo "Executing $file..."
-                mysql -h localhost -u ${{ secrets.MYSQL_USERNAME }} -p${{ secrets.MYSQL_PASSWORD }} uss_db_prod < "$file"
+                mysql -h localhost -u ${{ secrets.MYSQL_USERNAME }} -p${{ secrets.MYSQL_PASSWORD }} --default-character-set=utf8mb4 uss_db_prod < "$file"
               fi
             done
 
             for file in sql/course_schedule_01.sql sql/course_schedule_02.sql sql/course_schedule_03.sql; do
               if [ -f "$file" ]; then
                 echo "Executing $file..."
-                mysql -h localhost -u ${{ secrets.MYSQL_USERNAME }} -p${{ secrets.MYSQL_PASSWORD }} uss_db_prod < "$file"
+                mysql -h localhost -u ${{ secrets.MYSQL_USERNAME }} -p${{ secrets.MYSQL_PASSWORD }} --default-character-set=utf8mb4 uss_db_prod < "$file"
               fi
             done
 
