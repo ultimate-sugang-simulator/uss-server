@@ -93,26 +93,29 @@ jobs:
           script: |
             cd /home/serverking/uss/release
 
-            # .env 파일 생성
             echo "DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}" > .env
 
-            # SQL 파일 실행 (course 먼저, 그 다음 schedule)
             echo "Executing SQL files..."
+
+            if [ -f "sql/schema.sql" ]; then
+              echo "Executing schema.sql..."
+              mysql -h localhost -u ${{ secrets.MYSQL_USERNAME }} -p${{ secrets.MYSQL_PASSWORD }} uss_db_release < sql/schema.sql
+            fi
+
             for file in sql/course_01.sql sql/course_02.sql sql/course_03.sql; do
               if [ -f "$file" ]; then
                 echo "Executing $file..."
-                mysql -h localhost -u ${{ secrets.MYSQL_USERNAME }} -p${{ secrets.MYSQL_PASSWORD }} uss_db_release < "$file" || echo "Warning: $file execution failed"
+                mysql -h localhost -u ${{ secrets.MYSQL_USERNAME }} -p${{ secrets.MYSQL_PASSWORD }} uss_db_release < "$file"
               fi
             done
 
             for file in sql/course_schedule_01.sql sql/course_schedule_02.sql sql/course_schedule_03.sql; do
               if [ -f "$file" ]; then
                 echo "Executing $file..."
-                mysql -h localhost -u ${{ secrets.MYSQL_USERNAME }} -p${{ secrets.MYSQL_PASSWORD }} uss_db_release < "$file" || echo "Warning: $file execution failed"
+                mysql -h localhost -u ${{ secrets.MYSQL_USERNAME }} -p${{ secrets.MYSQL_PASSWORD }} uss_db_release < "$file"
               fi
             done
 
-            # Docker 배포
             docker-compose -f docker-compose-release.yml down
             docker-compose -f docker-compose-release.yml pull
             docker-compose -f docker-compose-release.yml up -d
