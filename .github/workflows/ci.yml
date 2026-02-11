@@ -1,0 +1,41 @@
+name: USS CI
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - release
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  test:
+    name: 테스트
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Java 17 설정
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Gradle 권한 설정
+        run: chmod +x ./gradlew
+
+      - name: 테스트 실행
+        run: ./gradlew --info test
+
+      - name: 결과 리포트
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: ${{ always() }}
+        with:
+          files: build/test-results/test/TEST-*.xml

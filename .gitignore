@@ -22,7 +22,6 @@ bin/
 *.iws
 *.iml
 *.ipr
-application.yml
 
 out/
 !**/src/main/**/out/
@@ -43,5 +42,3 @@ CLAUDE.md
 TASKS.md
 
 /src/main/resources/application-local.yml
-/src/main/resources/sql/generate_liberal_arts_sql.py
-/src/main/resources/sql/generate_sql.py

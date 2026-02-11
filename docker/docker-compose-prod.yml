@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  uss-server-prod:
+    container_name: uss-server-prod
+    image: ${DOCKER_HUB_USERNAME}/uss-server:prod
+    ports:
+      - "8181:8080"
+    environment:
+      - TZ=Asia/Seoul
+      - SPRING_PROFILES_ACTIVE=prod
+    networks:
+      - uss-prod
+    volumes:
+      - ./logs:/var/log/spring
+
+networks:
+  uss-prod:
+    driver: bridge
