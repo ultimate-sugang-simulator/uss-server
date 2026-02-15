@@ -7,7 +7,6 @@ import org.hibernate.engine.jdbc.internal.FormatStyle;
 import java.util.Locale;
 
 public class P6SpySqlFormatter implements MessageFormattingStrategy {
-
     @Override
     public String formatMessage(
             final int connectionId,
