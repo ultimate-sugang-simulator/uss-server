@@ -78,7 +78,7 @@ public interface CourseControllerDocs {
     })
     @GetMapping("/other-department")
     ResponseEntity<MajorCoursesResponse> getOtherDepartmentCourses(
-            @ParamValidation(maxLength = 30)
+            @ParamValidation(maxLength = 40)
             @RequestParam("department") final String department
     );
 
@@ -99,7 +99,7 @@ public interface CourseControllerDocs {
     })
     @GetMapping("/interdisciplinary-major")
     ResponseEntity<InterdisciplinaryMajorCoursesResponse> getInterdisciplinaryMajorCourses(
-            @ParamValidation(maxLength = 30)
+            @ParamValidation(maxLength = 40)
             @RequestParam("department") final String department
     );
 
@@ -110,7 +110,7 @@ public interface CourseControllerDocs {
     })
     @GetMapping("/search")
     ResponseEntity<SearchedCoursesResponse> searchCourses(
-            @ParamValidation(maxLength = 30)
+            @ParamValidation(maxLength = 70)
             @RequestParam("keyword") final String keyword
     );
 }

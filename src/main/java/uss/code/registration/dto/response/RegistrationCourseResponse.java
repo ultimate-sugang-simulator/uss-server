@@ -2,14 +2,13 @@ package uss.code.registration.dto.response;
 
 import lombok.Builder;
 import uss.code.course.domain.Course;
-import uss.code.course.domain.CourseClassification;
 
 import static lombok.AccessLevel.PRIVATE;
 
 @Builder(access = PRIVATE)
 public record RegistrationCourseResponse(
         long id,
-        CourseClassification courseClassification,
+        String courseClassification,
         String courseCode,
         String courseTitleKr,
         String courseTitleEn,
@@ -23,7 +22,7 @@ public record RegistrationCourseResponse(
     public static RegistrationCourseResponse from(final Course course) {
         return RegistrationCourseResponse.builder()
                 .id(course.getId())
-                .courseDepartment(course.getCourseDepartment().getName())
+                .courseClassification(course.getCourseClassification().getName())
                 .courseCode(course.getCourseCode())
                 .courseTitleKr(course.getTitleKr())
                 .courseTitleEn(course.getTitleEn())
@@ -32,6 +31,7 @@ public record RegistrationCourseResponse(
                 .schedule(course.getFormattedCourseSchedules())
                 .classroom(course.getClassroom() != null ? course.getClassroom() : "-")
                 .courseDepartment(course.getCourseDepartment().getName())
+                .professor(course.getProfessorName() != null ? course.getProfessorName() : "-")
                 .build();
     }
 }

@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS members (
     last_semester_gpa DOUBLE NOT NULL,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
-    INDEX idx_email (email),
     INDEX idx_student_id (student_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -35,9 +34,9 @@ CREATE TABLE IF NOT EXISTS courses (
     is_english_course BOOLEAN NOT NULL DEFAULT FALSE,
     max_capacity INT NOT NULL,
     current_enrollment INT NOT NULL DEFAULT 0,
-    INDEX idx_course_code (course_code),
-    INDEX idx_course_type (course_type),
-    INDEX idx_course_college (course_college)
+    INDEX idx_course_department (course_department),
+    INDEX idx_course_area (course_area),
+    FULLTEXT INDEX ft_idx_course_search (course_code, title_kr, title_en) WITH PARSER ngram
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS course_schedules (
@@ -48,8 +47,7 @@ CREATE TABLE IF NOT EXISTS course_schedules (
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
-    INDEX idx_course_id (course_id),
-    INDEX idx_course_day (course_day)
+    INDEX idx_course_id (course_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS registrations (
@@ -83,8 +81,7 @@ CREATE TABLE IF NOT EXISTS email_verification_codes (
     verified BOOLEAN NOT NULL DEFAULT FALSE,
     failed_count INT NOT NULL DEFAULT 0,
     resend_count INT NOT NULL DEFAULT 0,
-    expires_at DATETIME NOT NULL,
-    INDEX idx_email (email)
+    expires_at DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS challenge_codes (

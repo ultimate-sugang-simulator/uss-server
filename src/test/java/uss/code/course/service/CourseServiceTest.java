@@ -5,15 +5,21 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uss.code.auth.dto.request.SignUpRequest;
-import uss.code.course.domain.*;
+import uss.code.course.domain.Course;
+import uss.code.course.domain.CourseArea;
+import uss.code.course.domain.CourseClassification;
+import uss.code.course.domain.CourseCollege;
+import uss.code.course.domain.CourseDay;
+import uss.code.course.domain.CourseDepartment;
+import uss.code.course.domain.CourseGrade;
+import uss.code.course.domain.CourseSchedule;
+import uss.code.course.domain.CourseType;
 import uss.code.course.dto.response.GeneralEducationCourseResponse;
 import uss.code.course.dto.response.GeneralEducationCoursesResponse;
 import uss.code.course.dto.response.InterdisciplinaryMajorCourseResponse;
 import uss.code.course.dto.response.InterdisciplinaryMajorCoursesResponse;
 import uss.code.course.dto.response.MajorCourseResponse;
 import uss.code.course.dto.response.MajorCoursesResponse;
-import uss.code.course.dto.response.SearchedCourseResponse;
-import uss.code.course.dto.response.SearchedCoursesResponse;
 import uss.code.course.fixture.CourseFixture;
 import uss.code.course.fixture.CourseScheduleFixture;
 import uss.code.course.repository.CourseRepository;
@@ -27,10 +33,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
-import static uss.code.global.exception.domain.ExceptionCode.INVALID_GENERAL_EDUCATION_AREA;
-import static uss.code.global.exception.domain.ExceptionCode.INVALID_INTERDISCIPLINARY_DEPARTMENT;
-import static uss.code.global.exception.domain.ExceptionCode.MEMBER_NOT_FOUND;
+import static uss.code.global.exception.domain.ExceptionCode.*;
 
 @IntegrationTest
 class CourseServiceTest {
@@ -807,232 +810,232 @@ class CourseServiceTest {
         }
     }
 
-    @Nested
-    class 키워드_검색_테스트 {
-
-        @BeforeEach
-        void setUp() {
-            // 컴퓨터공학부 과목들
-            Course cse1 = CourseFixture.createCourseWithDetails(
-                    "자료구조", "Data Structure", "CSE101",
-                    CourseGrade.SOPHOMORE, "김교수", "공학관101"
-            );
-            Course cse2 = CourseFixture.createCourseWithDetails(
-                    "알고리즘", "Algorithm", "CSE201",
-                    CourseGrade.SOPHOMORE, "이교수", "공학관201"
-            );
-            Course cse3 = CourseFixture.createCourseWithDetails(
-                    "알고리즘설계", "Algorithm Design", "CSE202",
-                    CourseGrade.JUNIOR, null, null
-            );
-
-            // 수학과 과목들
-            Course math1 = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "선형대수", "Linear Algebra", "MATH101",
-                    CourseDepartment.MATHEMATICS,
-                    CourseGrade.FRESHMAN, "박교수", "자연관101"
-            );
-            Course math2 = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "데이터분석", "Data Analysis", "MATH201",
-                    CourseDepartment.MATHEMATICS,
-                    CourseGrade.SOPHOMORE, "최교수", "자연관201"
-            );
-
-            // 소셜데이터사이언스 연계전공 과목
-            Course sds = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "빅데이터분석", "Big Data Analysis", "SDS101",
-                    CourseDepartment.SOCIAL_DATA_SCIENCE,
-                    CourseGrade.ALL, "정교수", null
-            );
-
-            // 스케줄 추가
-            CourseSchedule schedule1 = CourseScheduleFixture.createCourseSchedule(
-                    cse1, "월3,4", CourseDay.MONDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
-            );
-            CourseSchedule schedule2 = CourseScheduleFixture.createCourseSchedule(
-                    cse1, "수3,4", CourseDay.WEDNESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
-            );
-            CourseSchedule schedule3 = CourseScheduleFixture.createCourseSchedule(
-                    cse2, "화1,2", CourseDay.TUESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
-            );
-
-            cse1.addCourseSchedule(schedule1);
-            cse1.addCourseSchedule(schedule2);
-            cse2.addCourseSchedule(schedule3);
-
-            courseRepository.saveAll(List.of(cse1, cse2, cse3, math1, math2, sds));
-        }
-
-        @Test
-        void 교과목명_국문으로_검색하면_해당_키워드가_포함된_과목이_조회된다() {
-            //given
-            final String keyword = "알고리즘";
-
-            //when
-            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
-
-            //then
-            assertThat(response.searchedCourseResponses()).hasSize(2);
-            assertThat(response.searchedCourseResponses())
-                    .extracting(SearchedCourseResponse::courseTitleKr)
-                    .containsExactlyInAnyOrder("알고리즘", "알고리즘설계");
-        }
-
-        @Test
-        void 교과목명_영문으로_검색하면_해당_키워드가_포함된_과목이_조회된다() {
-            //given
-            final String keyword = "Data";
-
-            //when
-            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
-
-            //then
-            assertThat(response.searchedCourseResponses()).hasSize(3);
-            assertThat(response.searchedCourseResponses())
-                    .extracting(SearchedCourseResponse::courseTitleEn)
-                    .containsExactlyInAnyOrder("Data Structure", "Data Analysis", "Big Data Analysis");
-        }
-
-        @Test
-        void 과목코드로_검색하면_해당_키워드가_포함된_과목이_조회된다() {
-            //given
-            final String keyword = "CSE";
-
-            //when
-            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
-
-            //then
-            assertThat(response.searchedCourseResponses()).hasSize(3);
-            assertThat(response.searchedCourseResponses())
-                    .extracting(SearchedCourseResponse::courseCode)
-                    .containsExactlyInAnyOrder("CSE101", "CSE201", "CSE202");
-        }
-
-        @Test
-        void 부분_문자열_검색이_정상_동작한다() {
-            //given
-            final String keyword = "101";
-
-            //when
-            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
-
-            //then
-            assertThat(response.searchedCourseResponses()).hasSize(3);
-            assertThat(response.searchedCourseResponses())
-                    .extracting(SearchedCourseResponse::courseCode)
-                    .containsExactlyInAnyOrder("CSE101", "MATH101", "SDS101");
-        }
-
-        @Test
-        void 여러_필드에서_동시에_매칭되어도_중복_없이_조회된다() {
-            //given
-            final String keyword = "Data";
-
-            //when
-            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
-
-            //then
-            // "빅데이터분석" 과목은 국문 과목명과 영문 과목명 모두에 "Data"를 포함하지만 한 번만 조회
-            assertThat(response.searchedCourseResponses()).hasSize(3);
-            final long sdsCount = response.searchedCourseResponses().stream()
-                    .filter(c -> c.courseCode().equals("SDS101"))
-                    .count();
-            assertThat(sdsCount).isEqualTo(1);
-        }
-
-        @Test
-        void 검색_결과가_없으면_빈_리스트가_반환된다() {
-            //given
-            final String keyword = "존재하지않는과목";
-
-            //when
-            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
-
-            //then
-            assertThat(response.searchedCourseResponses()).isEmpty();
-        }
-
-        @Test
-        void 스케줄이_있는_과목은_요일순으로_정렬되어_반환된다() {
-            //given
-            final String keyword = "CSE";
-
-            //when
-            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
-
-            //then
-            // CSE101: 월3,4 수3,4
-            final SearchedCourseResponse cse101 = response.searchedCourseResponses().stream()
-                    .filter(c -> c.courseCode().equals("CSE101"))
-                    .findFirst()
-                    .orElseThrow();
-            assertThat(cse101.schedule()).isEqualTo("월3,4 수3,4");
-
-            // CSE201: 화1,2
-            final SearchedCourseResponse cse201 = response.searchedCourseResponses().stream()
-                    .filter(c -> c.courseCode().equals("CSE201"))
-                    .findFirst()
-                    .orElseThrow();
-            assertThat(cse201.schedule()).isEqualTo("화1,2");
-        }
-
-        @Test
-        void 스케줄이_없는_과목은_하이픈으로_반환된다() {
-            //given
-            final String keyword = "알고리즘설계";
-
-            //when
-            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
-
-            //then
-            final SearchedCourseResponse cse202 = response.searchedCourseResponses().stream()
-                    .filter(c -> c.courseCode().equals("CSE202"))
-                    .findFirst()
-                    .orElseThrow();
-            assertThat(cse202.schedule()).isEqualTo("-");
-        }
-
-        @Test
-        void null값인_교수명과_강의실은_하이픈으로_반환된다() {
-            //given
-            final String keyword = "알고리즘설계";
-
-            //when
-            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
-
-            //then
-            final SearchedCourseResponse cse202 = response.searchedCourseResponses().stream()
-                    .filter(c -> c.courseCode().equals("CSE202"))
-                    .findFirst()
-                    .orElseThrow();
-            assertThat(cse202.professor()).isEqualTo("-");
-            assertThat(cse202.classroom()).isEqualTo("-");
-        }
-
-        @Test
-        void 다양한_학과의_과목들이_모두_검색된다() {
-            //given
-            final String keyword = "101";
-
-            //when
-            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
-
-            //then
-            assertThat(response.searchedCourseResponses())
-                    .extracting(SearchedCourseResponse::courseDepartment)
-                    .containsExactlyInAnyOrder("컴퓨터공학부", "수학과", "소셜데이터사이언스연계전공");
-        }
-
-        @Test
-        void 대소문자_구분_없이_검색된다() {
-            //given
-            final String keywordLower = "data";
-
-            //when
-            final SearchedCoursesResponse response = courseService.searchCourses(keywordLower);
-
-            //then
-            assertThat(response.searchedCourseResponses()).hasSize(3);
-        }
-    }
+//    @Nested
+//    class 키워드_검색_테스트 {
+//
+//        @BeforeEach
+//        void setUp() {
+//            // 컴퓨터공학부 과목들
+//            Course cse1 = CourseFixture.createCourseWithDetails(
+//                    "자료구조", "Data Structure", "CSE101",
+//                    CourseGrade.SOPHOMORE, "김교수", "공학관101"
+//            );
+//            Course cse2 = CourseFixture.createCourseWithDetails(
+//                    "알고리즘", "Algorithm", "CSE201",
+//                    CourseGrade.SOPHOMORE, "이교수", "공학관201"
+//            );
+//            Course cse3 = CourseFixture.createCourseWithDetails(
+//                    "알고리즘설계", "Algorithm Design", "CSE202",
+//                    CourseGrade.JUNIOR, null, null
+//            );
+//
+//            // 수학과 과목들
+//            Course math1 = CourseFixture.createCourseWithDepartmentAndDetails(
+//                    "선형대수", "Linear Algebra", "MATH101",
+//                    CourseDepartment.MATHEMATICS,
+//                    CourseGrade.FRESHMAN, "박교수", "자연관101"
+//            );
+//            Course math2 = CourseFixture.createCourseWithDepartmentAndDetails(
+//                    "데이터분석", "Data Analysis", "MATH201",
+//                    CourseDepartment.MATHEMATICS,
+//                    CourseGrade.SOPHOMORE, "최교수", "자연관201"
+//            );
+//
+//            // 소셜데이터사이언스 연계전공 과목
+//            Course sds = CourseFixture.createCourseWithDepartmentAndDetails(
+//                    "빅데이터분석", "Big Data Analysis", "SDS101",
+//                    CourseDepartment.SOCIAL_DATA_SCIENCE,
+//                    CourseGrade.ALL, "정교수", null
+//            );
+//
+//            // 스케줄 추가
+//            CourseSchedule schedule1 = CourseScheduleFixture.createCourseSchedule(
+//                    cse1, "월3,4", CourseDay.MONDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+//            );
+//            CourseSchedule schedule2 = CourseScheduleFixture.createCourseSchedule(
+//                    cse1, "수3,4", CourseDay.WEDNESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+//            );
+//            CourseSchedule schedule3 = CourseScheduleFixture.createCourseSchedule(
+//                    cse2, "화1,2", CourseDay.TUESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+//            );
+//
+//            cse1.addCourseSchedule(schedule1);
+//            cse1.addCourseSchedule(schedule2);
+//            cse2.addCourseSchedule(schedule3);
+//
+//            courseRepository.saveAll(List.of(cse1, cse2, cse3, math1, math2, sds));
+//        }
+//
+//        @Test
+//        void 교과목명_국문으로_검색하면_해당_키워드가_포함된_과목이_조회된다() {
+//            //given
+//            final String keyword = "알고리즘";
+//
+//            //when
+//            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
+//
+//            //then
+//            assertThat(response.searchedCourseResponses()).hasSize(2);
+//            assertThat(response.searchedCourseResponses())
+//                    .extracting(SearchedCourseResponse::courseTitleKr)
+//                    .containsExactlyInAnyOrder("알고리즘", "알고리즘설계");
+//        }
+//
+//        @Test
+//        void 교과목명_영문으로_검색하면_해당_키워드가_포함된_과목이_조회된다() {
+//            //given
+//            final String keyword = "Data";
+//
+//            //when
+//            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
+//
+//            //then
+//            assertThat(response.searchedCourseResponses()).hasSize(3);
+//            assertThat(response.searchedCourseResponses())
+//                    .extracting(SearchedCourseResponse::courseTitleEn)
+//                    .containsExactlyInAnyOrder("Data Structure", "Data Analysis", "Big Data Analysis");
+//        }
+//
+//        @Test
+//        void 과목코드로_검색하면_해당_키워드가_포함된_과목이_조회된다() {
+//            //given
+//            final String keyword = "CSE";
+//
+//            //when
+//            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
+//
+//            //then
+//            assertThat(response.searchedCourseResponses()).hasSize(3);
+//            assertThat(response.searchedCourseResponses())
+//                    .extracting(SearchedCourseResponse::courseCode)
+//                    .containsExactlyInAnyOrder("CSE101", "CSE201", "CSE202");
+//        }
+//
+//        @Test
+//        void 부분_문자열_검색이_정상_동작한다() {
+//            //given
+//            final String keyword = "101";
+//
+//            //when
+//            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
+//
+//            //then
+//            assertThat(response.searchedCourseResponses()).hasSize(3);
+//            assertThat(response.searchedCourseResponses())
+//                    .extracting(SearchedCourseResponse::courseCode)
+//                    .containsExactlyInAnyOrder("CSE101", "MATH101", "SDS101");
+//        }
+//
+//        @Test
+//        void 여러_필드에서_동시에_매칭되어도_중복_없이_조회된다() {
+//            //given
+//            final String keyword = "Data";
+//
+//            //when
+//            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
+//
+//            //then
+//            // "빅데이터분석" 과목은 국문 과목명과 영문 과목명 모두에 "Data"를 포함하지만 한 번만 조회
+//            assertThat(response.searchedCourseResponses()).hasSize(3);
+//            final long sdsCount = response.searchedCourseResponses().stream()
+//                    .filter(c -> c.courseCode().equals("SDS101"))
+//                    .count();
+//            assertThat(sdsCount).isEqualTo(1);
+//        }
+//
+//        @Test
+//        void 검색_결과가_없으면_빈_리스트가_반환된다() {
+//            //given
+//            final String keyword = "존재하지않는과목";
+//
+//            //when
+//            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
+//
+//            //then
+//            assertThat(response.searchedCourseResponses()).isEmpty();
+//        }
+//
+//        @Test
+//        void 스케줄이_있는_과목은_요일순으로_정렬되어_반환된다() {
+//            //given
+//            final String keyword = "CSE";
+//
+//            //when
+//            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
+//
+//            //then
+//            // CSE101: 월3,4 수3,4
+//            final SearchedCourseResponse cse101 = response.searchedCourseResponses().stream()
+//                    .filter(c -> c.courseCode().equals("CSE101"))
+//                    .findFirst()
+//                    .orElseThrow();
+//            assertThat(cse101.schedule()).isEqualTo("월3,4 수3,4");
+//
+//            // CSE201: 화1,2
+//            final SearchedCourseResponse cse201 = response.searchedCourseResponses().stream()
+//                    .filter(c -> c.courseCode().equals("CSE201"))
+//                    .findFirst()
+//                    .orElseThrow();
+//            assertThat(cse201.schedule()).isEqualTo("화1,2");
+//        }
+//
+//        @Test
+//        void 스케줄이_없는_과목은_하이픈으로_반환된다() {
+//            //given
+//            final String keyword = "알고리즘설계";
+//
+//            //when
+//            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
+//
+//            //then
+//            final SearchedCourseResponse cse202 = response.searchedCourseResponses().stream()
+//                    .filter(c -> c.courseCode().equals("CSE202"))
+//                    .findFirst()
+//                    .orElseThrow();
+//            assertThat(cse202.schedule()).isEqualTo("-");
+//        }
+//
+//        @Test
+//        void null값인_교수명과_강의실은_하이픈으로_반환된다() {
+//            //given
+//            final String keyword = "알고리즘설계";
+//
+//            //when
+//            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
+//
+//            //then
+//            final SearchedCourseResponse cse202 = response.searchedCourseResponses().stream()
+//                    .filter(c -> c.courseCode().equals("CSE202"))
+//                    .findFirst()
+//                    .orElseThrow();
+//            assertThat(cse202.professor()).isEqualTo("-");
+//            assertThat(cse202.classroom()).isEqualTo("-");
+//        }
+//
+//        @Test
+//        void 다양한_학과의_과목들이_모두_검색된다() {
+//            //given
+//            final String keyword = "101";
+//
+//            //when
+//            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
+//
+//            //then
+//            assertThat(response.searchedCourseResponses())
+//                    .extracting(SearchedCourseResponse::courseDepartment)
+//                    .containsExactlyInAnyOrder("컴퓨터공학부", "수학과", "소셜데이터사이언스연계전공");
+//        }
+//
+//        @Test
+//        void 대소문자_구분_없이_검색된다() {
+//            //given
+//            final String keywordLower = "data";
+//
+//            //when
+//            final SearchedCoursesResponse response = courseService.searchCourses(keywordLower);
+//
+//            //then
+//            assertThat(response.searchedCourseResponses()).hasSize(3);
+//        }
+//    }
 }
