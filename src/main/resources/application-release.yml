@@ -16,7 +16,6 @@ spring:
         format_sql: true
         show_sql: false
     show-sql: false
-    defer-datasource-initialization: true
 
   mail:
     host: smtp.gmail.com
@@ -34,6 +33,13 @@ spring:
           timeout: 5000
           writetimeout: 5000
     default-encoding: UTF-8
+
+    flyway:
+      enabled: true
+      baseline-on-migrate: true
+      locations:
+        - classpath:database/migration
+        - classpath:database/seed
 
 security:
   jwt:
