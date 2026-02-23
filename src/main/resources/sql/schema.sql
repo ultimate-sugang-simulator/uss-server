@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS courses (
     INDEX idx_course_type (course_type),
     INDEX idx_course_college (course_college),
     INDEX idx_course_department (course_department),
+    INDEX idx_course_area (course_area),
     FULLTEXT INDEX ft_idx_course_search (course_code, title_kr, title_en) WITH PARSER ngram
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
