@@ -34,12 +34,12 @@ spring:
           writetimeout: 5000
     default-encoding: UTF-8
 
-    flyway:
-      enabled: true
-      baseline-on-migrate: true
-      locations:
-        - classpath:database/migration
-        - classpath:database/seed
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations:
+      - classpath:database/migration
+      - classpath:database/seed
 
 security:
   jwt:
