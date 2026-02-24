@@ -8,8 +8,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: uss_db
-      MYSQL_USER: uss_user
-      MYSQL_PASSWORD: uss_password
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
       TZ: Asia/Seoul
     ports:
       - "3307:3306"
@@ -18,6 +18,7 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+      - --ngram_token_size=2
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s

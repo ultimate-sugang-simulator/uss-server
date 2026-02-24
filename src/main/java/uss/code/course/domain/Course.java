@@ -11,6 +11,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -30,6 +31,7 @@ public class Course {
     private Long id;
 
     @OneToMany(mappedBy = "course", cascade = {PERSIST, REMOVE}, orphanRemoval = true)
+    @BatchSize(size = 1000)
     private List<CourseSchedule> courseSchedules = new ArrayList<>();
 
     @Column(nullable = false, name = "title_kr")

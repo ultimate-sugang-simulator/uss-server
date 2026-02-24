@@ -29,15 +29,12 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     """)
     List<Course> findByCourseArea(@Param("course_area") final CourseArea courseArea);
 
-    @Query("""
-        SELECT DISTINCT c
-        FROM Course c
-        LEFT JOIN FETCH c.courseSchedules
-        WHERE LOWER(c.titleKr) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(c.titleEn) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(c.courseCode) LIKE LOWER(CONCAT('%', :keyword, '%'))
-        ORDER BY c.courseGrade, c.courseCode
-    """)
+    @Query(value = """
+        SELECT DISTINCT c.*
+        FROM courses c
+        WHERE MATCH(c.course_code, c.title_kr, c.title_en) AGAINST(:keyword IN BOOLEAN MODE)
+        ORDER BY MATCH(c.course_code, c.title_kr, c.title_en) AGAINST(:keyword IN BOOLEAN MODE)
+    """, nativeQuery = true)
     List<Course> findByKeyword(@Param("keyword") final String keyword);
 
     @Query("""

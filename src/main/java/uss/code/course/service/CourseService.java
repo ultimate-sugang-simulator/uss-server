@@ -57,6 +57,9 @@ public class CourseService {
         return GeneralEducationCoursesResponse.of(generalEducationCourseResponses);
     }
 
+    /**
+     * TODO 현재 타학과 조회 로직인데, 교양, 일선에 해당하는 department가 들어와도 조회됨 -> 특정 학과가 아니면 조회 안되는 로직 추가 필요
+     */
     @Transactional(readOnly = true)
     public MajorCoursesResponse getOtherDepartmentCourses(final String department) {
         final CourseDepartment courseDepartment = CourseDepartment.from(department);
