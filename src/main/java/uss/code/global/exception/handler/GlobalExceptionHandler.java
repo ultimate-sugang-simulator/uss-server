@@ -1,6 +1,7 @@
 package uss.code.global.exception.handler;
 
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -14,11 +15,13 @@ import uss.code.global.exception.dto.response.ErrorResponse;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static uss.code.global.exception.domain.ExceptionCode.INVALID_REQUEST_PARAMETER;
 
+@Log4j2
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RestApiException.class)
     public ResponseEntity<ErrorResponse> handleRestApiException(final RestApiException e) {
+        log.error("예외 발생: {}", e.getMessage());
         return makeExceptionResponse(e.getExceptionCode());
     }
 
@@ -41,11 +44,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(final ConstraintViolationException e) {
+        log.error("예외 발생: {}", e.getMessage());
         return makeExceptionResponse(INVALID_REQUEST_PARAMETER);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(final Exception e){
+        log.error("예외 발생: {}", e.getMessage());
         return makeExceptionResponse(ExceptionCode.UNEXPECTED_SERVER_ERROR);
     }
 

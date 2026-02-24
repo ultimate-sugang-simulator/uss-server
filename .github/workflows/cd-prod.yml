@@ -61,17 +61,6 @@ jobs:
       - name: 체크아웃
         uses: actions/checkout@v4
 
-      - name: SQL 파일 전송
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{secrets.APPCENTER_SERVER_IP}}
-          username: ${{secrets.APPCENTER_SERVER_USERNAME}}
-          password: ${{secrets.APPCENTER_SERVER_PASSWORD}}
-          port: ${{secrets.APPCENTER_SERVER_PORT}}
-          source: "src/main/resources/sql/*.sql"
-          target: "/home/serverking/uss/prod"
-          strip_components: 3
-
       - name: docker-compose-prod 파일 전송
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -83,7 +72,7 @@ jobs:
           target: "/home/serverking/uss/prod"
           strip_components: 1
 
-      - name: SQL 실행 및 배포
+      - name: 배포
         uses: appleboy/ssh-action@v1.1.0
         with:
           host: ${{secrets.APPCENTER_SERVER_IP}}
@@ -94,28 +83,7 @@ jobs:
             cd /home/serverking/uss/prod
 
             echo "DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}" > .env
-
-            echo "Executing SQL files..."
-
-            if [ -f "sql/schema.sql" ]; then
-              echo "Executing schema.sql..."
-              mysql -h localhost -u ${{ secrets.MYSQL_USERNAME }} -p${{ secrets.MYSQL_PASSWORD }} --default-character-set=utf8mb4 uss_db_prod < sql/schema.sql
-            fi
-
-            for file in sql/course_01.sql sql/course_02.sql sql/course_03.sql; do
-              if [ -f "$file" ]; then
-                echo "Executing $file..."
-                mysql -h localhost -u ${{ secrets.MYSQL_USERNAME }} -p${{ secrets.MYSQL_PASSWORD }} --default-character-set=utf8mb4 uss_db_prod < "$file"
-              fi
-            done
-
-            for file in sql/course_schedule_01.sql sql/course_schedule_02.sql sql/course_schedule_03.sql; do
-              if [ -f "$file" ]; then
-                echo "Executing $file..."
-                mysql -h localhost -u ${{ secrets.MYSQL_USERNAME }} -p${{ secrets.MYSQL_PASSWORD }} --default-character-set=utf8mb4 uss_db_prod < "$file"
-              fi
-            done
-
+            
             docker-compose -f docker-compose-prod.yml down
             docker-compose -f docker-compose-prod.yml pull
             docker-compose -f docker-compose-prod.yml up -d

@@ -38,7 +38,7 @@ public class CourseController implements CourseControllerDocs {
 
     @GetMapping("/other-department")
     public ResponseEntity<MajorCoursesResponse> getOtherDepartmentCourses(
-            @ParamValidation(maxLength = 30)
+            @ParamValidation(maxLength = 40)
             @RequestParam("department") final String department
     ){
         return ResponseEntity.ok(courseService.getOtherDepartmentCourses(department));
@@ -46,7 +46,7 @@ public class CourseController implements CourseControllerDocs {
 
     @GetMapping("/interdisciplinary-major")
     public ResponseEntity<InterdisciplinaryMajorCoursesResponse> getInterdisciplinaryMajorCourses(
-            @ParamValidation(maxLength = 30)
+            @ParamValidation(maxLength = 40)
             @RequestParam("department") final String department
     ){
         return ResponseEntity.ok(courseService.getInterdisciplinaryMajorCourses(department));
@@ -54,7 +54,7 @@ public class CourseController implements CourseControllerDocs {
 
     @GetMapping("/search")
     public ResponseEntity<SearchedCoursesResponse> searchCourses(
-            @ParamValidation(maxLength = 30)
+            @ParamValidation(maxLength = 70)
             @RequestParam("keyword") final String keyword
     ){
         return ResponseEntity.ok(courseService.searchCourses(keyword.trim()));
