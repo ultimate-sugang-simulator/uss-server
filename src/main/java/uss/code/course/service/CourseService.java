@@ -21,7 +21,7 @@ import uss.code.member.repository.MemberRepository;
 
 import java.util.List;
 
-import static uss.code.global.exception.domain.ExceptionCode.MEMBER_NOT_FOUND;
+import static uss.code.global.exception.domain.BusinessExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

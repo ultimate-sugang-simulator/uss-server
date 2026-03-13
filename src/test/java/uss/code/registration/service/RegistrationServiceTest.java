@@ -27,7 +27,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static uss.code.global.exception.domain.ExceptionCode.*;
+import static uss.code.global.exception.domain.BusinessExceptionCode.*;
 
 import uss.code.course.domain.CourseType;
 import uss.code.global.exception.domain.RestApiException;

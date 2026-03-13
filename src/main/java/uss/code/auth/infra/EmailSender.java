@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import uss.code.global.exception.domain.RestApiException;
 
-import static uss.code.global.exception.domain.ExceptionCode.EMAIL_SENDING_FAILED;
+import static uss.code.global.exception.domain.BusinessExceptionCode.EMAIL_SENDING_FAILED;
 
 @Log4j2
 @Component

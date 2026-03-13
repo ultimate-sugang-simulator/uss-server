@@ -3,11 +3,11 @@ package uss.code.global.exception.domain;
 import lombok.Getter;
 
 @Getter
-public class JwtAuthenticationException extends RuntimeException {
+public class AtAuthenticationException extends RuntimeException {
     private final int code;
     private final String message;
 
-    public JwtAuthenticationException(final AuthenticationExceptionCode exceptionCode) {
+    public AtAuthenticationException(final AuthenticationExceptionCode exceptionCode) {
         this.code = exceptionCode.getCode();
         this.message = exceptionCode.getMessage();
     }

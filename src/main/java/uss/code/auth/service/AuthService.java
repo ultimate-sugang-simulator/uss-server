@@ -13,7 +13,7 @@ import uss.code.global.exception.domain.RestApiException;
 import uss.code.member.domain.Member;
 import uss.code.member.repository.MemberRepository;
 
-import static uss.code.global.exception.domain.ExceptionCode.*;
+import static uss.code.global.exception.domain.BusinessExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor

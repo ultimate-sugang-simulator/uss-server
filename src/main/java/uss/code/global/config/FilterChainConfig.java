@@ -5,8 +5,10 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.jackson.databind.ObjectMapper;
+import uss.code.auth.filter.AdmissionTokenFilter;
 import uss.code.auth.filter.JwtAuthenticationFilter;
-import uss.code.auth.filter.JwtExceptionFilter;
+import uss.code.auth.filter.AuthenticationExceptionFilter;
+import uss.code.auth.infra.AtProvider;
 import uss.code.auth.infra.JwtProvider;
 
 @Configuration
@@ -15,27 +17,39 @@ public class FilterChainConfig {
 
     private static final int JWT_EXCEPTION_FILTER_ORDER = 1;
     private static final int JWT_AUTHENTICATION_FILTER_ORDER = 2;
+    private static final int ADMISSION_TOKEN_FILTER_ORDER = 3;
 
     private final ObjectMapper objectMapper;
     private final JwtProvider jwtProvider;
+    private final AtProvider atProvider;
 
     @Bean
-    public FilterRegistrationBean<JwtExceptionFilter> jwtExceptionFilter() {
-        FilterRegistrationBean<JwtExceptionFilter> bean = new FilterRegistrationBean<>();
+    public FilterRegistrationBean<AuthenticationExceptionFilter> jwtExceptionFilter() {
+        FilterRegistrationBean<AuthenticationExceptionFilter> jwtExceptionFilterBean = new FilterRegistrationBean<>();
 
-        bean.setFilter(new JwtExceptionFilter(objectMapper));
-        bean.setOrder(JWT_EXCEPTION_FILTER_ORDER);
+        jwtExceptionFilterBean.setFilter(new AuthenticationExceptionFilter(objectMapper));
+        jwtExceptionFilterBean.setOrder(JWT_EXCEPTION_FILTER_ORDER);
 
-        return bean;
+        return jwtExceptionFilterBean;
     }
 
     @Bean
     public FilterRegistrationBean<JwtAuthenticationFilter> jwtAuthenticationFilter() {
-        FilterRegistrationBean<JwtAuthenticationFilter> bean = new FilterRegistrationBean<>();
+        FilterRegistrationBean<JwtAuthenticationFilter> jwtAuthenticationFilterBean = new FilterRegistrationBean<>();
 
-        bean.setFilter(new JwtAuthenticationFilter(jwtProvider));
-        bean.setOrder(JWT_AUTHENTICATION_FILTER_ORDER);
+        jwtAuthenticationFilterBean.setFilter(new JwtAuthenticationFilter(jwtProvider));
+        jwtAuthenticationFilterBean.setOrder(JWT_AUTHENTICATION_FILTER_ORDER);
 
-        return bean;
+        return jwtAuthenticationFilterBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<AdmissionTokenFilter> admissionTokenFilter(){
+        FilterRegistrationBean<AdmissionTokenFilter> admissionTokenFilterBean = new FilterRegistrationBean<>();
+
+        admissionTokenFilterBean.setFilter(new AdmissionTokenFilter(atProvider));
+        admissionTokenFilterBean.setOrder(ADMISSION_TOKEN_FILTER_ORDER);
+
+        return admissionTokenFilterBean;
     }
 }
