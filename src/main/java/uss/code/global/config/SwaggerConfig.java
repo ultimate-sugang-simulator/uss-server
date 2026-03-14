@@ -19,6 +19,7 @@ public class SwaggerConfig {
 
     private static final String ACCESS_TOKEN_KEY = "access-token";
     private static final String REFRESH_TOKEN_KEY = "refresh-token";
+    private static final String ADMISSION_TOKEN_KEY = "at-token";
 
     @Bean
     public OpenAPI openAPI() {
@@ -36,13 +37,20 @@ public class SwaggerConfig {
                 .in(SecurityScheme.In.HEADER)
                 .name(REFRESH_TOKEN_KEY);
 
+        final SecurityScheme admissionTokenSecurityScheme = new SecurityScheme()
+                .type(SecurityScheme.Type.APIKEY)
+                .in(SecurityScheme.In.HEADER)
+                .name(ADMISSION_TOKEN_KEY);
+
         final Components components = new Components()
                 .addSecuritySchemes(ACCESS_TOKEN_KEY, accessTokenSecurityScheme)
-                .addSecuritySchemes(REFRESH_TOKEN_KEY, refreshTokenSecurityScheme);
+                .addSecuritySchemes(REFRESH_TOKEN_KEY, refreshTokenSecurityScheme)
+                .addSecuritySchemes(ADMISSION_TOKEN_KEY, admissionTokenSecurityScheme);
 
         final SecurityRequirement requirement = new SecurityRequirement()
                 .addList(ACCESS_TOKEN_KEY)
-                .addList(REFRESH_TOKEN_KEY);
+                .addList(REFRESH_TOKEN_KEY)
+                .addList(ADMISSION_TOKEN_KEY);
 
         return new OpenAPI()
                 .components(components)
@@ -60,7 +68,7 @@ public class SwaggerConfig {
 
     private List<Server> servers() {
         List<Server> servers = new ArrayList<>();
-        servers.add(new Server().url("http://localhost:8080").description("Dev env"));
+        servers.add(new Server().url("http://localhost:8181").description("Dev env"));
         servers.add(new Server().url("https://uss-release.inuappcenter.kr").description("Release env"));
         servers.add(new Server().url("https://uss.inuappcenter.kr").description("Production env"));
         return servers;

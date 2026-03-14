@@ -8,13 +8,11 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: uss_db
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
       TZ: Asia/Seoul
     ports:
       - "3307:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - uss_mysql_data:/var/lib/mysql
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
@@ -26,5 +24,5 @@ services:
       retries: 5
 
 volumes:
-  mysql_data:
+  uss_mysql_data:
     driver: local
