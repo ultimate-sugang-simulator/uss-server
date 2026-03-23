@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static uss.code.global.exception.domain.BusinessExceptionCode.*;
+import static uss.code.global.exception.domain.ExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor

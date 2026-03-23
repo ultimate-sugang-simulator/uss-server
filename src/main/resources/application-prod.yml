@@ -13,14 +13,9 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        format_sql: false
+        format_sql: true
         show_sql: false
     show-sql: false
-
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: 6379
 
   mail:
     host: smtp.gmail.com
@@ -55,5 +50,5 @@ logging:
   level:
     root: INFO
     com.uss: INFO
-    org.hibernate.SQL: WARN
+    org.hibernate.SQL: INFO
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE

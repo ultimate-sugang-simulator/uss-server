@@ -29,8 +29,6 @@ jobs:
           spring.datasource.username: ${{secrets.DATABASE_USERNAME}}
           spring.datasource.password: ${{secrets.DATABASE_PASSWORD}}
 
-          spring.data.redis.host: ${{secrets.REDIS_HOST}}
-
           spring.mail.username: ${{secrets.MAIL_USERNAME}}
           spring.mail.password: ${{secrets.MAIL_PASSWORD}}
 

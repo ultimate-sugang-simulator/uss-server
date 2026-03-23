@@ -29,7 +29,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static uss.code.global.exception.domain.BusinessExceptionCode.*;
+import static uss.code.global.exception.domain.ExceptionCode.*;
 
 @IntegrationTest
 class CartServiceTest {

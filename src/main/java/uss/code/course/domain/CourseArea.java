@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import uss.code.global.exception.domain.RestApiException;
 
-import static uss.code.global.exception.domain.BusinessExceptionCode.INVALID_ENUM_TYPE;
-import static uss.code.global.exception.domain.BusinessExceptionCode.INVALID_GENERAL_EDUCATION_AREA;
+import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
+import static uss.code.global.exception.domain.ExceptionCode.INVALID_GENERAL_EDUCATION_AREA;
 
 @Getter
 @RequiredArgsConstructor
