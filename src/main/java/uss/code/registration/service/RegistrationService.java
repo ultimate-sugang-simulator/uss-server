@@ -16,7 +16,7 @@ import uss.code.registration.repository.RegistrationRepository;
 
 import java.util.List;
 
-import static uss.code.global.exception.domain.BusinessExceptionCode.*;
+import static uss.code.global.exception.domain.ExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor

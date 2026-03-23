@@ -13,7 +13,7 @@ import uss.code.member.repository.MemberRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static uss.code.global.exception.domain.BusinessExceptionCode.MEMBER_NOT_FOUND;
+import static uss.code.global.exception.domain.ExceptionCode.MEMBER_NOT_FOUND;
 
 @IntegrationTest
 class MemberServiceTest {

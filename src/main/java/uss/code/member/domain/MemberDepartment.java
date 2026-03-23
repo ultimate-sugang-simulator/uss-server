@@ -6,7 +6,7 @@ import uss.code.global.exception.domain.RestApiException;
 
 import java.util.Arrays;
 
-import static uss.code.global.exception.domain.BusinessExceptionCode.INVALID_ENUM_TYPE;
+import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
 
 @Getter
 @RequiredArgsConstructor

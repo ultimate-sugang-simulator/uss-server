@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import uss.code.global.exception.domain.RestApiException;
 import uss.code.member.domain.MemberDepartment;
 
-import static uss.code.global.exception.domain.BusinessExceptionCode.INVALID_ENUM_TYPE;
-import static uss.code.global.exception.domain.BusinessExceptionCode.INVALID_INTERDISCIPLINARY_DEPARTMENT;
+import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
+import static uss.code.global.exception.domain.ExceptionCode.INVALID_INTERDISCIPLINARY_DEPARTMENT;
 
 @Getter
 @RequiredArgsConstructor
