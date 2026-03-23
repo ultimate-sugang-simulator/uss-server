@@ -11,15 +11,15 @@ import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uss.code.auth.dto.response.AuthTokenResponse;
-import uss.code.global.exception.domain.JwtTokenExpiredException;
-import uss.code.global.exception.domain.JwtTokenInvalidException;
-import uss.code.global.exception.domain.JwtTokenMissingException;
+import uss.code.global.exception.domain.JwtExpiredException;
+import uss.code.global.exception.domain.JwtInvalidException;
+import uss.code.global.exception.domain.JwtMissingException;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-import static uss.code.global.exception.domain.ExceptionCode.*;
+import static uss.code.global.exception.domain.AuthenticationExceptionCode.*;
 
 @Component
 public class JwtProvider {
@@ -70,10 +70,10 @@ public class JwtProvider {
             final String refreshToken
     ){
         if(accessToken == null)
-            throw new JwtTokenMissingException(MISSING_ACCESS_TOKEN);
+            throw new JwtMissingException(MISSING_ACCESS_TOKEN);
 
         if(refreshToken == null)
-            throw new JwtTokenMissingException(MISSING_REFRESH_TOKEN);
+            throw new JwtMissingException(MISSING_REFRESH_TOKEN);
 
         validateAccessToken(accessToken);
         validateRefreshToken(refreshToken);
@@ -98,13 +98,13 @@ public class JwtProvider {
         try {
             parseJwt(accessToken);
         } catch (ExpiredJwtException e) {
-            throw new JwtTokenExpiredException(EXPIRED_ACCESS_TOKEN);
+            throw new JwtExpiredException(EXPIRED_ACCESS_TOKEN);
         } catch (MalformedJwtException e) {
-            throw new JwtTokenInvalidException(INVALID_FORM_ACCESS_TOKEN);
+            throw new JwtInvalidException(INVALID_FORM_ACCESS_TOKEN);
         } catch (SignatureException e) {
-            throw new JwtTokenInvalidException(INVALID_SIGNATURE_ACCESS_TOKEN);
+            throw new JwtInvalidException(INVALID_SIGNATURE_ACCESS_TOKEN);
         } catch (JwtException | IllegalArgumentException e) {
-            throw new JwtTokenInvalidException(INVALID_ACCESS_TOKEN);
+            throw new JwtInvalidException(INVALID_ACCESS_TOKEN);
         }
     }
 
@@ -112,13 +112,13 @@ public class JwtProvider {
         try {
             parseJwt(refreshToken);
         } catch (ExpiredJwtException e) {
-            throw new JwtTokenExpiredException(EXPIRED_REFRESH_TOKEN);
+            throw new JwtExpiredException(EXPIRED_REFRESH_TOKEN);
         } catch (MalformedJwtException e) {
-            throw new JwtTokenInvalidException(INVALID_FORM_REFRESH_TOKEN);
+            throw new JwtInvalidException(INVALID_FORM_REFRESH_TOKEN);
         } catch (SignatureException e) {
-            throw new JwtTokenInvalidException(INVALID_SIGNATURE_REFRESH_TOKEN);
+            throw new JwtInvalidException(INVALID_SIGNATURE_REFRESH_TOKEN);
         } catch (JwtException | IllegalArgumentException e) {
-            throw new JwtTokenInvalidException(INVALID_REFRESH_TOKEN);
+            throw new JwtInvalidException(INVALID_REFRESH_TOKEN);
         }
     }
 }

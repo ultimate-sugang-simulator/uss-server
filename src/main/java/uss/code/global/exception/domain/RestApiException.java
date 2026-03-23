@@ -6,5 +6,5 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class RestApiException extends RuntimeException {
-    private final ExceptionCode exceptionCode;
+    private final BusinessExceptionCode exceptionCode;
 }

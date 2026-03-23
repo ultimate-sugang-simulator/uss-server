@@ -13,7 +13,7 @@ import uss.code.member.repository.MemberRepository;
 
 import java.time.LocalDateTime;
 
-import static uss.code.global.exception.domain.ExceptionCode.*;
+import static uss.code.global.exception.domain.BusinessExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
