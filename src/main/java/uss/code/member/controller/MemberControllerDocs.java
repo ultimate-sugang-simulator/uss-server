@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import uss.code.auth.annotation.Auth;
 import uss.code.global.exception.dto.response.ErrorResponse;
-import uss.code.member.dto.res.MemberProfileResponse;
+import uss.code.member.dto.response.MemberProfileResponse;
 
 @Tag(name = "Member API", description = "회원 관련 API")
 public interface MemberControllerDocs {
@@ -33,5 +33,5 @@ public interface MemberControllerDocs {
             )
     })
     @GetMapping("/profile")
-    ResponseEntity<MemberProfileResponse> getProfile(@Auth final long userId);
+    ResponseEntity<MemberProfileResponse> getProfile(@Auth final long memberId);
 }
