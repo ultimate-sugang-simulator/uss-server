@@ -39,6 +39,7 @@ out/
 
 ### Claude Code ###
 CLAUDE.md
+!.claude/CLAUDE.md
 TASKS.md
 
 /src/main/resources/application-local.yml
