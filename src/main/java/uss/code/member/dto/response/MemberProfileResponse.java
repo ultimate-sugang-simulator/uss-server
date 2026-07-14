@@ -1,4 +1,4 @@
-package uss.code.member.dto.res;
+package uss.code.member.dto.response;
 
 import lombok.Builder;
 import uss.code.member.domain.Member;

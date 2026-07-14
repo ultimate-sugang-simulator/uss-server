@@ -8,7 +8,7 @@ import uss.code.auth.dto.request.SignUpRequest;
 import uss.code.global.exception.domain.RestApiException;
 import uss.code.global.infra.IntegrationTest;
 import uss.code.member.domain.Member;
-import uss.code.member.dto.res.MemberProfileResponse;
+import uss.code.member.dto.response.MemberProfileResponse;
 import uss.code.member.repository.MemberRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
