@@ -46,9 +46,26 @@ security:
     access-token-expiration-time: 21600000
     refresh-token-expiration-time: 259200000
 
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  metrics:
+    tags:
+      application: uss-server-prod
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      slo:
+        http.server.requests: 100ms,200ms,500ms,1s,2s,5s
+
 logging:
   level:
     root: INFO
     com.uss: INFO
     org.hibernate.SQL: INFO
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    p6spy: WARN
