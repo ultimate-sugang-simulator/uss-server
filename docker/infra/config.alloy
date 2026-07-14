@@ -1,0 +1,99 @@
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+local.file_match "spring_info" {
+  path_targets = [{ __path__ = "/var/log/spring/info/*.log" }]
+}
+
+local.file_match "spring_warn" {
+  path_targets = [{ __path__ = "/var/log/spring/warn/*.log" }]
+}
+
+local.file_match "spring_error" {
+  path_targets = [{ __path__ = "/var/log/spring/error/*.log" }]
+}
+
+local.file_match "spring_api_perf" {
+  path_targets = [{ __path__ = "/var/log/spring/api-perf/*.log" }]
+}
+
+loki.source.file "spring_info" {
+  targets    = local.file_match.spring_info.targets
+  forward_to = [loki.process.spring_info_labels.receiver]
+}
+
+loki.source.file "spring_warn" {
+  targets    = local.file_match.spring_warn.targets
+  forward_to = [loki.process.spring_warn_labels.receiver]
+}
+
+loki.source.file "spring_error" {
+  targets    = local.file_match.spring_error.targets
+  forward_to = [loki.process.spring_error_labels.receiver]
+}
+
+loki.source.file "spring_api_perf" {
+  targets    = local.file_match.spring_api_perf.targets
+  forward_to = [loki.process.spring_api_perf_labels.receiver]
+}
+
+loki.process "spring_info_labels" {
+  forward_to = [loki.write.uss.receiver]
+
+  stage.static_labels {
+    values = {
+      service  = "uss-server",
+      env      = sys.env("ALLOY_ENV"),
+      level    = "info",
+      log_type = "application",
+    }
+  }
+}
+
+loki.process "spring_warn_labels" {
+  forward_to = [loki.write.uss.receiver]
+
+  stage.static_labels {
+    values = {
+      service  = "uss-server",
+      env      = sys.env("ALLOY_ENV"),
+      level    = "warn",
+      log_type = "application",
+    }
+  }
+}
+
+loki.process "spring_error_labels" {
+  forward_to = [loki.write.uss.receiver]
+
+  stage.static_labels {
+    values = {
+      service  = "uss-server",
+      env      = sys.env("ALLOY_ENV"),
+      level    = "error",
+      log_type = "application",
+    }
+  }
+}
+
+loki.process "spring_api_perf_labels" {
+  forward_to = [loki.write.uss.receiver]
+
+  stage.static_labels {
+    values = {
+      service  = "uss-server",
+      env      = sys.env("ALLOY_ENV"),
+      log_type = "performance",
+    }
+  }
+}
+
+loki.write "uss" {
+  endpoint {
+    url        = "http://uss-loki:3100/loki/api/v1/push"
+    batch_wait = "1s"
+    batch_size = "1MiB"
+  }
+}
