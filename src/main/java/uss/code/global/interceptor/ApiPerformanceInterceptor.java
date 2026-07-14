@@ -15,6 +15,7 @@ public class ApiPerformanceInterceptor implements HandlerInterceptor {
 
     private static final String START_TIME_ATTRIBUTE = "start-time";
     private static final long RESPONSE_TIME_THRESHOLD_MS = 3_000L;
+    private static final long NANOS_PER_MILLI = 1_000_000L;
 
     @Override
     public boolean preHandle(
@@ -22,7 +23,7 @@ public class ApiPerformanceInterceptor implements HandlerInterceptor {
             final HttpServletResponse response,
             final Object handler
     ) {
-        request.setAttribute(START_TIME_ATTRIBUTE, System.currentTimeMillis());
+        request.setAttribute(START_TIME_ATTRIBUTE, System.nanoTime());
 
         return true;
     }
@@ -40,7 +41,7 @@ public class ApiPerformanceInterceptor implements HandlerInterceptor {
             return;
         }
 
-        final long responseTime = System.currentTimeMillis() - startTime;
+        final long responseTime = (System.nanoTime() - startTime) / NANOS_PER_MILLI;
         final String method = request.getMethod();
         final String uri = request.getRequestURI();
         final int status = response.getStatus();

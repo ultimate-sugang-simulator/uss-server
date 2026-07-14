@@ -56,7 +56,7 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             logResponse(request, response);
         } finally {
-            MDC.clear();
+            MDC.remove(TRACE_ID_KEY);
         }
     }
 
@@ -96,17 +96,11 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
             return path;
         }
 
-        return path + "?" + maskSensitiveParams(decodeQuery(query));
+        return path + "?" + maskSensitiveParams(query);
     }
 
-    private String decodeQuery(final String query) {
-        try {
-            return URLDecoder.decode(query, StandardCharsets.UTF_8);
-        } catch (IllegalArgumentException e) {
-            return query;
-        }
-    }
-
+    // 인코딩된 원본 쿼리를 먼저 쪼갠 뒤 키·값을 개별 디코딩한다.
+    // 통째로 디코딩하면 값에 담긴 %26(&)·%3D(=)가 구분자로 둔갑해 파라미터가 잘못 쪼개진다.
     private String maskSensitiveParams(final String query) {
         final StringBuilder masked = new StringBuilder();
         final String[] params = query.split(QUERY_DELIMITER);
@@ -126,16 +120,26 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
         final int delimiterIndex = param.indexOf(KEY_VALUE_DELIMITER);
 
         if (delimiterIndex < 0) {
-            return param;
+            return decode(param);
         }
 
-        final String key = param.substring(0, delimiterIndex);
+        final String key = decode(param.substring(0, delimiterIndex));
 
         if (isSensitiveKey(key)) {
             return key + KEY_VALUE_DELIMITER + MASK_VALUE;
         }
 
-        return param;
+        final String value = decode(param.substring(delimiterIndex + 1));
+
+        return key + KEY_VALUE_DELIMITER + value;
+    }
+
+    private String decode(final String value) {
+        try {
+            return URLDecoder.decode(value, StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException e) {
+            return value;
+        }
     }
 
     private boolean isSensitiveKey(final String key) {
