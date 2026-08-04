@@ -29,7 +29,7 @@ public interface AuthControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "사용자 조회 실패",
-                                            value = "{\"error\" : \"MEMBER_1010\", \"message\" : \"사용자를 찾을 수 없습니다.\"}"
+                                            value = "{\"code\" : 1010, \"message\" : \"사용자를 찾을 수 없습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -39,7 +39,7 @@ public interface AuthControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "비밀번호 불일치",
-                                            value = "{\"error\" : \"PASSWORD_1012\", \"message\" : \"비밀번호가 일치하지 않습니다.\"}"
+                                            value = "{\"code\" : 1012, \"message\" : \"비밀번호가 일치하지 않습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -57,7 +57,7 @@ public interface AuthControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "이메일 인증 미완료",
-                                            value = "{\"error\" : \"EMAIL_1016\", \"message\" : \"이메일 인증이 완료되지 않았습니다.\"}"
+                                            value = "{\"code\" : 1016, \"message\" : \"이메일 인증이 완료되지 않았습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -67,7 +67,7 @@ public interface AuthControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "이미 존재하는 사용자",
-                                            value = "{\"error\" : \"MEMBER_1011\", \"message\" : \"이미 존재하는 사용자입니다.\"}"
+                                            value = "{\"code\" : 1011, \"message\" : \"이미 존재하는 사용자입니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))

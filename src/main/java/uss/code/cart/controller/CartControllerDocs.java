@@ -37,7 +37,7 @@ public interface CartControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "사용자 조회 실패",
-                                            value = "{\"error\" : \"MEMBER_1010\", \"message\" : \"사용자를 찾을 수 없습니다.\"}"
+                                            value = "{\"code\" : 1010, \"message\" : \"사용자를 찾을 수 없습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -47,7 +47,7 @@ public interface CartControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "과목 조회 실패",
-                                            value = "{\"error\" : \"COURSE_2002\", \"message\" : \"과목을 찾을 수 없습니다.\"}"
+                                            value = "{\"code\" : 2002, \"message\" : \"과목을 찾을 수 없습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -57,7 +57,7 @@ public interface CartControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "장바구니 제한 초과",
-                                            value = "{\"error\" : \"CARTED_COURSE_3001\", \"message\" : \"장바구니는 최대 10개의 과목을 담을 수 있습니다.\"}"
+                                            value = "{\"code\" : 3001, \"message\" : \"장바구니는 최대 10개의 과목을 담을 수 있습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -67,7 +67,7 @@ public interface CartControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "장바구니 중복 과목",
-                                            value = "{\"error\" : \"COURSE_3004\", \"message\" : \"이미 장바구니에 담긴 과목입니다.\"}"
+                                            value = "{\"code\" : 3004, \"message\" : \"이미 장바구니에 담긴 과목입니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -77,7 +77,7 @@ public interface CartControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "시간표 충돌",
-                                            value = "{\"error\" : \"COURSE_3002\", \"message\" : \"과목 시간표가 겹칩니다.\"}"
+                                            value = "{\"code\" : 3002, \"message\" : \"과목 시간표가 겹칩니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -87,7 +87,7 @@ public interface CartControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "과목 유형 제한 초과",
-                                            value = "{\"error\" : \"COURSE_3003\", \"message\" : \"해당 과목 유형의 등록 제한을 초과했습니다.\"}"
+                                            value = "{\"code\" : 3003, \"message\" : \"해당 과목 유형의 등록 제한을 초과했습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -108,7 +108,7 @@ public interface CartControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "장바구니 과목 조회 실패",
-                                            value = "{\"error\" : \"CARTED_COURSE_3000\", \"message\" : \"장바구니에 담은 과목을 찾을 수 없습니다.\"}"
+                                            value = "{\"code\" : 3000, \"message\" : \"장바구니에 담은 과목을 찾을 수 없습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))

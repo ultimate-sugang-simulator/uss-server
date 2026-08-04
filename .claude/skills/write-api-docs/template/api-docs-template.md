@@ -27,7 +27,7 @@ public interface {Controller}Docs {
                             examples = {
                                     @ExampleObject(
                                             name = "{에러명}",
-                                            value = "{\"error\" : \"DOMAIN_CODE\", \"message\" : \"에러 메시지\"}"
+                                            value = "{\"code\" : {코드}, \"message\" : \"에러 메시지\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -37,7 +37,7 @@ public interface {Controller}Docs {
                             examples = {
                                     @ExampleObject(
                                             name = "예기치 못한 예외 발생",
-                                            value = "{\"error\" : \"UNEXPECTED_SERVER_ERROR_9999\", \"message\" : \"서버 내부 오류가 발생했습니다.\"}"
+                                            value = "{\"code\" : 9999, \"message\" : \"서버 내부 오류가 발생했습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))

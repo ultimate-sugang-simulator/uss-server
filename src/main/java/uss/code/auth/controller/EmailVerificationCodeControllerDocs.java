@@ -29,7 +29,7 @@ public interface EmailVerificationCodeControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "이미 존재하는 사용자",
-                                            value = "{\"error\" : \"MEMBER_1011\", \"message\" : \"이미 존재하는 사용자입니다.\"}"
+                                            value = "{\"code\" : 1011, \"message\" : \"이미 존재하는 사용자입니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -39,7 +39,7 @@ public interface EmailVerificationCodeControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "이미 인증 진행 중",
-                                            value = "{\"error\" : \"EMAIL_1015\", \"message\" : \"이미 인증이 진행 중입니다.\"}"
+                                            value = "{\"code\" : 1015, \"message\" : \"이미 인증이 진행 중입니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -49,7 +49,7 @@ public interface EmailVerificationCodeControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "이미 인증 완료",
-                                            value = "{\"error\" : \"EMAIL_1017\", \"message\" : \"이미 인증이 완료되었습니다.\"}"
+                                            value = "{\"code\" : 1017, \"message\" : \"이미 인증이 완료되었습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -67,7 +67,7 @@ public interface EmailVerificationCodeControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "이메일 인증 정보 조회 실패",
-                                            value = "{\"error\" : \"EMAIL_1014\", \"message\" : \"이메일 인증 정보를 찾을 수 없습니다.\"}"
+                                            value = "{\"code\" : 1014, \"message\" : \"이메일 인증 정보를 찾을 수 없습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -77,7 +77,7 @@ public interface EmailVerificationCodeControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "이미 인증 완료",
-                                            value = "{\"error\" : \"EMAIL_1017\", \"message\" : \"이미 인증이 완료되었습니다.\"}"
+                                            value = "{\"code\" : 1017, \"message\" : \"이미 인증이 완료되었습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -87,7 +87,7 @@ public interface EmailVerificationCodeControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "재전송 횟수 초과",
-                                            value = "{\"error\" : \"VERIFICATION_1021\", \"message\" : \"인증코드 재전송 횟수를 초과했습니다.\"}"
+                                            value = "{\"code\" : 1021, \"message\" : \"인증코드 재전송 횟수를 초과했습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -105,7 +105,7 @@ public interface EmailVerificationCodeControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "이메일 인증 정보 조회 실패",
-                                            value = "{\"error\" : \"EMAIL_1014\", \"message\" : \"이메일 인증 정보를 찾을 수 없습니다.\"}"
+                                            value = "{\"code\" : 1014, \"message\" : \"이메일 인증 정보를 찾을 수 없습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -115,7 +115,7 @@ public interface EmailVerificationCodeControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "이미 인증 완료",
-                                            value = "{\"error\" : \"EMAIL_1017\", \"message\" : \"이미 인증이 완료되었습니다.\"}"
+                                            value = "{\"code\" : 1017, \"message\" : \"이미 인증이 완료되었습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -125,7 +125,7 @@ public interface EmailVerificationCodeControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "인증코드 만료",
-                                            value = "{\"error\" : \"VERIFICATION_1019\", \"message\" : \"인증코드가 만료되었습니다.\"}"
+                                            value = "{\"code\" : 1019, \"message\" : \"인증코드가 만료되었습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -135,7 +135,7 @@ public interface EmailVerificationCodeControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "인증 실패 횟수 초과",
-                                            value = "{\"error\" : \"VERIFICATION_1022\", \"message\" : \"인증 실패 횟수를 초과했습니다.\"}"
+                                            value = "{\"code\" : 1022, \"message\" : \"인증 실패 횟수를 초과했습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -145,7 +145,7 @@ public interface EmailVerificationCodeControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "인증코드 불일치",
-                                            value = "{\"error\" : \"VERIFICATION_1020\", \"message\" : \"인증코드가 일치하지 않습니다.\"}"
+                                            value = "{\"code\" : 1020, \"message\" : \"인증코드가 일치하지 않습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))

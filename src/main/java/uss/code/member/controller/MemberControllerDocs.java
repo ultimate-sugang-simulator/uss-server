@@ -26,7 +26,7 @@ public interface MemberControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "사용자 조회 실패",
-                                            value = "{\"error\" : \"MEMBER_1010\", \"message\" : \"사용자를 찾을 수 없습니다.\"}"
+                                            value = "{\"code\" : 1010, \"message\" : \"사용자를 찾을 수 없습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
