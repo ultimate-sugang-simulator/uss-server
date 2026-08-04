@@ -29,9 +29,6 @@ jobs:
           spring.datasource.username: ${{secrets.DATABASE_USERNAME}}
           spring.datasource.password: ${{secrets.DATABASE_PASSWORD}}
 
-          spring.mail.username: ${{secrets.MAIL_USERNAME}}
-          spring.mail.password: ${{secrets.MAIL_PASSWORD}}
-
           security.jwt.secret-key: ${{secrets.JWT_SECRET_KEY}}
 
       - name: Gradle 권한 설정

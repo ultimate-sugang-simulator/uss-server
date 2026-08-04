@@ -8,13 +8,11 @@ import uss.code.member.domain.MemberDepartment;
 import uss.code.member.domain.MemberGrade;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class MemberFixture {
 
     public static Member createMember() {
         return createMember(
-                UUID.randomUUID().toString().substring(0, 10) + "@example.com",
                 "20240001",
                 "password123",
                 "홍길동",
@@ -27,7 +25,6 @@ public class MemberFixture {
     }
 
     public static Member createMember(
-            final String email,
             final String studentId,
             final String password,
             final String name,
@@ -39,7 +36,6 @@ public class MemberFixture {
     ) {
         Member member = new Member();
 
-        ReflectionTestUtils.setField(member, "email", email);
         ReflectionTestUtils.setField(member, "studentId", studentId);
         ReflectionTestUtils.setField(member, "password", password);
         ReflectionTestUtils.setField(member, "name", name);

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import uss.code.auth.dto.request.SignUpRequest;
 import uss.code.course.domain.Course;
 import uss.code.course.domain.CourseArea;
 import uss.code.course.domain.CourseClassification;
@@ -25,7 +24,12 @@ import uss.code.course.fixture.CourseScheduleFixture;
 import uss.code.course.repository.CourseRepository;
 import uss.code.global.exception.domain.RestApiException;
 import uss.code.global.infra.IntegrationTest;
+import uss.code.member.domain.AcademicStatus;
 import uss.code.member.domain.Member;
+import uss.code.member.domain.MemberCollege;
+import uss.code.member.domain.MemberDepartment;
+import uss.code.member.domain.MemberGrade;
+import uss.code.member.fixture.MemberFixture;
 import uss.code.member.repository.MemberRepository;
 
 import java.time.LocalTime;
@@ -51,11 +55,10 @@ class CourseServiceTest {
         private static final String TEST_STUDENT_ID = "202012345";
         private static final String TEST_PASSWORD = "password1234";
         private static final String TEST_NAME = "홍길동";
-        private static final String TEST_EMAIL = "hong@inu.ac.kr";
-        private static final String TEST_COLLEGE = "INFORMATION_TECHNOLOGY";
-        private static final String TEST_DEPARTMENT = "COMPUTER_ENGINEERING";
-        private static final String TEST_GRADE = "JUNIOR";
-        private static final String TEST_ACADEMIC_STATUS = "ENROLLED";
+        private static final MemberCollege TEST_COLLEGE = MemberCollege.INFORMATION_TECHNOLOGY;
+        private static final MemberDepartment TEST_DEPARTMENT = MemberDepartment.COMPUTER_ENGINEERING;
+        private static final MemberGrade TEST_GRADE = MemberGrade.JUNIOR;
+        private static final AcademicStatus TEST_ACADEMIC_STATUS = AcademicStatus.ENROLLED;
         private static final double TEST_GPA = 3.5;
 
         private long validMemberId;
@@ -64,19 +67,16 @@ class CourseServiceTest {
         @BeforeEach
         void setUp() {
             // 회원 생성 (컴퓨터공학부)
-            final SignUpRequest signUpRequest = new SignUpRequest(
+            final Member member = MemberFixture.createMember(
                     TEST_STUDENT_ID,
                     TEST_PASSWORD,
                     TEST_NAME,
-                    TEST_EMAIL,
                     TEST_COLLEGE,
                     TEST_DEPARTMENT,
                     TEST_GRADE,
                     TEST_ACADEMIC_STATUS,
                     TEST_GPA
             );
-            final String encodedPassword = "testPassword1234";
-            final Member member = Member.signUp(signUpRequest, encodedPassword);
             memberRepository.save(member);
             validMemberId = member.getId();
 
