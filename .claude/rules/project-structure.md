@@ -9,7 +9,7 @@ paths:
 ```
 src/main/java/uss/code/
 ├── global/              # 공통 설정(config), 예외(exception), 어노테이션, HTTP, 공용 infra
-├── auth/                # JWT 발급/검증(filter, resolver), 이메일 인증, 비밀번호 인코딩
+├── auth/                # JWT 발급/검증(filter, resolver), 로그인, 비밀번호 인코딩
 │
 ├── member/              # 회원(학생) 정보
 ├── course/              # 강의 + 강의 시간표(CourseSchedule), 강의 조회/검색

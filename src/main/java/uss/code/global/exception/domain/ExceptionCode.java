@@ -30,20 +30,7 @@ public enum ExceptionCode {
 
     // 회원
     MEMBER_NOT_FOUND(NOT_FOUND, 1010, "사용자를 찾을 수 없습니다."),
-    MEMBER_ALREADY_EXISTS(BAD_REQUEST, 1011, "이미 존재하는 사용자입니다."),
     PASSWORD_NOT_MATCH(UNAUTHORIZED, 1012, "비밀번호가 일치하지 않습니다."),
-
-    // 이메일 인증
-    EMAIL_SENDING_FAILED(SERVICE_UNAVAILABLE, 1013, "이메일 전송에 실패했습니다."),
-    EMAIL_VERIFICATION_NOT_FOUND(NOT_FOUND, 1014, "이메일 인증 정보를 찾을 수 없습니다."),
-    EMAIL_VERIFICATION_IN_PROGRESS(BAD_REQUEST, 1015, "이미 인증이 진행 중입니다."),
-    EMAIL_VERIFICATION_NOT_COMPLETED(BAD_REQUEST, 1016, "이메일 인증이 완료되지 않았습니다."),
-    EMAIL_VERIFICATION_ALREADY_COMPLETED(BAD_REQUEST, 1017, "이미 인증이 완료되었습니다."),
-    VERIFICATION_CODE_NOT_FOUND(NOT_FOUND, 1018, "인증코드를 찾을 수 없습니다."),
-    VERIFICATION_CODE_EXPIRED(BAD_REQUEST, 1019, "인증코드가 만료되었습니다."),
-    VERIFICATION_CODE_NOT_MATCH(BAD_REQUEST, 1020, "인증코드가 일치하지 않습니다."),
-    VERIFICATION_RESEND_LIMIT_EXCEEDED(BAD_REQUEST, 1021, "인증코드 재전송 횟수를 초과했습니다."),
-    VERIFICATION_FAILED_LIMIT_EXCEEDED(BAD_REQUEST, 1022, "인증 실패 횟수를 초과했습니다."),
 
     // 과목
     INVALID_GENERAL_EDUCATION_AREA(BAD_REQUEST, 2000, "유효하지 않은 교양 영역입니다."),

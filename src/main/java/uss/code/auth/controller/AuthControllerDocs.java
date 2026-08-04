@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import uss.code.auth.dto.request.LoginRequest;
-import uss.code.auth.dto.request.SignUpRequest;
 import uss.code.auth.dto.response.AuthTokenResponse;
 import uss.code.global.exception.dto.response.ErrorResponse;
 
@@ -47,32 +46,4 @@ public interface AuthControllerDocs {
     })
     @PostMapping("/login")
     ResponseEntity<AuthTokenResponse> login(@Valid @RequestBody final LoginRequest request);
-
-    @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다.<br>" +
-            "🔓 <strong>Jwt 불필요</strong><br>")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "✅ 회원가입 성공"),
-            @ApiResponse(responseCode = "400", description = "🚨 이메일 인증 미완료",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            examples = {
-                                    @ExampleObject(
-                                            name = "이메일 인증 미완료",
-                                            value = "{\"code\" : 1016, \"message\" : \"이메일 인증이 완료되지 않았습니다.\"}"
-                                    )
-                            },
-                            schema = @Schema(implementation = ErrorResponse.class))
-            ),
-            @ApiResponse(responseCode = "400", description = "🚨 이미 존재하는 사용자",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            examples = {
-                                    @ExampleObject(
-                                            name = "이미 존재하는 사용자",
-                                            value = "{\"code\" : 1011, \"message\" : \"이미 존재하는 사용자입니다.\"}"
-                                    )
-                            },
-                            schema = @Schema(implementation = ErrorResponse.class))
-            )
-    })
-    @PostMapping("/sign-up")
-    ResponseEntity<Void> signUp(@Valid @RequestBody final SignUpRequest request);
 }

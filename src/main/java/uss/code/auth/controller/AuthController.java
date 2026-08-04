@@ -8,11 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uss.code.auth.dto.request.LoginRequest;
-import uss.code.auth.dto.request.SignUpRequest;
 import uss.code.auth.dto.response.AuthTokenResponse;
 import uss.code.auth.service.AuthService;
 
-import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
@@ -25,11 +23,5 @@ public class AuthController implements AuthControllerDocs {
     @PostMapping("/login")
     public ResponseEntity<AuthTokenResponse> login(@Valid@RequestBody final LoginRequest request){
         return ResponseEntity.status(OK).body(authService.login(request));
-    }
-
-    @PostMapping("/sign-up")
-    public ResponseEntity<Void> signUp(@Valid@RequestBody final SignUpRequest request){
-        authService.signUp(request);
-        return ResponseEntity.status(CREATED).build();
     }
 }

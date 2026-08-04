@@ -11,7 +11,6 @@ import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import uss.code.auth.dto.request.SignUpRequest;
 
 import java.time.LocalDateTime;
 
@@ -25,9 +24,6 @@ public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false, unique = true)
-    private String email;
 
     @Column(nullable = false, name = "student_id")
     private String studentId;
@@ -68,7 +64,6 @@ public class Member {
             final String studentId,
             final String password,
             final String name,
-            final String email,
             final MemberCollege memberCollege,
             final MemberDepartment memberDepartment,
             final MemberGrade memberGrade,
@@ -78,7 +73,6 @@ public class Member {
         this.studentId = studentId;
         this.password = password;
         this.name = name;
-        this.email = email;
         this.memberCollege = memberCollege;
         this.memberDepartment = memberDepartment;
         this.memberGrade = memberGrade;
@@ -86,23 +80,6 @@ public class Member {
         this.lastSemesterGPA = lastSemesterGPA;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-    }
-
-    public static Member signUp(
-            final SignUpRequest request,
-            final String encodedPassword
-    ) {
-        return Member.builder()
-                .studentId(request.studentId())
-                .password(encodedPassword)
-                .name(request.name())
-                .email(request.email())
-                .memberCollege(MemberCollege.from(request.memberCollege()))
-                .memberDepartment(MemberDepartment.from(request.memberDepartment()))
-                .memberGrade(MemberGrade.from(request.memberGrade()))
-                .academicStatus(AcademicStatus.from(request.academicStatus()))
-                .lastSemesterGPA(request.lastSemesterGPA())
-                .build();
     }
 
     public int getMaxCredit(){
