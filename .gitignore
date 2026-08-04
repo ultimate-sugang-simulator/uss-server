@@ -42,4 +42,7 @@ CLAUDE.md
 !.claude/CLAUDE.md
 TASKS.md
 
+# 성능 측정용 실 JWT. 커밋하지 않는다.
+.claude/resources/perf/**/tokens.json
+
 docs/roadmap.md
