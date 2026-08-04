@@ -61,7 +61,6 @@ public class SwaggerConfig {
     private List<Server> servers() {
         List<Server> servers = new ArrayList<>();
         servers.add(new Server().url("http://localhost:8080").description("Dev env"));
-        servers.add(new Server().url("https://uss-release.inuappcenter.kr").description("Release env"));
         servers.add(new Server().url("https://uss.inuappcenter.kr").description("Production env"));
         return servers;
     }
