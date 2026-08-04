@@ -61,3 +61,9 @@ return MajorCoursesResponse.of(...);
 - 클래스는 PascalCase로 작성하라 (`CourseService`, `RegistrationController`)
 - 메서드는 camelCase + CRUD 동사를 사용하라 (`findByCourseDepartment`, `registerCourse`, `deleteRegisteredCourse`)
 - API 경로는 kebab-case 복수형으로 작성하라 (`/api/v1/courses`, `/api/v1/registrations`)
+
+## 주석
+
+- 메인 코드에 설명 주석을 달지 마라. 설명이 필요하다고 느끼면 주석 대신 이름과 구조로 드러내라
+- 유지하는 예외: `ExceptionCode`의 카테고리 그룹 주석(`// 회원`, `// 수강신청`)처럼 나열을 구획하는 용도의 주석
+- 배경과 정책 설명이 필요하면 주석이 아니라 `.claude/spec/service-policy/`의 해당 도메인 파일에 남겨라

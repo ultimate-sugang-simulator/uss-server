@@ -31,6 +31,16 @@ public interface {Controller}Docs {
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "🚨 예기치 못한 예외 발생",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            examples = {
+                                    @ExampleObject(
+                                            name = "예기치 못한 예외 발생",
+                                            value = "{\"error\" : \"UNEXPECTED_SERVER_ERROR_9999\", \"message\" : \"서버 내부 오류가 발생했습니다.\"}"
+                                    )
+                            },
+                            schema = @Schema(implementation = ErrorResponse.class))
             )
     })
     ResponseEntity<{ResponseType}> methodName(@Auth final long memberId);
