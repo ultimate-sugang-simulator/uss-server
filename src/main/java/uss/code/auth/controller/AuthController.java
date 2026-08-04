@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uss.code.auth.dto.request.LoginRequest;
@@ -18,10 +19,19 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/api/v1/auth")
 public class AuthController implements AuthControllerDocs {
 
+    private static final String ACCESS_TOKEN_HEADER = "access-token";
+
     private final AuthService authService;
 
     @PostMapping("/login")
     public ResponseEntity<AuthTokenResponse> login(@Valid@RequestBody final LoginRequest request){
         return ResponseEntity.status(OK).body(authService.login(request));
+    }
+
+    @PostMapping("/re-issue")
+    public ResponseEntity<AuthTokenResponse> reIssue(
+            @RequestHeader(value = ACCESS_TOKEN_HEADER, required = false) final String accessToken
+    ){
+        return ResponseEntity.status(OK).body(authService.reIssue(accessToken));
     }
 }

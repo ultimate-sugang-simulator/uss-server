@@ -30,6 +30,16 @@ public class AuthService {
         if (!passwordEncoder.matches(request.password(), member.getPassword()))
             throw new RestApiException(PASSWORD_NOT_MATCH);
 
-        return jwtProvider.generateAuthTokens(member.getId());
+        return jwtProvider.generateAuthToken(member.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public AuthTokenResponse reIssue(final String accessToken) {
+        final Long memberId = jwtProvider.getMemberIdAllowingExpiration(accessToken);
+
+        if (!memberRepository.existsById(memberId))
+            throw new RestApiException(MEMBER_NOT_FOUND);
+
+        return jwtProvider.generateAuthToken(memberId);
     }
 }

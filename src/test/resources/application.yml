@@ -25,4 +25,3 @@ security:
   jwt:
     secret-key: test-secret-key-for-unit-testing-purposes-only
     access-token-expiration-time: 21600000
-    refresh-token-expiration-time: 259200000

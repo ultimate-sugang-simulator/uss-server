@@ -9,10 +9,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import uss.code.global.exception.domain.ExceptionCode;
+import uss.code.global.exception.domain.JwtAuthenticationException;
 import uss.code.global.exception.domain.RestApiException;
 import uss.code.global.exception.dto.response.ErrorResponse;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static uss.code.global.exception.domain.ExceptionCode.INVALID_REQUEST_PARAMETER;
 
 @Log4j2
@@ -23,6 +25,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleRestApiException(final RestApiException e) {
         log.error("예외 발생: {}", e.getMessage());
         return makeExceptionResponse(e.getExceptionCode());
+    }
+
+    @ExceptionHandler(JwtAuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleJwtAuthenticationException(final JwtAuthenticationException e) {
+        log.error("예외 발생: {}", e.getMessage());
+        return ResponseEntity.status(UNAUTHORIZED).body(ErrorResponse.of(e.getCode(), e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

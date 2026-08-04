@@ -21,13 +21,6 @@ public enum ExceptionCode {
     INVALID_SIGNATURE_ACCESS_TOKEN(UNAUTHORIZED, 1003, "액세스 토큰 서명이 유효하지 않습니다."),
     EXPIRED_ACCESS_TOKEN(UNAUTHORIZED, 1004, "액세스 토큰이 만료되었습니다."),
 
-    // 리프레시 토큰
-    MISSING_REFRESH_TOKEN(UNAUTHORIZED, 1005, "리프레시 토큰이 누락되었습니다."),
-    INVALID_REFRESH_TOKEN(UNAUTHORIZED, 1006, "리프레시 토큰이 유효하지 않습니다."),
-    INVALID_FORM_REFRESH_TOKEN(UNAUTHORIZED, 1007, "리프레시 토큰 형식이 올바르지 않습니다."),
-    INVALID_SIGNATURE_REFRESH_TOKEN(UNAUTHORIZED, 1008, "리프레시 토큰 서명이 유효하지 않습니다."),
-    EXPIRED_REFRESH_TOKEN(UNAUTHORIZED, 1009, "리프레시 토큰이 만료되었습니다."),
-
     // 회원
     MEMBER_NOT_FOUND(NOT_FOUND, 1010, "사용자를 찾을 수 없습니다."),
     PASSWORD_NOT_MATCH(UNAUTHORIZED, 1012, "비밀번호가 일치하지 않습니다."),
