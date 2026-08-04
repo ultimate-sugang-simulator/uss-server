@@ -30,7 +30,7 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
     );
 
     private static final List<String> SENSITIVE_KEYS = List.of(
-            "access-token", "refresh-token", "password"
+            "access-token", "password"
     );
     private static final String MASK_VALUE = "****";
 

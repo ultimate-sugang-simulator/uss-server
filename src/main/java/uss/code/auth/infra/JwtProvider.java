@@ -24,30 +24,19 @@ import static uss.code.global.exception.domain.ExceptionCode.*;
 @Component
 public class JwtProvider {
 
-    private static final int NO_SUBJECT = -1;
-
     private final SecretKey secretKey;
     private final long accessTokenExpirationTime;
-    private final long refreshTokenExpirationTime;
 
     public JwtProvider(
             @Value("${security.jwt.secret-key}") final String secretKey,
-            @Value("${security.jwt.access-token-expiration-time}") long accessTokenExpirationTime,
-            @Value("${security.jwt.refresh-token-expiration-time}") long refreshTokenExpirationTime
+            @Value("${security.jwt.access-token-expiration-time}") long accessTokenExpirationTime
     ){
         this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.accessTokenExpirationTime = accessTokenExpirationTime;
-        this.refreshTokenExpirationTime = refreshTokenExpirationTime;
     }
 
-    public AuthTokenResponse generateAuthTokens(final long memberId) {
-        final String accessToken = generateToken(memberId, accessTokenExpirationTime);
-        final String refreshToken = generateToken(NO_SUBJECT, refreshTokenExpirationTime);
-
-        return AuthTokenResponse.of(
-                accessToken,
-                refreshToken
-        );
+    public AuthTokenResponse generateAuthToken(final long memberId) {
+        return AuthTokenResponse.of(generateToken(memberId, accessTokenExpirationTime));
     }
 
     private String generateToken(
@@ -65,18 +54,11 @@ public class JwtProvider {
                 .compact();
     }
 
-    public void validateTokens(
-            final String accessToken,
-            final String refreshToken
-    ){
+    public void validateToken(final String accessToken){
         if(accessToken == null)
             throw new JwtTokenMissingException(MISSING_ACCESS_TOKEN);
 
-        if(refreshToken == null)
-            throw new JwtTokenMissingException(MISSING_REFRESH_TOKEN);
-
         validateAccessToken(accessToken);
-        validateRefreshToken(refreshToken);
     }
 
     public Long getMemberId(final String token){
@@ -85,6 +67,23 @@ public class JwtProvider {
                 .getSubject();
 
         return Long.valueOf(memberId);
+    }
+
+    public Long getMemberIdAllowingExpiration(final String accessToken){
+        if(accessToken == null)
+            throw new JwtTokenMissingException(MISSING_ACCESS_TOKEN);
+
+        try {
+            return Long.valueOf(parseJwt(accessToken).getPayload().getSubject());
+        } catch (ExpiredJwtException e) {
+            return Long.valueOf(e.getClaims().getSubject());
+        } catch (MalformedJwtException e) {
+            throw new JwtTokenInvalidException(INVALID_FORM_ACCESS_TOKEN);
+        } catch (SignatureException e) {
+            throw new JwtTokenInvalidException(INVALID_SIGNATURE_ACCESS_TOKEN);
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new JwtTokenInvalidException(INVALID_ACCESS_TOKEN);
+        }
     }
 
     private Jws<Claims> parseJwt(final String token){
@@ -105,20 +104,6 @@ public class JwtProvider {
             throw new JwtTokenInvalidException(INVALID_SIGNATURE_ACCESS_TOKEN);
         } catch (JwtException | IllegalArgumentException e) {
             throw new JwtTokenInvalidException(INVALID_ACCESS_TOKEN);
-        }
-    }
-
-    private void validateRefreshToken(final String refreshToken){
-        try {
-            parseJwt(refreshToken);
-        } catch (ExpiredJwtException e) {
-            throw new JwtTokenExpiredException(EXPIRED_REFRESH_TOKEN);
-        } catch (MalformedJwtException e) {
-            throw new JwtTokenInvalidException(INVALID_FORM_REFRESH_TOKEN);
-        } catch (SignatureException e) {
-            throw new JwtTokenInvalidException(INVALID_SIGNATURE_REFRESH_TOKEN);
-        } catch (JwtException | IllegalArgumentException e) {
-            throw new JwtTokenInvalidException(INVALID_REFRESH_TOKEN);
         }
     }
 }

@@ -8,6 +8,7 @@ public final class WhitelistEndpoint {
 
     private static final List<EndPoint> WHITELIST = List.of(
             new EndPoint("/api/v1/auth/login", HttpMethod.POST),
+            new EndPoint("/api/v1/auth/re-issue", HttpMethod.POST),
             new EndPoint("/swagger-ui/**", null),
             new EndPoint("/v3/api-docs/**", null),
             new EndPoint("/swagger-resources/**", null)
