@@ -8,32 +8,30 @@ import static lombok.AccessLevel.PRIVATE;
 @Builder(access = PRIVATE)
 public record CartedCourseResponse(
         long id,
-        String courseClassification,
+        String classification,
         String courseCode,
-        String courseTitleKr,
-        String courseTitleEn,
+        String haksuCode,
+        String titleKr,
+        String titleEn,
         int credits,
         boolean isEnglishCourse,
         String schedule,
-        String classroom,
-        String courseDepartment,
-        int cartCount,
-        String professor
+        String department,
+        int cartCount
 ) {
     public static CartedCourseResponse of(final Course course, final Long cartCount) {
         return CartedCourseResponse.builder()
                 .id(course.getId())
-                .courseClassification(course.getCourseClassification().getName())
+                .classification(course.getClassification().getName())
                 .courseCode(course.getCourseCode())
-                .courseTitleKr(course.getTitleKr())
-                .courseTitleEn(course.getTitleEn())
+                .haksuCode(course.getHaksuCode())
+                .titleKr(course.getTitleKr())
+                .titleEn(course.getTitleEn())
                 .credits(course.getCredits())
                 .isEnglishCourse(course.isEnglishCourse())
                 .schedule(course.getFormattedCourseSchedules())
-                .classroom(course.getClassroom() != null ? course.getClassroom() : "-")
-                .courseDepartment(course.getCourseDepartment().getName())
+                .department(course.getDepartment().getName())
                 .cartCount(cartCount.intValue())
-                .professor(course.getProfessorName() != null ? course.getProfessorName() : "-")
                 .build();
     }
 }

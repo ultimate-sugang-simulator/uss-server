@@ -35,23 +35,23 @@ public class Member {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private MemberCollege memberCollege;
+    @Column(nullable = false, name = "college")
+    private MemberCollege college;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private MemberDepartment memberDepartment;
+    @Column(nullable = false, name = "department")
+    private MemberDepartment department;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private MemberGrade memberGrade;
+    @Column(nullable = false, name = "grade")
+    private MemberGrade grade;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "academic_status")
     private AcademicStatus academicStatus;
 
     @Column(nullable = false, name = "last_semester_gpa")
-    private double lastSemesterGPA;
+    private double lastSemesterGpa;
 
     @Column(nullable = false, name = "created_at")
     private LocalDateTime createdAt;
@@ -64,28 +64,28 @@ public class Member {
             final String studentId,
             final String password,
             final String name,
-            final MemberCollege memberCollege,
-            final MemberDepartment memberDepartment,
-            final MemberGrade memberGrade,
+            final MemberCollege college,
+            final MemberDepartment department,
+            final MemberGrade grade,
             final AcademicStatus academicStatus,
-            final double lastSemesterGPA
+            final double lastSemesterGpa
     ) {
         this.studentId = studentId;
         this.password = password;
         this.name = name;
-        this.memberCollege = memberCollege;
-        this.memberDepartment = memberDepartment;
-        this.memberGrade = memberGrade;
+        this.college = college;
+        this.department = department;
+        this.grade = grade;
         this.academicStatus = academicStatus;
-        this.lastSemesterGPA = lastSemesterGPA;
+        this.lastSemesterGpa = lastSemesterGpa;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
     public int getMaxCredit(){
-        if (lastSemesterGPA >= 4.0) {
+        if (lastSemesterGpa >= 4.0) {
             return 24;
-        } else if (lastSemesterGPA >= 3.5) {
+        } else if (lastSemesterGpa >= 3.5) {
             return 21;
         } else {
             return 19;

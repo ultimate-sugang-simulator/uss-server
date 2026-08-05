@@ -17,10 +17,10 @@ public record MemberProfileResponse(
             final Member member
     ){
         return MemberProfileResponse.builder()
-                .department(member.getMemberDepartment().getName())
+                .department(member.getDepartment().getName())
                 .studentId(member.getStudentId())
                 .name(member.getName())
-                .grade(member.getMemberGrade().getName())
+                .grade(member.getGrade().getName())
                 .academicStatus(member.getAcademicStatus().getName())
                 .build();
     }

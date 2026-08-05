@@ -14,7 +14,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
         SELECT c
         FROM Cart c
         JOIN FETCH c.course course
-        LEFT JOIN FETCH course.courseSchedules
+        LEFT JOIN FETCH course.schedules
         WHERE c.member.id = :memberId
         ORDER BY c.createdAt
     """)

@@ -45,4 +45,7 @@ TASKS.md
 # 성능 측정용 실 JWT. 커밋하지 않는다.
 .claude/resources/perf/**/tokens.json
 
+# 학교 연계 API 원본 응답 덤프. 용량이 크고 레포가 public이라 커밋하지 않는다.
+.local/
+
 docs/roadmap.md
