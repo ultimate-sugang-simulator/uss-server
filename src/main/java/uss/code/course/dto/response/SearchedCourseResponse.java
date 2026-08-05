@@ -8,31 +8,29 @@ import static lombok.AccessLevel.PRIVATE;
 @Builder(access = PRIVATE)
 public record SearchedCourseResponse(
         long id,
-        String courseGrade,
+        String grade,
         String courseCode,
-        String courseTitleKr,
-        String courseTitleEn,
+        String haksuCode,
+        String titleKr,
+        String titleEn,
         int credits,
         boolean isEnglishCourse,
         String schedule,
-        String classroom,
-        String courseDepartment,
-        String professor,
+        String department,
         boolean isRegisterable
 ) {
     public static SearchedCourseResponse from(final Course course){
         return SearchedCourseResponse.builder()
                 .id(course.getId())
-                .courseGrade(course.getCourseGrade().getName())
+                .grade(course.getGrade().getName())
                 .courseCode(course.getCourseCode())
-                .courseTitleKr(course.getTitleKr())
-                .courseTitleEn(course.getTitleEn())
+                .haksuCode(course.getHaksuCode())
+                .titleKr(course.getTitleKr())
+                .titleEn(course.getTitleEn())
                 .credits(course.getCredits())
                 .isEnglishCourse(course.isEnglishCourse())
                 .schedule(course.getFormattedCourseSchedules())
-                .classroom(course.getClassroom() != null ? course.getClassroom() : "-")
-                .courseDepartment(course.getCourseDepartment().getName())
-                .professor(course.getProfessorName() != null ? course.getProfessorName() : "-")
+                .department(course.getDepartment().getName())
                 .isRegisterable(course.isRegisterable())
                 .build();
     }

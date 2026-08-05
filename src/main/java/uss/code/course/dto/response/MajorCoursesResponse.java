@@ -8,11 +8,11 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Builder(access = PRIVATE)
 public record MajorCoursesResponse(
-    List<MajorCourseResponse> majorCourses
+    List<MajorCourseResponse> majorCourseResponses
 ) {
-    public static MajorCoursesResponse of(final List<MajorCourseResponse> majorCourses) {
+    public static MajorCoursesResponse of(final List<MajorCourseResponse> majorCourseResponses) {
         return MajorCoursesResponse.builder()
-                .majorCourses(majorCourses)
+                .majorCourseResponses(majorCourseResponses)
                 .build();
     }
 }

@@ -22,6 +22,9 @@ import java.time.LocalTime;
 @Table(name = "course_schedules")
 public class CourseSchedule {
 
+    private static final String PERIOD_PREFIX = "(";
+    private static final String PERIOD_SUFFIX = ")";
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -29,18 +32,25 @@ public class CourseSchedule {
     @JoinColumn(nullable = false, name = "course_id")
     private Course course;
 
-    @Column(nullable = false, name = "schedule_text")
-    private String scheduleText;
-
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, name = "course_day")
-    private CourseDay courseDay;
+    @Column(nullable = false, name = "day_of_week")
+    private CourseDay dayOfWeek;
+
+    @Column(nullable = false, name = "period_name")
+    private String periodName;
+
+    @Column(nullable = false, name = "classroom")
+    private String classroom;
 
     @Column(nullable = false, name = "start_time")
     private LocalTime startTime;
 
     @Column(nullable = false, name = "end_time")
     private LocalTime endTime;
+
+    public String getScheduleText() {
+        return dayOfWeek.getName() + PERIOD_PREFIX + periodName + PERIOD_SUFFIX;
+    }
 
     public void addCourse(final Course course) {
         this.course = course;

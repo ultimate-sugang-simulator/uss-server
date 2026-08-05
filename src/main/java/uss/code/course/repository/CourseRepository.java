@@ -14,33 +14,33 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query("""
         SELECT DISTINCT c
         FROM Course c
-        LEFT JOIN FETCH c.courseSchedules
-        WHERE c.courseDepartment = :course_department
-        ORDER BY c.courseGrade
+        LEFT JOIN FETCH c.schedules
+        WHERE c.department = :department
+        ORDER BY c.grade
     """)
-    List<Course> findByCourseDepartment(@Param("course_department") final CourseDepartment courseDepartment);
+    List<Course> findByDepartment(@Param("department") final CourseDepartment department);
 
     @Query("""
         SELECT DISTINCT c
         FROM Course c
-        LEFT JOIN FETCH c.courseSchedules
-        WHERE c.courseArea = :course_area
-        ORDER BY c.courseGrade
+        LEFT JOIN FETCH c.schedules
+        WHERE c.area = :area
+        ORDER BY c.grade
     """)
-    List<Course> findByCourseArea(@Param("course_area") final CourseArea courseArea);
+    List<Course> findByArea(@Param("area") final CourseArea area);
 
     @Query(value = """
         SELECT DISTINCT c.*
         FROM courses c
-        WHERE MATCH(c.course_code, c.title_kr, c.title_en) AGAINST(:keyword IN BOOLEAN MODE)
-        ORDER BY MATCH(c.course_code, c.title_kr, c.title_en) AGAINST(:keyword IN BOOLEAN MODE)
+        WHERE MATCH(c.course_code, c.haksu_code, c.title_kr, c.title_en) AGAINST(:keyword IN BOOLEAN MODE)
+        ORDER BY MATCH(c.course_code, c.haksu_code, c.title_kr, c.title_en) AGAINST(:keyword IN BOOLEAN MODE)
     """, nativeQuery = true)
     List<Course> findByKeyword(@Param("keyword") final String keyword);
 
     @Query("""
         SELECT c
         FROM Course c
-        LEFT JOIN FETCH c.courseSchedules
+        LEFT JOIN FETCH c.schedules
         WHERE c.id = :id
     """)
     Optional<Course> findByIdWithSchedules(@Param("id") final long id);
