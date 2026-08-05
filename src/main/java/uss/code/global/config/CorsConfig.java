@@ -20,6 +20,7 @@ public class CorsConfig {
             "http://localhost:5173",
             "https://uss.inuappcenter.kr"
     );
+
     private static final List<String> ALLOWED_METHODS = List.of("GET", "POST", "PUT", "DELETE", "PATCH");
 
     @Bean
