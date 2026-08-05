@@ -6,6 +6,7 @@
       "Bash(git log*)",
       "Bash(git diff*)",
       "Bash(git branch*)",
+      "Bash(gh issue create*)",
       "Bash(ls)",
       "Bash(ls *)",
       "Read",
