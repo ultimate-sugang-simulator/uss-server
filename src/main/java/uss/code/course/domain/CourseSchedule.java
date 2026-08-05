@@ -22,9 +22,6 @@ import java.time.LocalTime;
 @Table(name = "course_schedules")
 public class CourseSchedule {
 
-    private static final String PERIOD_PREFIX = "(";
-    private static final String PERIOD_SUFFIX = ")";
-
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -47,10 +44,6 @@ public class CourseSchedule {
 
     @Column(nullable = false, name = "end_time")
     private LocalTime endTime;
-
-    public String getScheduleText() {
-        return dayOfWeek.getName() + PERIOD_PREFIX + periodName + PERIOD_SUFFIX;
-    }
 
     public void addCourse(final Course course) {
         this.course = course;

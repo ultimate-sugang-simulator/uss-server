@@ -2,6 +2,7 @@ package uss.code.course.dto.response;
 
 import lombok.Builder;
 import uss.code.course.domain.Course;
+import uss.code.course.infra.CourseScheduleFormatter;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -30,7 +31,7 @@ public record GeneralEducationCourseResponse(
                 .titleEn(course.getTitleEn())
                 .credits(course.getCredits())
                 .isEnglishCourse(course.isEnglishCourse())
-                .schedule(course.getFormattedCourseSchedules())
+                .schedule(CourseScheduleFormatter.format(course.getSchedules()))
                 .isRegisterable(course.isRegisterable())
                 .build();
     }
