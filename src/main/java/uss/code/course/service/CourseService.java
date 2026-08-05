@@ -35,8 +35,8 @@ public class CourseService {
         final Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
-        final List<Course> courses = courseRepository.findByCourseDepartment(
-                CourseDepartment.from(member.getMemberDepartment())
+        final List<Course> courses = courseRepository.findByDepartment(
+                CourseDepartment.from(member.getDepartment())
         );
 
         final List<MajorCourseResponse> majorCourseResponses = courses.stream()
@@ -48,7 +48,7 @@ public class CourseService {
 
     @Transactional(readOnly = true)
     public GeneralEducationCoursesResponse getGeneralEducationCourses(final String courseArea) {
-        final List<Course> courses = courseRepository.findByCourseArea(CourseArea.fromGeneralEducation(courseArea));
+        final List<Course> courses = courseRepository.findByArea(CourseArea.fromGeneralEducation(courseArea));
 
         final List<GeneralEducationCourseResponse> generalEducationCourseResponses = courses.stream()
                 .map(GeneralEducationCourseResponse::from)
@@ -64,7 +64,7 @@ public class CourseService {
     public MajorCoursesResponse getOtherDepartmentCourses(final String department) {
         final CourseDepartment courseDepartment = CourseDepartment.from(department);
 
-        final List<Course> courses = courseRepository.findByCourseDepartment(courseDepartment);
+        final List<Course> courses = courseRepository.findByDepartment(courseDepartment);
 
         final List<MajorCourseResponse> majorCourseResponses = courses.stream()
                 .map(MajorCourseResponse::from)
@@ -77,7 +77,7 @@ public class CourseService {
     public InterdisciplinaryMajorCoursesResponse getInterdisciplinaryMajorCourses(final String department) {
         final CourseDepartment courseDepartment = CourseDepartment.fromInterdisciplinary(department);
 
-        final List<Course> courses = courseRepository.findByCourseDepartment(courseDepartment);
+        final List<Course> courses = courseRepository.findByDepartment(courseDepartment);
 
         final List<InterdisciplinaryMajorCourseResponse> interdisciplinaryMajorCoursesResponses = courses.stream()
                 .map(InterdisciplinaryMajorCourseResponse::from)

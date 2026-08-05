@@ -18,7 +18,6 @@ import java.util.List;
 public class SwaggerConfig {
 
     private static final String ACCESS_TOKEN_KEY = "access-token";
-    private static final String REFRESH_TOKEN_KEY = "refresh-token";
 
     @Bean
     public OpenAPI openAPI() {
@@ -29,20 +28,11 @@ public class SwaggerConfig {
                 .in(SecurityScheme.In.HEADER)
                 .name(ACCESS_TOKEN_KEY);
 
-        final SecurityScheme refreshTokenSecurityScheme = new SecurityScheme()
-                .type(SecurityScheme.Type.APIKEY)
-                .scheme("bearer")
-                .bearerFormat("JWT")
-                .in(SecurityScheme.In.HEADER)
-                .name(REFRESH_TOKEN_KEY);
-
         final Components components = new Components()
-                .addSecuritySchemes(ACCESS_TOKEN_KEY, accessTokenSecurityScheme)
-                .addSecuritySchemes(REFRESH_TOKEN_KEY, refreshTokenSecurityScheme);
+                .addSecuritySchemes(ACCESS_TOKEN_KEY, accessTokenSecurityScheme);
 
         final SecurityRequirement requirement = new SecurityRequirement()
-                .addList(ACCESS_TOKEN_KEY)
-                .addList(REFRESH_TOKEN_KEY);
+                .addList(ACCESS_TOKEN_KEY);
 
         return new OpenAPI()
                 .components(components)
@@ -61,7 +51,6 @@ public class SwaggerConfig {
     private List<Server> servers() {
         List<Server> servers = new ArrayList<>();
         servers.add(new Server().url("http://localhost:8080").description("Dev env"));
-        servers.add(new Server().url("https://uss-release.inuappcenter.kr").description("Release env"));
         servers.add(new Server().url("https://uss.inuappcenter.kr").description("Production env"));
         return servers;
     }

@@ -6,7 +6,7 @@
     <property name="LOG_PATTERN"
               value="timestamp=%d{yyyy-MM-dd'T'HH:mm:ss,Asia/Seoul} level=%-5level traceId=%X{traceId:-none} %msg%n"/>
 
-    <springProfile name="prod | release">
+    <springProfile name="prod">
         <property name="LOG_ROOT" value="${LOG_ROOT:-/var/log/spring}"/>
         <property name="MAX_HISTORY" value="7"/>
 
@@ -81,7 +81,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="!prod &amp; !release">
+    <springProfile name="!prod">
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
         </root>

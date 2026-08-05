@@ -16,7 +16,7 @@ effort: xhigh
 '어떻게(구현)'은 본 스킬에서 담당하지 않는다.
 
 작업은 기능 구현(feat), 수정(fix), 리펙토링(refactor), 긴급 수정(hotfix), 문서화(docs),
-테스트 관련(test), CI/CD(cicd), 기타(chore)로 분류되며 작업 종류를 먼저 판별한 뒤, 그에 맞는
+테스트 관련(test), CI/CD(cicd), 기타(chore), 분석(analysis)으로 분류되며 작업 종류를 먼저 판별한 뒤, 그에 맞는
 템플릿, 라벨, 브랜치 접두사를 사용한다.
 
 ## Phase 1: 작업 구체화 (대화)
@@ -29,8 +29,10 @@ effort: xhigh
    - 왜(배경, 문제 상황)
    - 제약사항(있는 경우에)
 3. 아래 다섯 요소가 확정되면 다음 Phase로 이동하라
-   - 종류: feat / fix / refactor / hotfix / docs / test / cicd 중 하나
-   - 제목: 작업을 한 줄로 표현하는 명사형
+   - 종류: feat / fix / refactor / hotfix / docs / test / cicd / chore / analysis 중 하나
+   - 제목: 작업을 한 줄로 표현하는 명사형.
+     `.claude/spec/git-convention.md`의 제목 규칙을 따른다 - 40자 이내, 클래스명 나열과 괄호 중첩 금지,
+     대상을 나열하지 말고 무엇을 해결하는지를 남긴다.
    - 설명: 이 작업이 왜 필요한지 1~3문장
    - 작업 항목: 체크리스트로 쪼갠 하위 작업 목록
    - 연관 도메인
@@ -44,12 +46,13 @@ effort: xhigh
 1. 종류별 title 접두사·이슈 라벨·브랜치 접두사는 `.claude/spec/git-convention.md`의 커밋 타입 표를 참조하라 (접두사 `{종류}:`, 브랜치 `{종류}/`, 라벨은 표의 이슈 라벨).
    이슈 본문 템플릿은 다음을 쓴다:
    - `.github/ISSUE_TEMPLATE/{종류}-issue-template.md`가 있으면 Read해서 본문 구조를 그대로 따른다.
-   - 전용 템플릿이 없는 종류(test, cicd, chore)는 `feat-issue-template.md`의 본문 구조를 재사용한다.
+   - 전용 템플릿이 없는 종류(test, cicd, chore, analysis)는 `feat-issue-template.md`의 본문 구조를 재사용한다.
 2. Phase 1 결과를 template 규격에 맞춰 본문으로 구성하라:
    - 1. Issue Description: 설명
    - 2. Issue Task: 작업 항목을 `- [ ] {작업명}` 체크리스트로
    - 3. Related Domain: 해당 도메인만 `- [x]`, 나머지는 `- [ ]` 유지
-3. 본문을 스크래치 파일에 저장해두면 `gh` 전달이 안전하다 (`--body-file`로 넘김).
+3. 제목과 본문 모두 `.claude/spec/git-convention.md`의 표기 규칙을 따른다 (가운데점 대신 콤마, 긴 대시 대신 짧은 대시).
+4. 본문을 스크래치 파일에 저장해두면 `gh` 전달이 안전하다 (`--body-file`로 넘김).
 
 > 다음 Phase 조건: template 규격에 맞는 본문과 라벨이 준비되었을 때
 
@@ -59,8 +62,11 @@ effort: xhigh
 
 1. 아래 명령으로 이슈를 생성하라 (title 접두사·라벨은 `.claude/spec/git-convention.md`의 커밋 타입 표를 참조하라):
    ```bash
-   gh issue create --title "{접두}: {제목}" --body-file {본문파일} --label "{라벨}"
+   gh issue create --title "{접두}: {제목}" --body-file {본문파일} --label "{라벨}" --assignee @me
    ```
+   - 담당자는 항상 호출자 본인(`@me`)이다. 이슈 템플릿 frontmatter에는 담당자를 고정하지 않는다
+     (웹 UI로 이슈를 여는 다른 사람에게 잘못 배정된다).
+   - 라벨 이름은 이모지 뒤 공백까지 정확해야 한다. 실패하면 `gh label list`로 실제 이름을 확인하라.
 2. 출력된 이슈 URL에서 이슈 번호를 파싱하라 (다음 Phase에서 브랜치명에 사용).
 
 > 다음 Phase 조건: 이슈가 생성되고 번호를 확보했을 때

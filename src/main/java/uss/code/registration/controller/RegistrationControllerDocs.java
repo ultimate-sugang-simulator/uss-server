@@ -37,7 +37,7 @@ public interface RegistrationControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "사용자 조회 실패",
-                                            value = "{\"error\" : \"MEMBER_1010\", \"message\" : \"사용자를 찾을 수 없습니다.\"}"
+                                            value = "{\"code\" : 1010, \"message\" : \"사용자를 찾을 수 없습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -47,7 +47,7 @@ public interface RegistrationControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "과목 조회 실패",
-                                            value = "{\"error\" : \"COURSE_2002\", \"message\" : \"과목을 찾을 수 없습니다.\"}"
+                                            value = "{\"code\" : 2002, \"message\" : \"과목을 찾을 수 없습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -57,7 +57,7 @@ public interface RegistrationControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "수강 정원 마감",
-                                            value = "{\"error\" : \"COURSE_4000\", \"message\" : \"수강 정원이 마감되었습니다.\"}"
+                                            value = "{\"code\" : 4000, \"message\" : \"수강 정원이 마감되었습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -67,7 +67,7 @@ public interface RegistrationControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "과목 중복 신청",
-                                            value = "{\"error\" : \"COURSE_4002\", \"message\" : \"이미 신청된 과목입니다.\"}"
+                                            value = "{\"code\" : 4002, \"message\" : \"이미 신청된 과목입니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -77,7 +77,7 @@ public interface RegistrationControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "학점 제한 초과",
-                                            value = "{\"error\" : \"CREDIT_4001\", \"message\" : \"최대 이수 가능 학점을 초과하였습니다.\"}"
+                                            value = "{\"code\" : 4001, \"message\" : \"최대 이수 가능 학점을 초과하였습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -87,7 +87,7 @@ public interface RegistrationControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "시간표 충돌",
-                                            value = "{\"error\" : \"COURSE_3002\", \"message\" : \"과목 시간표가 겹칩니다.\"}"
+                                            value = "{\"code\" : 3002, \"message\" : \"과목 시간표가 겹칩니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -97,7 +97,7 @@ public interface RegistrationControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "과목 유형 제한 초과",
-                                            value = "{\"error\" : \"COURSE_3003\", \"message\" : \"해당 과목 유형의 등록 제한을 초과했습니다.\"}"
+                                            value = "{\"code\" : 3003, \"message\" : \"해당 과목 유형의 등록 제한을 초과했습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -118,7 +118,7 @@ public interface RegistrationControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "수강신청 내역 조회 실패",
-                                            value = "{\"error\" : \"REGISTERED_COURSE_4003\", \"message\" : \"수강신청한 과목을 찾을 수 없습니다.\"}"
+                                            value = "{\"code\" : 4003, \"message\" : \"수강신청한 과목을 찾을 수 없습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -128,7 +128,7 @@ public interface RegistrationControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "과목 조회 실패",
-                                            value = "{\"error\" : \"COURSE_2002\", \"message\" : \"과목을 찾을 수 없습니다.\"}"
+                                            value = "{\"code\" : 2002, \"message\" : \"과목을 찾을 수 없습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))

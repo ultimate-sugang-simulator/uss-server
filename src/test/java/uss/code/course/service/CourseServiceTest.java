@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import uss.code.auth.dto.request.SignUpRequest;
 import uss.code.course.domain.Course;
 import uss.code.course.domain.CourseArea;
 import uss.code.course.domain.CourseClassification;
@@ -25,7 +24,12 @@ import uss.code.course.fixture.CourseScheduleFixture;
 import uss.code.course.repository.CourseRepository;
 import uss.code.global.exception.domain.RestApiException;
 import uss.code.global.infra.IntegrationTest;
+import uss.code.member.domain.AcademicStatus;
 import uss.code.member.domain.Member;
+import uss.code.member.domain.MemberCollege;
+import uss.code.member.domain.MemberDepartment;
+import uss.code.member.domain.MemberGrade;
+import uss.code.member.fixture.MemberFixture;
 import uss.code.member.repository.MemberRepository;
 
 import java.time.LocalTime;
@@ -51,11 +55,10 @@ class CourseServiceTest {
         private static final String TEST_STUDENT_ID = "202012345";
         private static final String TEST_PASSWORD = "password1234";
         private static final String TEST_NAME = "홍길동";
-        private static final String TEST_EMAIL = "hong@inu.ac.kr";
-        private static final String TEST_COLLEGE = "INFORMATION_TECHNOLOGY";
-        private static final String TEST_DEPARTMENT = "COMPUTER_ENGINEERING";
-        private static final String TEST_GRADE = "JUNIOR";
-        private static final String TEST_ACADEMIC_STATUS = "ENROLLED";
+        private static final MemberCollege TEST_COLLEGE = MemberCollege.INFORMATION_TECHNOLOGY;
+        private static final MemberDepartment TEST_DEPARTMENT = MemberDepartment.COMPUTER_ENGINEERING;
+        private static final MemberGrade TEST_GRADE = MemberGrade.JUNIOR;
+        private static final AcademicStatus TEST_ACADEMIC_STATUS = AcademicStatus.ENROLLED;
         private static final double TEST_GPA = 3.5;
 
         private long validMemberId;
@@ -64,68 +67,65 @@ class CourseServiceTest {
         @BeforeEach
         void setUp() {
             // 회원 생성 (컴퓨터공학부)
-            final SignUpRequest signUpRequest = new SignUpRequest(
+            final Member member = MemberFixture.createMember(
                     TEST_STUDENT_ID,
                     TEST_PASSWORD,
                     TEST_NAME,
-                    TEST_EMAIL,
                     TEST_COLLEGE,
                     TEST_DEPARTMENT,
                     TEST_GRADE,
                     TEST_ACADEMIC_STATUS,
                     TEST_GPA
             );
-            final String encodedPassword = "testPassword1234";
-            final Member member = Member.signUp(signUpRequest, encodedPassword);
             memberRepository.save(member);
             validMemberId = member.getId();
 
             // 전학년 과목 2개
             Course allGrade1 = CourseFixture.createCourseWithDetails(
-                    "자료구조", "Data Structure", "COM001",
-                    CourseGrade.ALL, "김교수", "공학관101"
+                    "자료구조", "Data Structure", "COM001", "COM001001",
+                    CourseGrade.ALL
             );
             Course allGrade2 = CourseFixture.createCourseWithDetails(
-                    "알고리즘", "Algorithm", "COM002",
-                    CourseGrade.ALL, null, null
+                    "알고리즘", "Algorithm", "COM002", "COM002001",
+                    CourseGrade.ALL
             );
 
             // 1학년 과목 2개
             Course freshman1 = CourseFixture.createCourseWithDetails(
-                    "프로그래밍기초", "Programming Basics", "COM101",
-                    CourseGrade.FRESHMAN, "이교수", "공학관201"
+                    "프로그래밍기초", "Programming Basics", "COM101", "COM101001",
+                    CourseGrade.FRESHMAN
             );
             Course freshman2 = CourseFixture.createCourseWithDetails(
-                    "컴퓨터개론", "Introduction to Computer", "COM102",
-                    CourseGrade.FRESHMAN, "박교수", null
+                    "컴퓨터개론", "Introduction to Computer", "COM102", "COM102001",
+                    CourseGrade.FRESHMAN
             );
 
             // 2학년 과목 2개
             Course sophomore1 = CourseFixture.createCourseWithDetails(
-                    "객체지향프로그래밍", "OOP", "COM201",
-                    CourseGrade.SOPHOMORE, null, "공학관301"
+                    "객체지향프로그래밍", "OOP", "COM201", "COM201001",
+                    CourseGrade.SOPHOMORE
             );
             Course sophomore2 = CourseFixture.createCourseWithDetails(
-                    "데이터베이스", "Database", "COM202",
-                    CourseGrade.SOPHOMORE, "최교수", "공학관302"
+                    "데이터베이스", "Database", "COM202", "COM202001",
+                    CourseGrade.SOPHOMORE
             );
 
             // 컴공이 아닌 다른 학과 과목
             Course otherDept = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "미적분학", "Calculus", "MATH101",
+                    "미적분학", "Calculus", "MATH101", "MATH101001",
                     CourseDepartment.MATHEMATICS,
-                    CourseGrade.FRESHMAN, "수학교수", "자연관101"
+                    CourseGrade.FRESHMAN
             );
 
             // 스케줄 추가 (저장 전에 추가)
             CourseSchedule schedule1 = CourseScheduleFixture.createCourseSchedule(
-                    allGrade1, "월3,4", CourseDay.MONDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+                    allGrade1, CourseDay.MONDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
             );
             CourseSchedule schedule2 = CourseScheduleFixture.createCourseSchedule(
-                    allGrade1, "수3,4", CourseDay.WEDNESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+                    allGrade1, CourseDay.WEDNESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
             );
             CourseSchedule schedule3 = CourseScheduleFixture.createCourseSchedule(
-                    freshman1, "화1,2", CourseDay.TUESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+                    freshman1, CourseDay.TUESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
             );
 
             allGrade1.addCourseSchedule(schedule1);
@@ -148,8 +148,8 @@ class CourseServiceTest {
             final MajorCoursesResponse response = courseService.getMajorCourses(validMemberId);
 
             //then
-            assertThat(response.majorCourses()).hasSize(6);
-            assertThat(response.majorCourses())
+            assertThat(response.majorCourseResponses()).hasSize(6);
+            assertThat(response.majorCourseResponses())
                     .extracting(MajorCourseResponse::department)
                     .containsOnly("컴퓨터공학부");
         }
@@ -160,8 +160,8 @@ class CourseServiceTest {
 
             //when
             final MajorCoursesResponse response = courseService.getMajorCourses(validMemberId);
-            final List<String> grades = response.majorCourses().stream()
-                    .map(MajorCourseResponse::courseGrade)
+            final List<String> grades = response.majorCourseResponses().stream()
+                    .map(MajorCourseResponse::grade)
                     .toList();
 
             //then
@@ -180,19 +180,19 @@ class CourseServiceTest {
             final MajorCoursesResponse response = courseService.getMajorCourses(validMemberId);
 
             //then
-            // COM001: 월3,4 수3,4
-            final MajorCourseResponse allGrade1 = response.majorCourses().stream()
+            // COM001: [07-401:월(1-2A),수(1-2A)]
+            final MajorCourseResponse allGrade1 = response.majorCourseResponses().stream()
                     .filter(c -> c.courseCode().equals("COM001"))
                     .findFirst()
                     .orElseThrow();
-            assertThat(allGrade1.schedule()).isEqualTo("월3,4 수3,4");
+            assertThat(allGrade1.schedule()).isEqualTo("[07-401:월(1-2A),수(1-2A)]");
 
-            // COM101: 화1,2
-            final MajorCourseResponse freshman1 = response.majorCourses().stream()
+            // COM101: [07-401:화(1-2A)]
+            final MajorCourseResponse freshman1 = response.majorCourseResponses().stream()
                     .filter(c -> c.courseCode().equals("COM101"))
                     .findFirst()
                     .orElseThrow();
-            assertThat(freshman1.schedule()).isEqualTo("화1,2");
+            assertThat(freshman1.schedule()).isEqualTo("[07-401:화(1-2A)]");
         }
 
         @Test
@@ -203,7 +203,7 @@ class CourseServiceTest {
             final MajorCoursesResponse response = courseService.getMajorCourses(validMemberId);
 
             //then
-            assertThat(response.majorCourses())
+            assertThat(response.majorCourseResponses())
                     .extracting(MajorCourseResponse::courseCode)
                     .doesNotContain("MATH101");
         }
@@ -226,69 +226,69 @@ class CourseServiceTest {
         void setUp() {
             // 핵심 인문 과목 2개
             Course coreHumanities1 = CourseFixture.createCourse(
-                    "글쓰기", "Writing", "GEN101",
+                    "글쓰기", "Writing", "GEN101", "GEN101001",
                     CourseCollege.GENERAL_EDUCATION, CourseDepartment.GENERAL_EDUCATION,
                     CourseClassification.CORE_LIBERAL_ARTS, CourseArea.CORE_HUMANITIES,
-                    CourseType.LECTURE, CourseGrade.ALL,
-                    "이교수", "인문관101",
+                    CourseType.LECTURE,
+                    CourseGrade.ALL,
                     3, false, 50, 30
             );
             Course coreHumanities2 = CourseFixture.createCourse(
-                    "철학의이해", "Understanding Philosophy", "GEN102",
+                    "철학의이해", "Understanding Philosophy", "GEN102", "GEN102001",
                     CourseCollege.GENERAL_EDUCATION, CourseDepartment.GENERAL_EDUCATION,
                     CourseClassification.CORE_LIBERAL_ARTS, CourseArea.CORE_HUMANITIES,
-                    CourseType.LECTURE, CourseGrade.ALL,
-                    null, null,
+                    CourseType.LECTURE,
+                    CourseGrade.ALL,
                     2, false, 40, 20
             );
 
             // 핵심 외국어 과목 2개
             Course coreForeignLanguage1 = CourseFixture.createCourse(
-                    "영어회화", "English Conversation", "GEN201",
+                    "영어회화", "English Conversation", "GEN201", "GEN201001",
                     CourseCollege.GENERAL_EDUCATION, CourseDepartment.GENERAL_EDUCATION,
                     CourseClassification.CORE_LIBERAL_ARTS, CourseArea.CORE_FOREIGN_LANGUAGE,
-                    CourseType.LECTURE, CourseGrade.ALL,
-                    "박교수", "인문관201",
+                    CourseType.LECTURE,
+                    CourseGrade.ALL,
                     3, true, 45, 25
             );
             Course coreForeignLanguage2 = CourseFixture.createCourse(
-                    "중국어회화", "Chinese Conversation", "GEN202",
+                    "중국어회화", "Chinese Conversation", "GEN202", "GEN202001",
                     CourseCollege.GENERAL_EDUCATION, CourseDepartment.GENERAL_EDUCATION,
                     CourseClassification.CORE_LIBERAL_ARTS, CourseArea.CORE_FOREIGN_LANGUAGE,
-                    CourseType.LECTURE, CourseGrade.ALL,
-                    "최교수", "인문관202",
+                    CourseType.LECTURE,
+                    CourseGrade.ALL,
                     3, false, 40, 15
             );
 
             // 일반 사회 과목 1개
             Course social = CourseFixture.createCourse(
-                    "현대사회와윤리", "Modern Society and Ethics", "GEN301",
+                    "현대사회와윤리", "Modern Society and Ethics", "GEN301", "GEN301001",
                     CourseCollege.GENERAL_EDUCATION, CourseDepartment.GENERAL_EDUCATION,
                     CourseClassification.ADVANCED_LIBERAL_ARTS, CourseArea.SOCIAL,
-                    CourseType.LECTURE, CourseGrade.ALL,
-                    "김교수", "인문관301",
+                    CourseType.LECTURE,
+                    CourseGrade.ALL,
                     3, false, 35, 20
             );
 
             // 전공 과목 (교양이 아님)
             Course majorCourse = CourseFixture.createCourse(
-                    "데이터구조", "Data Structure", "COM101",
+                    "데이터구조", "Data Structure", "COM101", "COM101001",
                     CourseCollege.INFORMATION_TECHNOLOGY, CourseDepartment.COMPUTER_ENGINEERING,
                     CourseClassification.MAJOR_CORE, CourseArea.MAJOR_CORE,
-                    CourseType.LECTURE, CourseGrade.SOPHOMORE,
-                    "홍교수", "공학관101",
+                    CourseType.LECTURE,
+                    CourseGrade.SOPHOMORE,
                     3, false, 50, 40
             );
 
             // 스케줄 추가
             CourseSchedule schedule1 = CourseScheduleFixture.createCourseSchedule(
-                    coreHumanities1, "월1,2", CourseDay.MONDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+                    coreHumanities1, CourseDay.MONDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
             );
             CourseSchedule schedule2 = CourseScheduleFixture.createCourseSchedule(
-                    coreHumanities1, "수1,2", CourseDay.WEDNESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+                    coreHumanities1, CourseDay.WEDNESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
             );
             CourseSchedule schedule3 = CourseScheduleFixture.createCourseSchedule(
-                    coreForeignLanguage1, "화3,4", CourseDay.TUESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+                    coreForeignLanguage1, CourseDay.TUESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
             );
 
             coreHumanities1.addCourseSchedule(schedule1);
@@ -314,7 +314,7 @@ class CourseServiceTest {
             //then
             assertThat(response.generalEducationCourseResponses()).hasSize(2);
             assertThat(response.generalEducationCourseResponses())
-                    .extracting(GeneralEducationCourseResponse::courseArea)
+                    .extracting(GeneralEducationCourseResponse::area)
                     .containsOnly("(핵심)인문");
         }
 
@@ -329,7 +329,7 @@ class CourseServiceTest {
             //then
             assertThat(response.generalEducationCourseResponses()).hasSize(2);
             assertThat(response.generalEducationCourseResponses())
-                    .extracting(GeneralEducationCourseResponse::courseArea)
+                    .extracting(GeneralEducationCourseResponse::area)
                     .containsOnly("(핵심)외국어");
         }
 
@@ -344,7 +344,7 @@ class CourseServiceTest {
             //then
             assertThat(response.generalEducationCourseResponses()).hasSize(1);
             assertThat(response.generalEducationCourseResponses())
-                    .extracting(GeneralEducationCourseResponse::courseArea)
+                    .extracting(GeneralEducationCourseResponse::area)
                     .containsOnly("사회");
         }
 
@@ -361,7 +361,7 @@ class CourseServiceTest {
                     .filter(c -> c.courseCode().equals("GEN101"))
                     .findFirst()
                     .orElseThrow();
-            assertThat(coreHumanities1.schedule()).isEqualTo("월1,2 수1,2");
+            assertThat(coreHumanities1.schedule()).isEqualTo("[07-401:월(1-2A),수(1-2A)]");
         }
 
         @Test
@@ -378,23 +378,6 @@ class CourseServiceTest {
                     .findFirst()
                     .orElseThrow();
             assertThat(coreHumanities2.schedule()).isEqualTo("-");
-        }
-
-        @Test
-        void null값인_교수명과_강의실은_하이픈으로_반환된다() {
-            //given
-            final String courseArea = "CORE_HUMANITIES";
-
-            //when
-            final GeneralEducationCoursesResponse response = courseService.getGeneralEducationCourses(courseArea);
-
-            //then
-            final GeneralEducationCourseResponse coreHumanities2 = response.generalEducationCourseResponses().stream()
-                    .filter(c -> c.courseCode().equals("GEN102"))
-                    .findFirst()
-                    .orElseThrow();
-            assertThat(coreHumanities2.professor()).isEqualTo("-");
-            assertThat(coreHumanities2.classroom()).isEqualTo("-");
         }
 
         @Test
@@ -442,55 +425,55 @@ class CourseServiceTest {
             // 수학과 과목들
             // 전학년 과목 2개
             Course mathAllGrade1 = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "미적분학", "Calculus", "MATH101",
+                    "미적분학", "Calculus", "MATH101", "MATH101001",
                     CourseDepartment.MATHEMATICS,
-                    CourseGrade.ALL, "김교수", "자연관101"
+                    CourseGrade.ALL
             );
             Course mathAllGrade2 = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "선형대수", "Linear Algebra", "MATH102",
+                    "선형대수", "Linear Algebra", "MATH102", "MATH102001",
                     CourseDepartment.MATHEMATICS,
-                    CourseGrade.ALL, null, null
+                    CourseGrade.ALL
             );
 
             // 1학년 과목 2개
             Course mathFreshman1 = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "수학의이해", "Understanding Mathematics", "MATH201",
+                    "수학의이해", "Understanding Mathematics", "MATH201", "MATH201001",
                     CourseDepartment.MATHEMATICS,
-                    CourseGrade.FRESHMAN, "이교수", "자연관201"
+                    CourseGrade.FRESHMAN
             );
             Course mathFreshman2 = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "기초수학", "Basic Mathematics", "MATH202",
+                    "기초수학", "Basic Mathematics", "MATH202", "MATH202001",
                     CourseDepartment.MATHEMATICS,
-                    CourseGrade.FRESHMAN, "박교수", null
+                    CourseGrade.FRESHMAN
             );
 
             // 2학년 과목 2개
             Course mathSophomore1 = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "해석학", "Analysis", "MATH301",
+                    "해석학", "Analysis", "MATH301", "MATH301001",
                     CourseDepartment.MATHEMATICS,
-                    CourseGrade.SOPHOMORE, null, "자연관301"
+                    CourseGrade.SOPHOMORE
             );
             Course mathSophomore2 = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "정수론", "Number Theory", "MATH302",
+                    "정수론", "Number Theory", "MATH302", "MATH302001",
                     CourseDepartment.MATHEMATICS,
-                    CourseGrade.SOPHOMORE, "최교수", "자연관302"
+                    CourseGrade.SOPHOMORE
             );
 
             // 컴퓨터공학부 과목 (다른 학과)
             Course cseCourse = CourseFixture.createCourseWithDetails(
-                    "자료구조", "Data Structure", "CSE101",
-                    CourseGrade.SOPHOMORE, "정교수", "공학관101"
+                    "자료구조", "Data Structure", "CSE101", "CSE101001",
+                    CourseGrade.SOPHOMORE
             );
 
             // 스케줄 추가
             CourseSchedule schedule1 = CourseScheduleFixture.createCourseSchedule(
-                    mathAllGrade1, "월1,2", CourseDay.MONDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+                    mathAllGrade1, CourseDay.MONDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
             );
             CourseSchedule schedule2 = CourseScheduleFixture.createCourseSchedule(
-                    mathAllGrade1, "수1,2", CourseDay.WEDNESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+                    mathAllGrade1, CourseDay.WEDNESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
             );
             CourseSchedule schedule3 = CourseScheduleFixture.createCourseSchedule(
-                    mathFreshman1, "화3,4", CourseDay.TUESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+                    mathFreshman1, CourseDay.TUESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
             );
 
             mathAllGrade1.addCourseSchedule(schedule1);
@@ -514,8 +497,8 @@ class CourseServiceTest {
             final MajorCoursesResponse response = courseService.getOtherDepartmentCourses(department);
 
             //then
-            assertThat(response.majorCourses()).hasSize(6);
-            assertThat(response.majorCourses())
+            assertThat(response.majorCourseResponses()).hasSize(6);
+            assertThat(response.majorCourseResponses())
                     .extracting(MajorCourseResponse::department)
                     .containsOnly("수학과");
         }
@@ -527,8 +510,8 @@ class CourseServiceTest {
 
             //when
             final MajorCoursesResponse response = courseService.getOtherDepartmentCourses(department);
-            final List<String> grades = response.majorCourses().stream()
-                    .map(MajorCourseResponse::courseGrade)
+            final List<String> grades = response.majorCourseResponses().stream()
+                    .map(MajorCourseResponse::grade)
                     .toList();
 
             //then
@@ -548,19 +531,19 @@ class CourseServiceTest {
             final MajorCoursesResponse response = courseService.getOtherDepartmentCourses(department);
 
             //then
-            // MATH101: 월1,2 수1,2
-            final MajorCourseResponse mathAllGrade1 = response.majorCourses().stream()
+            // MATH101: [07-401:월(1-2A),수(1-2A)]
+            final MajorCourseResponse mathAllGrade1 = response.majorCourseResponses().stream()
                     .filter(c -> c.courseCode().equals("MATH101"))
                     .findFirst()
                     .orElseThrow();
-            assertThat(mathAllGrade1.schedule()).isEqualTo("월1,2 수1,2");
+            assertThat(mathAllGrade1.schedule()).isEqualTo("[07-401:월(1-2A),수(1-2A)]");
 
-            // MATH201: 화3,4
-            final MajorCourseResponse mathFreshman1 = response.majorCourses().stream()
+            // MATH201: [07-401:화(1-2A)]
+            final MajorCourseResponse mathFreshman1 = response.majorCourseResponses().stream()
                     .filter(c -> c.courseCode().equals("MATH201"))
                     .findFirst()
                     .orElseThrow();
-            assertThat(mathFreshman1.schedule()).isEqualTo("화3,4");
+            assertThat(mathFreshman1.schedule()).isEqualTo("[07-401:화(1-2A)]");
         }
 
         @Test
@@ -572,7 +555,7 @@ class CourseServiceTest {
             final MajorCoursesResponse response = courseService.getOtherDepartmentCourses(department);
 
             //then
-            assertThat(response.majorCourses())
+            assertThat(response.majorCourseResponses())
                     .extracting(MajorCourseResponse::courseCode)
                     .doesNotContain("CSE101");
         }
@@ -597,62 +580,62 @@ class CourseServiceTest {
             // 소셜데이터사이언스 연계전공 과목들
             // 전학년 과목 2개
             Course socialDataAllGrade1 = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "빅데이터분석", "Big Data Analysis", "SDS101",
+                    "빅데이터분석", "Big Data Analysis", "SDS101", "SDS101001",
                     CourseDepartment.SOCIAL_DATA_SCIENCE,
-                    CourseGrade.ALL, "김교수", "융합관101"
+                    CourseGrade.ALL
             );
             Course socialDataAllGrade2 = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "데이터사이언스개론", "Intro to Data Science", "SDS102",
+                    "데이터사이언스개론", "Intro to Data Science", "SDS102", "SDS102001",
                     CourseDepartment.SOCIAL_DATA_SCIENCE,
-                    CourseGrade.ALL, null, null
+                    CourseGrade.ALL
             );
 
             // 1학년 과목 2개
             Course socialDataFreshman1 = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "통계학기초", "Basic Statistics", "SDS201",
+                    "통계학기초", "Basic Statistics", "SDS201", "SDS201001",
                     CourseDepartment.SOCIAL_DATA_SCIENCE,
-                    CourseGrade.FRESHMAN, "이교수", "융합관201"
+                    CourseGrade.FRESHMAN
             );
             Course socialDataFreshman2 = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "프로그래밍입문", "Programming Intro", "SDS202",
+                    "프로그래밍입문", "Programming Intro", "SDS202", "SDS202001",
                     CourseDepartment.SOCIAL_DATA_SCIENCE,
-                    CourseGrade.FRESHMAN, "박교수", null
+                    CourseGrade.FRESHMAN
             );
 
             // 2학년 과목 2개
             Course socialDataSophomore1 = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "머신러닝", "Machine Learning", "SDS301",
+                    "머신러닝", "Machine Learning", "SDS301", "SDS301001",
                     CourseDepartment.SOCIAL_DATA_SCIENCE,
-                    CourseGrade.SOPHOMORE, null, "융합관301"
+                    CourseGrade.SOPHOMORE
             );
             Course socialDataSophomore2 = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "데이터시각화", "Data Visualization", "SDS302",
+                    "데이터시각화", "Data Visualization", "SDS302", "SDS302001",
                     CourseDepartment.SOCIAL_DATA_SCIENCE,
-                    CourseGrade.SOPHOMORE, "최교수", "융합관302"
+                    CourseGrade.SOPHOMORE
             );
 
             // 미래자동차 연계전공 과목 (다른 연계전공)
             Course futureAutoCourse = CourseFixture.createCourseWithDepartmentAndDetails(
-                    "자율주행개론", "Intro to Autonomous Driving", "FA101",
+                    "자율주행개론", "Intro to Autonomous Driving", "FA101", "FA101001",
                     CourseDepartment.FUTURE_AUTOMOBILE,
-                    CourseGrade.SOPHOMORE, "정교수", "융합관401"
+                    CourseGrade.SOPHOMORE
             );
 
             // 일반 학과 과목 (컴퓨터공학부)
             Course cseCourse = CourseFixture.createCourseWithDetails(
-                    "자료구조", "Data Structure", "CSE101",
-                    CourseGrade.SOPHOMORE, "홍교수", "공학관101"
+                    "자료구조", "Data Structure", "CSE101", "CSE101001",
+                    CourseGrade.SOPHOMORE
             );
 
             // 스케줄 추가
             CourseSchedule schedule1 = CourseScheduleFixture.createCourseSchedule(
-                    socialDataAllGrade1, "월1,2", CourseDay.MONDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+                    socialDataAllGrade1, CourseDay.MONDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
             );
             CourseSchedule schedule2 = CourseScheduleFixture.createCourseSchedule(
-                    socialDataAllGrade1, "수1,2", CourseDay.WEDNESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+                    socialDataAllGrade1, CourseDay.WEDNESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
             );
             CourseSchedule schedule3 = CourseScheduleFixture.createCourseSchedule(
-                    socialDataFreshman1, "화3,4", CourseDay.TUESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+                    socialDataFreshman1, CourseDay.TUESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
             );
 
             socialDataAllGrade1.addCourseSchedule(schedule1);
@@ -691,7 +674,7 @@ class CourseServiceTest {
             //when
             final InterdisciplinaryMajorCoursesResponse response = courseService.getInterdisciplinaryMajorCourses(department);
             final List<String> grades = response.interdisciplinaryMajorCourseResponses().stream()
-                    .map(InterdisciplinaryMajorCourseResponse::courseGrade)
+                    .map(InterdisciplinaryMajorCourseResponse::grade)
                     .toList();
 
             //then
@@ -711,19 +694,19 @@ class CourseServiceTest {
             final InterdisciplinaryMajorCoursesResponse response = courseService.getInterdisciplinaryMajorCourses(department);
 
             //then
-            // SDS101: 월1,2 수1,2
+            // SDS101: [07-401:월(1-2A),수(1-2A)]
             final InterdisciplinaryMajorCourseResponse allGrade1 = response.interdisciplinaryMajorCourseResponses().stream()
                     .filter(c -> c.courseCode().equals("SDS101"))
                     .findFirst()
                     .orElseThrow();
-            assertThat(allGrade1.schedule()).isEqualTo("월1,2 수1,2");
+            assertThat(allGrade1.schedule()).isEqualTo("[07-401:월(1-2A),수(1-2A)]");
 
-            // SDS201: 화3,4
+            // SDS201: [07-401:화(1-2A)]
             final InterdisciplinaryMajorCourseResponse freshman1 = response.interdisciplinaryMajorCourseResponses().stream()
                     .filter(c -> c.courseCode().equals("SDS201"))
                     .findFirst()
                     .orElseThrow();
-            assertThat(freshman1.schedule()).isEqualTo("화3,4");
+            assertThat(freshman1.schedule()).isEqualTo("[07-401:화(1-2A)]");
         }
 
         @Test
@@ -740,23 +723,6 @@ class CourseServiceTest {
                     .findFirst()
                     .orElseThrow();
             assertThat(allGrade2.schedule()).isEqualTo("-");
-        }
-
-        @Test
-        void null값인_교수명과_강의실은_하이픈으로_반환된다() {
-            //given
-            final String department = "SOCIAL_DATA_SCIENCE";
-
-            //when
-            final InterdisciplinaryMajorCoursesResponse response = courseService.getInterdisciplinaryMajorCourses(department);
-
-            //then
-            final InterdisciplinaryMajorCourseResponse allGrade2 = response.interdisciplinaryMajorCourseResponses().stream()
-                    .filter(c -> c.courseCode().equals("SDS102"))
-                    .findFirst()
-                    .orElseThrow();
-            assertThat(allGrade2.professor()).isEqualTo("-");
-            assertThat(allGrade2.classroom()).isEqualTo("-");
         }
 
         @Test
@@ -877,7 +843,7 @@ class CourseServiceTest {
 //            //then
 //            assertThat(response.searchedCourseResponses()).hasSize(2);
 //            assertThat(response.searchedCourseResponses())
-//                    .extracting(SearchedCourseResponse::courseTitleKr)
+//                    .extracting(SearchedCourseResponse::titleKr)
 //                    .containsExactlyInAnyOrder("알고리즘", "알고리즘설계");
 //        }
 //
@@ -892,7 +858,7 @@ class CourseServiceTest {
 //            //then
 //            assertThat(response.searchedCourseResponses()).hasSize(3);
 //            assertThat(response.searchedCourseResponses())
-//                    .extracting(SearchedCourseResponse::courseTitleEn)
+//                    .extracting(SearchedCourseResponse::titleEn)
 //                    .containsExactlyInAnyOrder("Data Structure", "Data Analysis", "Big Data Analysis");
 //        }
 //
@@ -964,19 +930,19 @@ class CourseServiceTest {
 //            final SearchedCoursesResponse response = courseService.searchCourses(keyword);
 //
 //            //then
-//            // CSE101: 월3,4 수3,4
+//            // CSE101: [07-401:월(1-2A),수(1-2A)]
 //            final SearchedCourseResponse cse101 = response.searchedCourseResponses().stream()
 //                    .filter(c -> c.courseCode().equals("CSE101"))
 //                    .findFirst()
 //                    .orElseThrow();
-//            assertThat(cse101.schedule()).isEqualTo("월3,4 수3,4");
+//            assertThat(cse101.schedule()).isEqualTo("[07-401:월(1-2A),수(1-2A)]");
 //
-//            // CSE201: 화1,2
+//            // CSE201: [07-401:화(1-2A)]
 //            final SearchedCourseResponse cse201 = response.searchedCourseResponses().stream()
 //                    .filter(c -> c.courseCode().equals("CSE201"))
 //                    .findFirst()
 //                    .orElseThrow();
-//            assertThat(cse201.schedule()).isEqualTo("화1,2");
+//            assertThat(cse201.schedule()).isEqualTo("[07-401:화(1-2A)]");
 //        }
 //
 //        @Test
@@ -1022,7 +988,7 @@ class CourseServiceTest {
 //
 //            //then
 //            assertThat(response.searchedCourseResponses())
-//                    .extracting(SearchedCourseResponse::courseDepartment)
+//                    .extracting(SearchedCourseResponse::department)
 //                    .containsExactlyInAnyOrder("컴퓨터공학부", "수학과", "소셜데이터사이언스연계전공");
 //        }
 //

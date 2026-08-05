@@ -28,7 +28,7 @@ public class CourseValidator {
         }
 
         // 추가하려는 과목의 시간표 가져오기
-        List<CourseSchedule> newCourseSchedules = newCourse.getCourseSchedules();
+        List<CourseSchedule> newCourseSchedules = newCourse.getSchedules();
 
         if (newCourseSchedules.isEmpty()) {
             return true;
@@ -36,15 +36,15 @@ public class CourseValidator {
 
         // 현재 등록된 과목들의 시간표와 겹치는지 확인
         for (final Course existingCourse : existingCourses) {
-            List<CourseSchedule> existingCourseSchedules = existingCourse.getCourseSchedules();
+            List<CourseSchedule> existingCourseSchedules = existingCourse.getSchedules();
 
             for (final CourseSchedule newSchedule : newCourseSchedules) {
-                final CourseDay newCourseDay = newSchedule.getCourseDay();
+                final CourseDay newCourseDay = newSchedule.getDayOfWeek();
                 final LocalTime newStartTime = newSchedule.getStartTime();
                 final LocalTime newEndTime = newSchedule.getEndTime();
 
                 for (final CourseSchedule existingSchedule : existingCourseSchedules) {
-                    final CourseDay existingCourseDay = existingSchedule.getCourseDay();
+                    final CourseDay existingCourseDay = existingSchedule.getDayOfWeek();
                     final LocalTime existingStartTime = existingSchedule.getStartTime();
                     final LocalTime existingEndTime = existingSchedule.getEndTime();
 
@@ -62,10 +62,10 @@ public class CourseValidator {
             final List<Course> existingCourses,
             final Course newCourse
     ) {
-        final var courseType = newCourse.getCourseType();
+        final var courseType = newCourse.getType();
 
         long sameTypeCount = existingCourses.stream()
-                .filter(course -> course.getCourseType() == courseType)
+                .filter(course -> course.getType() == courseType)
                 .count();
 
         if (courseType == OCU) {

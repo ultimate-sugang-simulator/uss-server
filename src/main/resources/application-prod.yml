@@ -17,23 +17,6 @@ spring:
         show_sql: false
     show-sql: false
 
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
-    default-encoding: UTF-8
-
   flyway:
     enabled: true
     baseline-on-migrate: true
@@ -44,7 +27,6 @@ security:
   jwt:
     secret-key: ${JWT_SECRET_KEY}
     access-token-expiration-time: 21600000
-    refresh-token-expiration-time: 259200000
 
 management:
   server:

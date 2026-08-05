@@ -14,6 +14,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final String ACCESS_TOKEN_HEADER = "access-token";
+
     private final JwtProvider jwtProvider;
 
     @Override
@@ -23,10 +25,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final FilterChain filterChain
     ) throws ServletException, IOException {
 
-            final String accessToken = request.getHeader("access-token");
-            final String refreshToken = request.getHeader("refresh-token");
+            final String accessToken = request.getHeader(ACCESS_TOKEN_HEADER);
 
-            jwtProvider.validateTokens(accessToken, refreshToken);
+            jwtProvider.validateToken(accessToken);
 
             final Long memberId = jwtProvider.getMemberId(accessToken);
             request.setAttribute("member-id", memberId);

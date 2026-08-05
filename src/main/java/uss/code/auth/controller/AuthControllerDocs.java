@@ -12,8 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import uss.code.auth.dto.request.LoginRequest;
-import uss.code.auth.dto.request.SignUpRequest;
 import uss.code.auth.dto.response.AuthTokenResponse;
 import uss.code.global.exception.dto.response.ErrorResponse;
 
@@ -29,7 +29,7 @@ public interface AuthControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "사용자 조회 실패",
-                                            value = "{\"error\" : \"MEMBER_1010\", \"message\" : \"사용자를 찾을 수 없습니다.\"}"
+                                            value = "{\"code\" : 1010, \"message\" : \"사용자를 찾을 수 없습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -39,7 +39,7 @@ public interface AuthControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "비밀번호 불일치",
-                                            value = "{\"error\" : \"PASSWORD_1012\", \"message\" : \"비밀번호가 일치하지 않습니다.\"}"
+                                            value = "{\"code\" : 1012, \"message\" : \"비밀번호가 일치하지 않습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -48,31 +48,46 @@ public interface AuthControllerDocs {
     @PostMapping("/login")
     ResponseEntity<AuthTokenResponse> login(@Valid @RequestBody final LoginRequest request);
 
-    @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다.<br>" +
+    @Operation(summary = "액세스 토큰 재발급", description = "만료된 액세스 토큰으로 새 액세스 토큰을 발급받습니다.<br>" +
+            "서명이 유효하면 만료 여부와 관계없이 발급됩니다.<br>" +
             "🔓 <strong>Jwt 불필요</strong><br>")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "✅ 회원가입 성공"),
-            @ApiResponse(responseCode = "400", description = "🚨 이메일 인증 미완료",
+            @ApiResponse(responseCode = "200", description = "✅ 재발급 성공"),
+            @ApiResponse(responseCode = "401", description = "🚨 액세스 토큰 누락 또는 유효하지 않음",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             examples = {
                                     @ExampleObject(
-                                            name = "이메일 인증 미완료",
-                                            value = "{\"error\" : \"EMAIL_1016\", \"message\" : \"이메일 인증이 완료되지 않았습니다.\"}"
+                                            name = "액세스 토큰 누락",
+                                            value = "{\"code\" : 1000, \"message\" : \"액세스 토큰이 누락되었습니다.\"}"
+                                    ),
+                                    @ExampleObject(
+                                            name = "액세스 토큰 유효하지 않음",
+                                            value = "{\"code\" : 1001, \"message\" : \"액세스 토큰이 유효하지 않습니다.\"}"
+                                    ),
+                                    @ExampleObject(
+                                            name = "액세스 토큰 형식 오류",
+                                            value = "{\"code\" : 1002, \"message\" : \"액세스 토큰 형식이 올바르지 않습니다.\"}"
+                                    ),
+                                    @ExampleObject(
+                                            name = "액세스 토큰 서명 오류",
+                                            value = "{\"code\" : 1003, \"message\" : \"액세스 토큰 서명이 유효하지 않습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
             ),
-            @ApiResponse(responseCode = "400", description = "🚨 이미 존재하는 사용자",
+            @ApiResponse(responseCode = "404", description = "🚨 사용자 조회 실패",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             examples = {
                                     @ExampleObject(
-                                            name = "이미 존재하는 사용자",
-                                            value = "{\"error\" : \"MEMBER_1011\", \"message\" : \"이미 존재하는 사용자입니다.\"}"
+                                            name = "사용자 조회 실패",
+                                            value = "{\"code\" : 1010, \"message\" : \"사용자를 찾을 수 없습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
             )
     })
-    @PostMapping("/sign-up")
-    ResponseEntity<Void> signUp(@Valid @RequestBody final SignUpRequest request);
+    @PostMapping("/re-issue")
+    ResponseEntity<AuthTokenResponse> reIssue(
+            @RequestHeader(value = "access-token", required = false) final String accessToken
+    );
 }

@@ -31,7 +31,7 @@ public interface CourseControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "사용자 조회 실패",
-                                            value = "{\"error\" : \"MEMBER_1010\", \"message\" : \"사용자를 찾을 수 없습니다.\"}"
+                                            value = "{\"code\" : 1010, \"message\" : \"사용자를 찾을 수 없습니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -49,7 +49,7 @@ public interface CourseControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "유효하지 않은 교양 영역",
-                                            value = "{\"error\" : \"INVALID_GENERAL_EDUCATION_AREA_2000\", \"message\" : \"유효하지 않은 교양 영역입니다.\"}"
+                                            value = "{\"code\" : 2000, \"message\" : \"유효하지 않은 교양 영역입니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -70,7 +70,7 @@ public interface CourseControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "유효하지 않은 학과",
-                                            value = "{\"error\" : \"INVALID_ENUM_TYPE_8888\", \"message\" : \"유효하지 않은 열거타입입니다.\"}"
+                                            value = "{\"code\" : 8888, \"message\" : \"유효하지 않은 열거타입입니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -91,7 +91,7 @@ public interface CourseControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "유효하지 않은 연계전공",
-                                            value = "{\"error\" : \"INVALID_INTERDISCIPLINARY_DEPARTMENT_2001\", \"message\" : \"유효하지 않은 연계전공과목입니다.\"}"
+                                            value = "{\"code\" : 2001, \"message\" : \"유효하지 않은 연계전공과목입니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))

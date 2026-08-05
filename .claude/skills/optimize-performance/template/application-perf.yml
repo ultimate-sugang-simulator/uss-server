@@ -1,0 +1,101 @@
+# 성능 측정 전용 프로파일.
+# Phase 2에서 src/main/resources/application-perf.yml 이 없으면 이 내용으로 생성한다.
+#
+# 이 파일의 목적은 하나다. **측정값을 왜곡하는 요소를 전부 끄는 것.**
+# 값을 바꿀 때는 아래 주석의 이유를 먼저 읽어라. 이유 없이 prod 설정을 베껴오지 마라.
+#
+# 기동: ./gradlew bootRun --args='--spring.profiles.active=perf'
+# 선행: docker-compose -f docker/docker-compose-local.yml up -d mysql
+
+spring:
+  application:
+    name: uss-server-perf
+
+  datasource:
+    # docker-compose-local.yml의 mysql 서비스. 호스트 포트가 3307이다(3306 아님).
+    url: jdbc:mysql://127.0.0.1:3307/uss_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&rewriteBatchedStatements=true
+    username: root
+    password: root
+    # p6spy 드라이버(com.p6spy.engine.spy.P6SpyDriver)를 쓰지 마라.
+    # 쿼리마다 프록시를 한 겹 태우면 그 오버헤드가 측정값에 그대로 들어간다.
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+    hikari:
+      # Phase 3-B에서 VU를 정할 때 이 값을 함께 본다.
+      # 풀보다 훨씬 큰 VU로 재면 쿼리가 아니라 커넥션 대기를 재게 된다.
+      # 값을 바꾸면 record.md의 측정 환경에 변경 시점과 함께 남긴다.
+      maximum-pool-size: 10
+      minimum-idle: 10
+      connection-timeout: 10000
+      # 측정 중 커넥션이 재생성되면 그 지연이 응답시간에 섞인다.
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        # SQL 로깅은 요청당 수십 줄을 찍는다. 측정값을 통째로 바꾸므로 반드시 꺼둔다.
+        format_sql: false
+        show_sql: false
+        # 통계 수집도 오버헤드다. 쿼리 관측은 performance_schema로 한다.
+        generate_statistics: false
+    show-sql: false
+    # 뷰 렌더링이 없으므로 열어둘 이유가 없다. 열려 있으면 커넥션 점유 구간이 실제보다 길어진다.
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations:
+      - classpath:database/migration
+      - classpath:database/seed
+
+  mail:
+    # 측정 중 실제 메일이 나가지 않게 한다. 이메일 인증 경로를 재는 게 아니라면 건드릴 일이 없다.
+    host: localhost
+    port: 1025
+    username: perf
+    password: perf
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+security:
+  jwt:
+    # 로컬 측정 전용 키다. 이 값을 다른 환경에 쓰지 마라.
+    # 32바이트 이상이어야 HS256 서명이 된다.
+    secret-key: perf-only-local-secret-key-not-for-any-real-environment
+    # 측정 중 토큰이 만료되면 401이 섞여 에러율이 오염된다. 넉넉히 잡는다.
+    access-token-expiration-time: 86400000
+    refresh-token-expiration-time: 604800000
+
+management:
+  # Phase 2의 actuator 확인 명령이 8081을 본다. 포트를 바꾸면 그 명령도 함께 고쳐야 한다.
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  metrics:
+    tags:
+      application: uss-server-perf
+    distribution:
+      # 이 두 설정이 없으면 Phase 2의 3)번 확인(히스토그램 버킷 개수)이 0으로 나온다.
+      percentiles-histogram:
+        http.server.requests: true
+      slo:
+        http.server.requests: 100ms,200ms,500ms,1s,2s,5s
+
+logging:
+  level:
+    root: WARN
+    uss.code: WARN
+    org.hibernate.SQL: OFF
+    org.hibernate.orm.jdbc.bind: OFF
+    # p6spy는 위 driver-class-name 설정상 끼어들지 않지만, 설정이 바뀌어도 로그가 새지 않게 막아둔다.
+    p6spy: OFF
