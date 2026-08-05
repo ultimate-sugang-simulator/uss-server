@@ -60,27 +60,27 @@ class CartServiceTest {
 
             // 과목 생성
             Course course1 = CourseFixture.createCourseWithDetails(
-                    "자료구조", "Data Structure", "CSE101",
-                    CourseGrade.SOPHOMORE, "김교수", "공학관101"
+                    "자료구조", "Data Structure", "CSE101", "CSE101001",
+                    CourseGrade.SOPHOMORE
             );
             Course course2 = CourseFixture.createCourseWithDetails(
-                    "알고리즘", "Algorithm", "CSE201",
-                    CourseGrade.SOPHOMORE, "이교수", "공학관201"
+                    "알고리즘", "Algorithm", "CSE201", "CSE201001",
+                    CourseGrade.SOPHOMORE
             );
             Course course3 = CourseFixture.createCourseWithDetails(
-                    "데이터베이스", "Database", "CSE301",
-                    CourseGrade.JUNIOR, null, null
+                    "데이터베이스", "Database", "CSE301", "CSE301001",
+                    CourseGrade.JUNIOR
             );
 
             // 스케줄 추가
             CourseSchedule schedule1 = CourseScheduleFixture.createCourseSchedule(
-                    course1, "월3,4", CourseDay.MONDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+                    course1, CourseDay.MONDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
             );
             CourseSchedule schedule2 = CourseScheduleFixture.createCourseSchedule(
-                    course1, "수3,4", CourseDay.WEDNESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+                    course1, CourseDay.WEDNESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
             );
             CourseSchedule schedule3 = CourseScheduleFixture.createCourseSchedule(
-                    course2, "화1,2", CourseDay.TUESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+                    course2, CourseDay.TUESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
             );
 
             course1.addCourseSchedule(schedule1);
@@ -164,19 +164,19 @@ class CartServiceTest {
             final CartedCoursesResponse response = cartService.getCartedCourse(testMemberId);
 
             //then
-            // CSE101: 월3,4 수3,4
+            // CSE101: [07-401:월(1-2A),수(1-2A)]
             final CartedCourseResponse course1 = response.cartedCourseResponses().stream()
                     .filter(c -> c.courseCode().equals("CSE101"))
                     .findFirst()
                     .orElseThrow();
-            assertThat(course1.schedule()).isEqualTo("월3,4 수3,4");
+            assertThat(course1.schedule()).isEqualTo("[07-401:월(1-2A),수(1-2A)]");
 
-            // CSE201: 화1,2
+            // CSE201: [07-401:화(1-2A)]
             final CartedCourseResponse course2 = response.cartedCourseResponses().stream()
                     .filter(c -> c.courseCode().equals("CSE201"))
                     .findFirst()
                     .orElseThrow();
-            assertThat(course2.schedule()).isEqualTo("화1,2");
+            assertThat(course2.schedule()).isEqualTo("[07-401:화(1-2A)]");
         }
 
         @Test
@@ -194,21 +194,6 @@ class CartServiceTest {
             assertThat(course3.schedule()).isEqualTo("-");
         }
 
-        @Test
-        void null값인_교수명과_강의실은_하이픈으로_반환된다() {
-            //given
-
-            //when
-            final CartedCoursesResponse response = cartService.getCartedCourse(testMemberId);
-
-            //then
-            final CartedCourseResponse course3 = response.cartedCourseResponses().stream()
-                    .filter(c -> c.courseCode().equals("CSE301"))
-                    .findFirst()
-                    .orElseThrow();
-            assertThat(course3.professor()).isEqualTo("-");
-            assertThat(course3.classroom()).isEqualTo("-");
-        }
 
         @Test
         void 빈_장바구니를_조회하면_빈_리스트가_반환된다() {
@@ -244,16 +229,16 @@ class CartServiceTest {
 
             // 과목 생성
             Course course1 = CourseFixture.createCourseWithDetails(
-                    "자료구조", "Data Structure", "CSE101",
-                    CourseGrade.SOPHOMORE, "김교수", "공학관101"
+                    "자료구조", "Data Structure", "CSE101", "CSE101001",
+                    CourseGrade.SOPHOMORE
             );
             Course course2 = CourseFixture.createCourseWithDetails(
-                    "알고리즘", "Algorithm", "CSE201",
-                    CourseGrade.SOPHOMORE, "이교수", "공학관201"
+                    "알고리즘", "Algorithm", "CSE201", "CSE201001",
+                    CourseGrade.SOPHOMORE
             );
             Course course3 = CourseFixture.createCourseWithDetails(
-                    "데이터베이스", "Database", "CSE301",
-                    CourseGrade.JUNIOR, null, null
+                    "데이터베이스", "Database", "CSE301", "CSE301001",
+                    CourseGrade.JUNIOR
             );
 
             courseRepository.saveAll(List.of(course1, course2, course3));
@@ -359,22 +344,22 @@ class CartServiceTest {
 
             // 과목 생성
             Course course1 = CourseFixture.createCourseWithDetails(
-                    "자료구조", "Data Structure", "CSE101",
-                    CourseGrade.SOPHOMORE, "김교수", "공학관101"
+                    "자료구조", "Data Structure", "CSE101", "CSE101001",
+                    CourseGrade.SOPHOMORE
             );
             Course course2 = CourseFixture.createCourseWithDetails(
-                    "알고리즘", "Algorithm", "CSE201",
-                    CourseGrade.SOPHOMORE, "이교수", "공학관201"
+                    "알고리즘", "Algorithm", "CSE201", "CSE201001",
+                    CourseGrade.SOPHOMORE
             );
 
             // 스케줄 추가
             CourseSchedule schedule1 = CourseScheduleFixture.createCourseSchedule(
-                    course1, "월3,4", CourseDay.MONDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+                    course1, CourseDay.MONDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
             );
             course1.addCourseSchedule(schedule1);
 
             CourseSchedule schedule2 = CourseScheduleFixture.createCourseSchedule(
-                    course2, "화1,2", CourseDay.TUESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+                    course2, CourseDay.TUESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
             );
             course2.addCourseSchedule(schedule2);
 
@@ -402,8 +387,8 @@ class CartServiceTest {
             // 9개의 과목을 미리 추가
             for (int i = 0; i < 9; i++) {
                 Course course = CourseFixture.createCourseWithDetails(
-                        "과목" + i, "Course" + i, "CSE30" + i,
-                        CourseGrade.SOPHOMORE, "교수" + i, "강의실" + i
+                        "과목" + i, "Course" + i, "CSE30" + i, "CSE30" + i + "001",
+                        CourseGrade.SOPHOMORE
                 );
                 courseRepository.save(course);
 
@@ -426,8 +411,8 @@ class CartServiceTest {
             // 10개의 과목을 미리 추가
             for (int i = 0; i < 10; i++) {
                 Course course = CourseFixture.createCourseWithDetails(
-                        "과목" + i, "Course" + i, "CSE30" + i,
-                        CourseGrade.SOPHOMORE, "교수" + i, "강의실" + i
+                        "과목" + i, "Course" + i, "CSE30" + i, "CSE30" + i + "001",
+                        CourseGrade.SOPHOMORE
                 );
                 courseRepository.save(course);
 
@@ -483,11 +468,11 @@ class CartServiceTest {
 
             // 겹치는 시간대의 새 과목 생성 (월 14:00-16:00)
             Course conflictCourse = CourseFixture.createCourseWithDetails(
-                    "운영체제", "Operating System", "CSE301",
-                    CourseGrade.JUNIOR, "박교수", "공학관301"
+                    "운영체제", "Operating System", "CSE301", "CSE301001",
+                    CourseGrade.JUNIOR
             );
             CourseSchedule conflictSchedule = CourseScheduleFixture.createCourseSchedule(
-                    conflictCourse, "월5,6", CourseDay.MONDAY, LocalTime.of(14, 0), LocalTime.of(16, 0)
+                    conflictCourse, CourseDay.MONDAY, LocalTime.of(14, 0), LocalTime.of(16, 0)
             );
             conflictCourse.addCourseSchedule(conflictSchedule);
             courseRepository.save(conflictCourse);
@@ -506,11 +491,11 @@ class CartServiceTest {
 
             // 겹치지 않는 시간대의 새 과목 생성 (월 15:00-17:00)
             Course nonConflictCourse = CourseFixture.createCourseWithDetails(
-                    "운영체제", "Operating System", "CSE301",
-                    CourseGrade.JUNIOR, "박교수", "공학관301"
+                    "운영체제", "Operating System", "CSE301", "CSE301001",
+                    CourseGrade.JUNIOR
             );
             CourseSchedule nonConflictSchedule = CourseScheduleFixture.createCourseSchedule(
-                    nonConflictCourse, "월5,6", CourseDay.MONDAY, LocalTime.of(15, 0), LocalTime.of(17, 0)
+                    nonConflictCourse, CourseDay.MONDAY, LocalTime.of(15, 0), LocalTime.of(17, 0)
             );
             nonConflictCourse.addCourseSchedule(nonConflictSchedule);
             courseRepository.save(nonConflictCourse);
@@ -528,34 +513,34 @@ class CartServiceTest {
             //given
             // OCU 과목 2개 생성 및 추가
             Course ocu1 = CourseFixture.createCourse(
-                    "OCU과목1", "OCU Course 1", "OCU001",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "OCU과목1", "OCU Course 1", "OCU001", "OCU001001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.OCU,
                     CourseGrade.SOPHOMORE,
-                    "교수1", "강의실1", 3, false, 50, 30
+                    3, false, 50, 30
             );
             Course ocu2 = CourseFixture.createCourse(
-                    "OCU과목2", "OCU Course 2", "OCU002",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "OCU과목2", "OCU Course 2", "OCU002", "OCU002001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.OCU,
                     CourseGrade.SOPHOMORE,
-                    "교수2", "강의실2", 3, false, 50, 30
+                    3, false, 50, 30
             );
             Course ocu3 = CourseFixture.createCourse(
-                    "OCU과목3", "OCU Course 3", "OCU003",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "OCU과목3", "OCU Course 3", "OCU003", "OCU003001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.OCU,
                     CourseGrade.SOPHOMORE,
-                    "교수3", "강의실3", 3, false, 50, 30
+                    3, false, 50, 30
             );
 
             courseRepository.saveAll(List.of(ocu1, ocu2, ocu3));
@@ -576,24 +561,24 @@ class CartServiceTest {
             //given
             // OCU 과목 1개 생성 및 추가
             Course ocu1 = CourseFixture.createCourse(
-                    "OCU과목1", "OCU Course 1", "OCU001",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "OCU과목1", "OCU Course 1", "OCU001", "OCU001001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.OCU,
                     CourseGrade.SOPHOMORE,
-                    "교수1", "강의실1", 3, false, 50, 30
+                    3, false, 50, 30
             );
             Course ocu2 = CourseFixture.createCourse(
-                    "OCU과목2", "OCU Course 2", "OCU002",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "OCU과목2", "OCU Course 2", "OCU002", "OCU002001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.OCU,
                     CourseGrade.SOPHOMORE,
-                    "교수2", "강의실2", 3, false, 50, 30
+                    3, false, 50, 30
             );
 
             courseRepository.saveAll(List.of(ocu1, ocu2));
@@ -615,24 +600,24 @@ class CartServiceTest {
             //given
             // K-MOOC 과목 1개 생성 및 추가
             Course kMooc1 = CourseFixture.createCourse(
-                    "K-MOOC과목1", "K-MOOC Course 1", "KMOOC001",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "K-MOOC과목1", "K-MOOC Course 1", "KMOOC001", "KMOOC001001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.K_MOOC,
                     CourseGrade.SOPHOMORE,
-                    "교수1", "강의실1", 3, false, 50, 30
+                    3, false, 50, 30
             );
             Course kMooc2 = CourseFixture.createCourse(
-                    "K-MOOC과목2", "K-MOOC Course 2", "KMOOC002",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "K-MOOC과목2", "K-MOOC Course 2", "KMOOC002", "KMOOC002001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.K_MOOC,
                     CourseGrade.SOPHOMORE,
-                    "교수2", "강의실2", 3, false, 50, 30
+                    3, false, 50, 30
             );
 
             courseRepository.saveAll(List.of(kMooc1, kMooc2));
@@ -653,8 +638,8 @@ class CartServiceTest {
             // 일반 과목 여러 개 추가
             for (int i = 0; i < 5; i++) {
                 Course course = CourseFixture.createCourseWithDetails(
-                        "과목" + i, "Course" + i, "CSE30" + i,
-                        CourseGrade.SOPHOMORE, "교수" + i, "강의실" + i
+                        "과목" + i, "Course" + i, "CSE30" + i, "CSE30" + i + "001",
+                        CourseGrade.SOPHOMORE
                 );
                 courseRepository.save(course);
 

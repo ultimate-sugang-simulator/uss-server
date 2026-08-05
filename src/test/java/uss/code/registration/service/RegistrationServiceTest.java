@@ -61,27 +61,27 @@ class RegistrationServiceTest {
 
             // 과목 생성
             Course course1 = CourseFixture.createCourseWithDetails(
-                    "자료구조", "Data Structure", "CSE101",
-                    CourseGrade.SOPHOMORE, "김교수", "공학관101"
+                    "자료구조", "Data Structure", "CSE101", "CSE101001",
+                    CourseGrade.SOPHOMORE
             );
             Course course2 = CourseFixture.createCourseWithDetails(
-                    "알고리즘", "Algorithm", "CSE201",
-                    CourseGrade.SOPHOMORE, "이교수", "공학관201"
+                    "알고리즘", "Algorithm", "CSE201", "CSE201001",
+                    CourseGrade.SOPHOMORE
             );
             Course course3 = CourseFixture.createCourseWithDetails(
-                    "데이터베이스", "Database", "CSE301",
-                    CourseGrade.JUNIOR, null, null
+                    "데이터베이스", "Database", "CSE301", "CSE301001",
+                    CourseGrade.JUNIOR
             );
 
             // 스케줄 추가
             CourseSchedule schedule1 = CourseScheduleFixture.createCourseSchedule(
-                    course1, "월3,4", CourseDay.MONDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+                    course1, CourseDay.MONDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
             );
             CourseSchedule schedule2 = CourseScheduleFixture.createCourseSchedule(
-                    course1, "수3,4", CourseDay.WEDNESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+                    course1, CourseDay.WEDNESDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
             );
             CourseSchedule schedule3 = CourseScheduleFixture.createCourseSchedule(
-                    course2, "화1,2", CourseDay.TUESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+                    course2, CourseDay.TUESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
             );
 
             course1.addCourseSchedule(schedule1);
@@ -162,19 +162,19 @@ class RegistrationServiceTest {
             final RegistrationCoursesResponse response = registrationService.getRegistrationCourse(testMemberId);
 
             //then
-            // CSE101: 월3,4 수3,4
+            // CSE101: [07-401:월(1-2A),수(1-2A)]
             final RegistrationCourseResponse course1 = response.registrationCourseResponses().stream()
                     .filter(c -> c.courseCode().equals("CSE101"))
                     .findFirst()
                     .orElseThrow();
-            assertThat(course1.schedule()).isEqualTo("월3,4 수3,4");
+            assertThat(course1.schedule()).isEqualTo("[07-401:월(1-2A),수(1-2A)]");
 
-            // CSE201: 화1,2
+            // CSE201: [07-401:화(1-2A)]
             final RegistrationCourseResponse course2 = response.registrationCourseResponses().stream()
                     .filter(c -> c.courseCode().equals("CSE201"))
                     .findFirst()
                     .orElseThrow();
-            assertThat(course2.schedule()).isEqualTo("화1,2");
+            assertThat(course2.schedule()).isEqualTo("[07-401:화(1-2A)]");
         }
 
         @Test
@@ -193,21 +193,6 @@ class RegistrationServiceTest {
         }
 
         @Test
-        void null값인_강의실은_하이픈으로_반환된다() {
-            //given
-
-            //when
-            final RegistrationCoursesResponse response = registrationService.getRegistrationCourse(testMemberId);
-
-            //then
-            final RegistrationCourseResponse course3 = response.registrationCourseResponses().stream()
-                    .filter(c -> c.courseCode().equals("CSE301"))
-                    .findFirst()
-                    .orElseThrow();
-            assertThat(course3.classroom()).isEqualTo("-");
-        }
-
-        @Test
         void 과목_정보가_올바르게_매핑된다() {
             //given
 
@@ -220,9 +205,9 @@ class RegistrationServiceTest {
                     .findFirst()
                     .orElseThrow();
 
-            assertThat(course1.courseTitleKr()).isEqualTo("자료구조");
-            assertThat(course1.courseTitleEn()).isEqualTo("Data Structure");
-            assertThat(course1.classroom()).isEqualTo("공학관101");
+            assertThat(course1.titleKr()).isEqualTo("자료구조");
+            assertThat(course1.titleEn()).isEqualTo("Data Structure");
+            assertThat(course1.haksuCode()).isEqualTo("CSE101001");
         }
 
         @Test
@@ -254,22 +239,22 @@ class RegistrationServiceTest {
 
             // 과목 생성
             Course course1 = CourseFixture.createCourseWithDetails(
-                    "자료구조", "Data Structure", "CSE101",
-                    CourseGrade.SOPHOMORE, "김교수", "공학관101"
+                    "자료구조", "Data Structure", "CSE101", "CSE101001",
+                    CourseGrade.SOPHOMORE
             );
             Course course2 = CourseFixture.createCourseWithDetails(
-                    "알고리즘", "Algorithm", "CSE201",
-                    CourseGrade.SOPHOMORE, "이교수", "공학관201"
+                    "알고리즘", "Algorithm", "CSE201", "CSE201001",
+                    CourseGrade.SOPHOMORE
             );
 
             // 스케줄 추가
             CourseSchedule schedule1 = CourseScheduleFixture.createCourseSchedule(
-                    course1, "월3,4", CourseDay.MONDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
+                    course1, CourseDay.MONDAY, LocalTime.of(13, 0), LocalTime.of(15, 0)
             );
             course1.addCourseSchedule(schedule1);
 
             CourseSchedule schedule2 = CourseScheduleFixture.createCourseSchedule(
-                    course2, "화1,2", CourseDay.TUESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
+                    course2, CourseDay.TUESDAY, LocalTime.of(9, 0), LocalTime.of(11, 0)
             );
             course2.addCourseSchedule(schedule2);
 
@@ -331,11 +316,11 @@ class RegistrationServiceTest {
 
             // 겹치는 시간대의 새 과목 생성 (월 14:00-16:00)
             Course conflictCourse = CourseFixture.createCourseWithDetails(
-                    "운영체제", "Operating System", "CSE301",
-                    CourseGrade.JUNIOR, "박교수", "공학관301"
+                    "운영체제", "Operating System", "CSE301", "CSE301001",
+                    CourseGrade.JUNIOR
             );
             CourseSchedule conflictSchedule = CourseScheduleFixture.createCourseSchedule(
-                    conflictCourse, "월5,6", CourseDay.MONDAY, LocalTime.of(14, 0), LocalTime.of(16, 0)
+                    conflictCourse, CourseDay.MONDAY, LocalTime.of(14, 0), LocalTime.of(16, 0)
             );
             conflictCourse.addCourseSchedule(conflictSchedule);
             courseRepository.save(conflictCourse);
@@ -354,11 +339,11 @@ class RegistrationServiceTest {
 
             // 겹치지 않는 시간대의 새 과목 생성 (월 15:00-17:00)
             Course nonConflictCourse = CourseFixture.createCourseWithDetails(
-                    "운영체제", "Operating System", "CSE301",
-                    CourseGrade.JUNIOR, "박교수", "공학관301"
+                    "운영체제", "Operating System", "CSE301", "CSE301001",
+                    CourseGrade.JUNIOR
             );
             CourseSchedule nonConflictSchedule = CourseScheduleFixture.createCourseSchedule(
-                    nonConflictCourse, "월5,6", CourseDay.MONDAY, LocalTime.of(15, 0), LocalTime.of(17, 0)
+                    nonConflictCourse, CourseDay.MONDAY, LocalTime.of(15, 0), LocalTime.of(17, 0)
             );
             nonConflictCourse.addCourseSchedule(nonConflictSchedule);
             courseRepository.save(nonConflictCourse);
@@ -376,34 +361,34 @@ class RegistrationServiceTest {
             //given
             // OCU 과목 2개 생성 및 신청
             Course ocu1 = CourseFixture.createCourse(
-                    "OCU과목1", "OCU Course 1", "OCU001",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "OCU과목1", "OCU Course 1", "OCU001", "OCU001001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.OCU,
                     CourseGrade.SOPHOMORE,
-                    "교수1", "강의실1", 3, false, 50, 30
+                    3, false, 50, 30
             );
             Course ocu2 = CourseFixture.createCourse(
-                    "OCU과목2", "OCU Course 2", "OCU002",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "OCU과목2", "OCU Course 2", "OCU002", "OCU002001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.OCU,
                     CourseGrade.SOPHOMORE,
-                    "교수2", "강의실2", 3, false, 50, 30
+                    3, false, 50, 30
             );
             Course ocu3 = CourseFixture.createCourse(
-                    "OCU과목3", "OCU Course 3", "OCU003",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "OCU과목3", "OCU Course 3", "OCU003", "OCU003001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.OCU,
                     CourseGrade.SOPHOMORE,
-                    "교수3", "강의실3", 3, false, 50, 30
+                    3, false, 50, 30
             );
 
             courseRepository.saveAll(List.of(ocu1, ocu2, ocu3));
@@ -424,24 +409,24 @@ class RegistrationServiceTest {
             //given
             // OCU 과목 1개 생성 및 신청
             Course ocu1 = CourseFixture.createCourse(
-                    "OCU과목1", "OCU Course 1", "OCU001",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "OCU과목1", "OCU Course 1", "OCU001", "OCU001001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.OCU,
                     CourseGrade.SOPHOMORE,
-                    "교수1", "강의실1", 3, false, 50, 30
+                    3, false, 50, 30
             );
             Course ocu2 = CourseFixture.createCourse(
-                    "OCU과목2", "OCU Course 2", "OCU002",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "OCU과목2", "OCU Course 2", "OCU002", "OCU002001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.OCU,
                     CourseGrade.SOPHOMORE,
-                    "교수2", "강의실2", 3, false, 50, 30
+                    3, false, 50, 30
             );
 
             courseRepository.saveAll(List.of(ocu1, ocu2));
@@ -463,24 +448,24 @@ class RegistrationServiceTest {
             //given
             // K-MOOC 과목 1개 생성 및 신청
             Course kMooc1 = CourseFixture.createCourse(
-                    "K-MOOC과목1", "K-MOOC Course 1", "KMOOC001",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "K-MOOC과목1", "K-MOOC Course 1", "KMOOC001", "KMOOC001001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.K_MOOC,
                     CourseGrade.SOPHOMORE,
-                    "교수1", "강의실1", 3, false, 50, 30
+                    3, false, 50, 30
             );
             Course kMooc2 = CourseFixture.createCourse(
-                    "K-MOOC과목2", "K-MOOC Course 2", "KMOOC002",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "K-MOOC과목2", "K-MOOC Course 2", "KMOOC002", "KMOOC002001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.K_MOOC,
                     CourseGrade.SOPHOMORE,
-                    "교수2", "강의실2", 3, false, 50, 30
+                    3, false, 50, 30
             );
 
             courseRepository.saveAll(List.of(kMooc1, kMooc2));
@@ -501,8 +486,8 @@ class RegistrationServiceTest {
             // 일반 과목 여러 개 신청
             for (int i = 0; i < 5; i++) {
                 Course course = CourseFixture.createCourseWithDetails(
-                        "과목" + i, "Course" + i, "CSE30" + i,
-                        CourseGrade.SOPHOMORE, "교수" + i, "강의실" + i
+                        "과목" + i, "Course" + i, "CSE30" + i, "CSE30" + i + "001",
+                        CourseGrade.SOPHOMORE
                 );
                 courseRepository.save(course);
 
@@ -524,14 +509,14 @@ class RegistrationServiceTest {
             //given
             // 정원이 가득 찬 과목 생성 (maxCapacity: 2, currentEnrollment: 2)
             Course fullCourse = CourseFixture.createCourse(
-                    "정원마감과목", "Full Course", "CSE999",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "정원마감과목", "Full Course", "CSE999", "CSE999001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.LECTURE,
                     CourseGrade.SOPHOMORE,
-                    "김교수", "공학관101", 3, false, 2, 2
+                    3, false, 2, 2
             );
             courseRepository.save(fullCourse);
 
@@ -549,74 +534,74 @@ class RegistrationServiceTest {
 
             // 이미 21학점 신청한 상태로 만들기 (7과목 * 3학점)
             Course course3Credit1 = CourseFixture.createCourse(
-                    "과목1", "Course1", "CSE301",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "과목1", "Course1", "CSE301", "CSE301001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.LECTURE,
                     CourseGrade.SOPHOMORE,
-                    "교수1", "강의실1", 3, false, 50, 30
+                    3, false, 50, 30
             );
             Course course3Credit2 = CourseFixture.createCourse(
-                    "과목2", "Course2", "CSE302",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "과목2", "Course2", "CSE302", "CSE302001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.LECTURE,
                     CourseGrade.SOPHOMORE,
-                    "교수2", "강의실2", 3, false, 50, 30
+                    3, false, 50, 30
             );
             Course course3Credit3 = CourseFixture.createCourse(
-                    "과목3", "Course3", "CSE303",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "과목3", "Course3", "CSE303", "CSE303001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.LECTURE,
                     CourseGrade.SOPHOMORE,
-                    "교수3", "강의실3", 3, false, 50, 30
+                    3, false, 50, 30
             );
             Course course3Credit4 = CourseFixture.createCourse(
-                    "과목4", "Course4", "CSE304",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "과목4", "Course4", "CSE304", "CSE304001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.LECTURE,
                     CourseGrade.SOPHOMORE,
-                    "교수4", "강의실4", 3, false, 50, 30
+                    3, false, 50, 30
             );
             Course course3Credit5 = CourseFixture.createCourse(
-                    "과목5", "Course5", "CSE305",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "과목5", "Course5", "CSE305", "CSE305001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.LECTURE,
                     CourseGrade.SOPHOMORE,
-                    "교수5", "강의실5", 3, false, 50, 30
+                    3, false, 50, 30
             );
             Course course3Credit6 = CourseFixture.createCourse(
-                    "과목6", "Course6", "CSE306",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "과목6", "Course6", "CSE306", "CSE306001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.LECTURE,
                     CourseGrade.SOPHOMORE,
-                    "교수6", "강의실6", 3, false, 50, 30
+                    3, false, 50, 30
             );
             Course course3Credit7 = CourseFixture.createCourse(
-                    "과목7", "Course7", "CSE307",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "과목7", "Course7", "CSE307", "CSE307001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.LECTURE,
                     CourseGrade.SOPHOMORE,
-                    "교수7", "강의실7", 3, false, 50, 30
+                    3, false, 50, 30
             );
 
             courseRepository.saveAll(List.of(
@@ -635,14 +620,14 @@ class RegistrationServiceTest {
 
             // 3학점 과목 추가 시도 (21 + 3 = 24 > 21)
             Course extraCourse = CourseFixture.createCourse(
-                    "추가과목", "Extra Course", "CSE308",
-                    CourseFixture.createCourse().getCourseCollege(),
-                    CourseFixture.createCourse().getCourseDepartment(),
-                    CourseFixture.createCourse().getCourseClassification(),
-                    CourseFixture.createCourse().getCourseArea(),
+                    "추가과목", "Extra Course", "CSE308", "CSE308001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseFixture.createCourse().getClassification(),
+                    CourseFixture.createCourse().getArea(),
                     CourseType.LECTURE,
                     CourseGrade.SOPHOMORE,
-                    "김교수", "강의실", 3, false, 50, 30
+                    3, false, 50, 30
             );
             courseRepository.save(extraCourse);
 
@@ -661,14 +646,14 @@ class RegistrationServiceTest {
             // 이미 15학점 신청한 상태로 만들기 (5과목 * 3학점)
             for (int i = 0; i < 5; i++) {
                 Course course = CourseFixture.createCourse(
-                        "과목" + i, "Course" + i, "CSE30" + i,
-                        CourseFixture.createCourse().getCourseCollege(),
-                        CourseFixture.createCourse().getCourseDepartment(),
-                        CourseFixture.createCourse().getCourseClassification(),
-                        CourseFixture.createCourse().getCourseArea(),
+                        "과목" + i, "Course" + i, "CSE30" + i, "CSE30" + i + "001",
+                        CourseFixture.createCourse().getCollege(),
+                        CourseFixture.createCourse().getDepartment(),
+                        CourseFixture.createCourse().getClassification(),
+                        CourseFixture.createCourse().getArea(),
                         CourseType.LECTURE,
                         CourseGrade.SOPHOMORE,
-                        "교수" + i, "강의실" + i, 3, false, 50, 30
+                        3, false, 50, 30
                 );
                 courseRepository.save(course);
                 Registration registration = RegistrationFixture.createRegistration(member, course);
@@ -711,16 +696,16 @@ class RegistrationServiceTest {
 
             // 과목 생성
             Course course1 = CourseFixture.createCourseWithDetails(
-                    "자료구조", "Data Structure", "CSE101",
-                    CourseGrade.SOPHOMORE, "김교수", "공학관101"
+                    "자료구조", "Data Structure", "CSE101", "CSE101001",
+                    CourseGrade.SOPHOMORE
             );
             Course course2 = CourseFixture.createCourseWithDetails(
-                    "알고리즘", "Algorithm", "CSE201",
-                    CourseGrade.SOPHOMORE, "이교수", "공학관201"
+                    "알고리즘", "Algorithm", "CSE201", "CSE201001",
+                    CourseGrade.SOPHOMORE
             );
             Course course3 = CourseFixture.createCourseWithDetails(
-                    "데이터베이스", "Database", "CSE301",
-                    CourseGrade.JUNIOR, null, null
+                    "데이터베이스", "Database", "CSE301", "CSE301001",
+                    CourseGrade.JUNIOR
             );
 
             courseRepository.saveAll(List.of(course1, course2, course3));

@@ -28,22 +28,22 @@ public class MemberFixture {
             final String studentId,
             final String password,
             final String name,
-            final MemberCollege memberCollege,
-            final MemberDepartment memberDepartment,
-            final MemberGrade memberGrade,
+            final MemberCollege college,
+            final MemberDepartment department,
+            final MemberGrade grade,
             final AcademicStatus academicStatus,
-            final double lastSemesterGPA
+            final double lastSemesterGpa
     ) {
         Member member = new Member();
 
         ReflectionTestUtils.setField(member, "studentId", studentId);
         ReflectionTestUtils.setField(member, "password", password);
         ReflectionTestUtils.setField(member, "name", name);
-        ReflectionTestUtils.setField(member, "memberCollege", memberCollege);
-        ReflectionTestUtils.setField(member, "memberDepartment", memberDepartment);
-        ReflectionTestUtils.setField(member, "memberGrade", memberGrade);
+        ReflectionTestUtils.setField(member, "college", college);
+        ReflectionTestUtils.setField(member, "department", department);
+        ReflectionTestUtils.setField(member, "grade", grade);
         ReflectionTestUtils.setField(member, "academicStatus", academicStatus);
-        ReflectionTestUtils.setField(member, "lastSemesterGPA", lastSemesterGPA);
+        ReflectionTestUtils.setField(member, "lastSemesterGpa", lastSemesterGpa);
         ReflectionTestUtils.setField(member, "createdAt", LocalDateTime.now());
         ReflectionTestUtils.setField(member, "updatedAt", LocalDateTime.now());
 
