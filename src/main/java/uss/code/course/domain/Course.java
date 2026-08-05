@@ -14,11 +14,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static jakarta.persistence.CascadeType.PERSIST;
 import static jakarta.persistence.CascadeType.REMOVE;
@@ -28,12 +24,6 @@ import static jakarta.persistence.CascadeType.REMOVE;
 @NoArgsConstructor
 @Table(name = "courses")
 public class Course {
-
-    private static final String NO_SCHEDULE = "-";
-    private static final String GROUP_PREFIX = "[";
-    private static final String GROUP_SUFFIX = "]";
-    private static final String CLASSROOM_DELIMITER = ":";
-    private static final String PERIOD_DELIMITER = ",";
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -96,37 +86,6 @@ public class Course {
 
     @Column(nullable = false, name = "current_enrollment")
     private int currentEnrollment;
-
-    public String getFormattedCourseSchedules(){
-        if(schedules.isEmpty())
-            return NO_SCHEDULE;
-
-        return groupByClassroom().entrySet().stream()
-                .map(entry -> formatClassroomSchedules(entry.getKey(), entry.getValue()))
-                .collect(Collectors.joining());
-    }
-
-    private Map<String, List<CourseSchedule>> groupByClassroom() {
-        return schedules.stream()
-                .sorted(Comparator.comparing(CourseSchedule::getDayOfWeek)
-                        .thenComparing(CourseSchedule::getStartTime))
-                .collect(Collectors.groupingBy(
-                        CourseSchedule::getClassroom,
-                        LinkedHashMap::new,
-                        Collectors.toList()
-                ));
-    }
-
-    private String formatClassroomSchedules(
-            final String classroom,
-            final List<CourseSchedule> classroomSchedules
-    ) {
-        final String periods = classroomSchedules.stream()
-                .map(CourseSchedule::getScheduleText)
-                .collect(Collectors.joining(PERIOD_DELIMITER));
-
-        return GROUP_PREFIX + classroom + CLASSROOM_DELIMITER + periods + GROUP_SUFFIX;
-    }
 
     public void addCourseSchedule(final CourseSchedule courseSchedule) {
         this.schedules.add(courseSchedule);
