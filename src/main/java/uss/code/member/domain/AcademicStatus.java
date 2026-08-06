@@ -12,7 +12,8 @@ import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
 @RequiredArgsConstructor
 public enum AcademicStatus {
     ENROLLED("재학"),
-    LEAVE_OF_ABSENCE("휴학");
+    LEAVE_OF_ABSENCE("휴학"),
+    DEFAULT("미정");
 
     private final String name;
 
