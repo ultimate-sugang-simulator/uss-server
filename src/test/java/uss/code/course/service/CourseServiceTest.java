@@ -53,7 +53,6 @@ class CourseServiceTest {
     class 전공_과목_조회_테스트 {
 
         private static final String TEST_STUDENT_ID = "202012345";
-        private static final String TEST_PASSWORD = "password1234";
         private static final String TEST_NAME = "홍길동";
         private static final MemberCollege TEST_COLLEGE = MemberCollege.INFORMATION_TECHNOLOGY;
         private static final MemberDepartment TEST_DEPARTMENT = MemberDepartment.COMPUTER_ENGINEERING;
@@ -69,7 +68,6 @@ class CourseServiceTest {
             // 회원 생성 (컴퓨터공학부)
             final Member member = MemberFixture.createMember(
                     TEST_STUDENT_ID,
-                    TEST_PASSWORD,
                     TEST_NAME,
                     TEST_COLLEGE,
                     TEST_DEPARTMENT,

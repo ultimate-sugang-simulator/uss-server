@@ -14,7 +14,6 @@ public class MemberFixture {
     public static Member createMember() {
         return createMember(
                 "20240001",
-                "password123",
                 "홍길동",
                 MemberCollege.INFORMATION_TECHNOLOGY,
                 MemberDepartment.COMPUTER_ENGINEERING,
@@ -26,7 +25,6 @@ public class MemberFixture {
 
     public static Member createMember(
             final String studentId,
-            final String password,
             final String name,
             final MemberCollege college,
             final MemberDepartment department,
@@ -37,7 +35,6 @@ public class MemberFixture {
         Member member = new Member();
 
         ReflectionTestUtils.setField(member, "studentId", studentId);
-        ReflectionTestUtils.setField(member, "password", password);
         ReflectionTestUtils.setField(member, "name", name);
         ReflectionTestUtils.setField(member, "college", college);
         ReflectionTestUtils.setField(member, "department", department);
