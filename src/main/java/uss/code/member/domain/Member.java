@@ -29,9 +29,6 @@ public class Member {
     private String studentId;
 
     @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false)
     private String name;
 
     @Enumerated(EnumType.STRING)
@@ -62,7 +59,6 @@ public class Member {
     @Builder(access = PRIVATE)
     private Member(
             final String studentId,
-            final String password,
             final String name,
             final MemberCollege college,
             final MemberDepartment department,
@@ -71,7 +67,6 @@ public class Member {
             final double lastSemesterGpa
     ) {
         this.studentId = studentId;
-        this.password = password;
         this.name = name;
         this.college = college;
         this.department = department;
@@ -80,6 +75,20 @@ public class Member {
         this.lastSemesterGpa = lastSemesterGpa;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public static Member createDefault(
+            final String studentId
+    ) {
+        return Member.builder()
+                .studentId(studentId)
+                .name(studentId)
+                .college(MemberCollege.DEFAULT)
+                .department(MemberDepartment.DEFAULT)
+                .grade(MemberGrade.DEFAULT)
+                .academicStatus(AcademicStatus.DEFAULT)
+                .lastSemesterGpa(0.0)
+                .build();
     }
 
     public int getMaxCredit(){

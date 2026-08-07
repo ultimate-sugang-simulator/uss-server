@@ -23,7 +23,8 @@ public enum MemberCollege {
     URBAN_SCIENCE("도시과학대학"),
     LIFE_SCIENCES_BIOENGINEERING("생명과학기술대학"),
     LIBERAL_ARTS_COLLEGE("융합자유전공대학"),
-    LAW("법학부");
+    LAW("법학부"),
+    DEFAULT("미정");
 
     private final String name;
 

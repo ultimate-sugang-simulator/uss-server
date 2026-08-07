@@ -31,7 +31,6 @@ class MemberServiceTest {
     class 사용자의_헤더_정보를_조회할_때 {
 
         private static final String TEST_STUDENT_ID = "202012345";
-        private static final String TEST_PASSWORD = "password1234";
         private static final String TEST_NAME = "홍길동";
         private static final MemberCollege TEST_COLLEGE = MemberCollege.INFORMATION_TECHNOLOGY;
         private static final MemberDepartment TEST_DEPARTMENT = MemberDepartment.COMPUTER_ENGINEERING;
@@ -50,7 +49,6 @@ class MemberServiceTest {
         void setUp() {
             final Member member = MemberFixture.createMember(
                     TEST_STUDENT_ID,
-                    TEST_PASSWORD,
                     TEST_NAME,
                     TEST_COLLEGE,
                     TEST_DEPARTMENT,

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import uss.code.auth.dto.request.LoginRequest;
 import uss.code.auth.dto.response.AuthTokenResponse;
 import uss.code.auth.infra.JwtProvider;
-import uss.code.auth.infra.PasswordEncoder;
 import uss.code.global.exception.domain.JwtTokenInvalidException;
 import uss.code.global.exception.domain.JwtTokenMissingException;
 import uss.code.global.exception.domain.RestApiException;
@@ -19,11 +18,14 @@ import uss.code.member.domain.MemberCollege;
 import uss.code.member.domain.MemberDepartment;
 import uss.code.member.domain.MemberGrade;
 import uss.code.member.fixture.MemberFixture;
+import uss.code.member.repository.InuMemberRepository;
 import uss.code.member.repository.MemberRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.reset;
 import static uss.code.global.exception.domain.ExceptionCode.*;
 
 @IntegrationTest
@@ -51,11 +53,11 @@ class AuthServiceTest {
     private AuthService authService;
     @Autowired
     private JwtProvider jwtProvider;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private InuMemberRepository inuMemberRepository;
 
     @Value("${security.jwt.secret-key}")
     private String secretKey;
@@ -64,9 +66,10 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
+        reset(inuMemberRepository);
+
         final Member member = MemberFixture.createMember(
                 TEST_STUDENT_ID,
-                passwordEncoder.encode(TEST_RAW_PASSWORD),
                 TEST_NAME,
                 TEST_COLLEGE,
                 TEST_DEPARTMENT,
@@ -96,8 +99,10 @@ class AuthServiceTest {
     class 로그인_테스트 {
 
         @Test
-        void 학번과_비밀번호가_유효하면_액세스_토큰을_발급한다() {
+        void 포털_인증에_성공하고_가입된_회원이면_액세스_토큰을_발급한다() {
             //given
+            given(inuMemberRepository.verifyInuMember(TEST_STUDENT_ID, TEST_RAW_PASSWORD)).willReturn(true);
+
             final LoginRequest request = new LoginRequest(TEST_STUDENT_ID, TEST_RAW_PASSWORD);
 
             //when
@@ -109,25 +114,32 @@ class AuthServiceTest {
         }
 
         @Test
-        void 학번에_해당하는_회원이_없으면_예외가_발생한다() {
+        void 포털_인증에_성공하고_미가입_회원이면_회원을_생성하고_토큰을_발급한다() {
             //given
+            given(inuMemberRepository.verifyInuMember(UNKNOWN_STUDENT_ID, TEST_RAW_PASSWORD)).willReturn(true);
+            assertThat(memberRepository.findByStudentId(UNKNOWN_STUDENT_ID)).isEmpty();
+
             final LoginRequest request = new LoginRequest(UNKNOWN_STUDENT_ID, TEST_RAW_PASSWORD);
 
-            //when & then
-            assertThatThrownBy(() -> authService.login(request))
-                    .isInstanceOf(RestApiException.class)
-                    .hasFieldOrPropertyWithValue("exceptionCode", MEMBER_NOT_FOUND);
+            //when
+            final AuthTokenResponse response = authService.login(request);
+
+            //then
+            assertThat(response.accessToken()).isNotBlank();
+            assertThat(memberRepository.findByStudentId(UNKNOWN_STUDENT_ID)).isPresent();
         }
 
         @Test
-        void 비밀번호가_일치하지_않으면_예외가_발생한다() {
+        void 포털_인증에_실패하면_예외가_발생한다() {
             //given
+            given(inuMemberRepository.verifyInuMember(TEST_STUDENT_ID, WRONG_PASSWORD)).willReturn(false);
+
             final LoginRequest request = new LoginRequest(TEST_STUDENT_ID, WRONG_PASSWORD);
 
             //when & then
             assertThatThrownBy(() -> authService.login(request))
                     .isInstanceOf(RestApiException.class)
-                    .hasFieldOrPropertyWithValue("exceptionCode", PASSWORD_NOT_MATCH);
+                    .hasFieldOrPropertyWithValue("exceptionCode", PORTAL_LOGIN_FAILED);
         }
     }
 
@@ -156,6 +168,8 @@ class AuthServiceTest {
         @Test
         void 아직_만료되지_않은_토큰으로도_재발급에_성공한다() {
             //given
+            given(inuMemberRepository.verifyInuMember(TEST_STUDENT_ID, TEST_RAW_PASSWORD)).willReturn(true);
+
             final String validToken = authService.login(new LoginRequest(TEST_STUDENT_ID, TEST_RAW_PASSWORD))
                     .accessToken();
 

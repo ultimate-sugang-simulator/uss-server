@@ -31,6 +31,10 @@ jobs:
 
           security.jwt.secret-key: ${{secrets.JWT_SECRET_KEY}}
 
+          oracle.datasource.jdbc-url: ${{secrets.ORACLE_URL}}
+          oracle.datasource.username: ${{secrets.ORACLE_USERNAME}}
+          oracle.datasource.password: ${{secrets.ORACLE_PASSWORD}}
+
       - name: Gradle 권한 설정
         run: chmod +x ./gradlew
 
