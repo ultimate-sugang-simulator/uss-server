@@ -91,6 +91,11 @@ public class Member {
                 .build();
     }
 
+    public void updateDepartment(final MemberDepartment department) {
+        this.department = department;
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public int getMaxCredit(){
         if (lastSemesterGpa >= 4.0) {
             return 24;
