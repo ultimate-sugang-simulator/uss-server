@@ -6,29 +6,30 @@ import org.springframework.transaction.annotation.Transactional;
 import uss.code.auth.dto.request.LoginRequest;
 import uss.code.auth.dto.response.AuthTokenResponse;
 import uss.code.auth.infra.JwtProvider;
-import uss.code.auth.infra.PasswordEncoder;
 import uss.code.global.exception.domain.RestApiException;
 import uss.code.member.domain.Member;
+import uss.code.member.repository.InuMemberRepository;
 import uss.code.member.repository.MemberRepository;
 
-import static uss.code.global.exception.domain.ExceptionCode.*;
+import static uss.code.global.exception.domain.ExceptionCode.MEMBER_NOT_FOUND;
+import static uss.code.global.exception.domain.ExceptionCode.PORTAL_LOGIN_FAILED;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final JwtProvider jwtProvider;
-    private final PasswordEncoder passwordEncoder;
 
     private final MemberRepository memberRepository;
+    private final InuMemberRepository inuMemberRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public AuthTokenResponse login(final LoginRequest request) {
-        final Member member = memberRepository.findByStudentId(request.studentId())
-                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
+        if (!inuMemberRepository.verifyInuMember(request.studentId(), request.password()))
+            throw new RestApiException(PORTAL_LOGIN_FAILED);
 
-        if (!passwordEncoder.matches(request.password(), member.getPassword()))
-            throw new RestApiException(PASSWORD_NOT_MATCH);
+        final Member member = memberRepository.findByStudentId(request.studentId())
+                .orElseGet(() -> memberRepository.save(Member.createDefault(request.studentId())));
 
         return jwtProvider.generateAuthToken(member.getId());
     }

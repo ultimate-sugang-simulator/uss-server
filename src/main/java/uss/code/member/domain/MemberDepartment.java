@@ -90,7 +90,10 @@ public enum MemberDepartment {
     LIBERAL_ARTS(MemberCollege.LIBERAL_ARTS_COLLEGE, "자유전공학부"),
 
     // 법학부
-    LAW(MemberCollege.LAW, "법학부");
+    LAW(MemberCollege.LAW, "법학부"),
+
+    // 기본값 (포털 로그인으로 신규 생성된 회원의 미설정 상태)
+    DEFAULT(MemberCollege.DEFAULT, "미정");
 
     private final MemberCollege memberCollege;
     private final String name;

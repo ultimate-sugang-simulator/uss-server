@@ -14,7 +14,8 @@ public enum MemberGrade {
     FRESHMAN("1학년", 1),
     SOPHOMORE("2학년", 2),
     JUNIOR("3학년", 3),
-    SENIOR("4학년", 4);
+    SENIOR("4학년", 4),
+    DEFAULT("미정", 0);
 
     private final String name;
     private final int year;
