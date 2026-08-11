@@ -26,6 +26,8 @@ description: GitHub Secrets 네이밍 규칙과 발급, 교체 절차
 | DB 계정 | `DATABASE_USERNAME`, `DATABASE_PASSWORD` | `spring.datasource.username` / `.password` |
 | 메일 계정 | `MAIL_USERNAME`, `MAIL_PASSWORD` | `spring.mail.username` / `.password` |
 | JWT 서명 키 | `JWT_SECRET_KEY` | `security.jwt.secret-key` |
+| 학교 연계 API 주소 | `INU_API_BASE_URL` | `inu.course-api.base-url` |
+| 학교 연계 API 인증 키 | `INU_API_AUTH_KEY` | `inu.course-api.auth-key` |
 | Docker Hub | `DOCKER_HUB_USERNAME`, `DOCKER_HUB_PASSWORD` | 이미지 push, 배포 `.env` |
 | 배포 서버 접속 | `APPCENTER_SERVER_IP`, `APPCENTER_SERVER_USERNAME`, `APPCENTER_SERVER_PASSWORD`, `APPCENTER_SERVER_PORT` | scp, ssh 액션 |
 
