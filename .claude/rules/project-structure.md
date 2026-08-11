@@ -14,8 +14,7 @@ src/main/java/uss/code/
 ├── member/              # 회원(학생) 정보
 ├── course/              # 강의 + 강의 시간표(CourseSchedule), 강의 조회/검색
 ├── cart/                # 장바구니
-├── registration/       # 수강신청 (신청/취소/조회)
-└── challengeCode/       # 본인 확인 코드
+└── registration/       # 수강신청 (신청/취소/조회)
 ```
 
 ## 도메인 패키지 내부 구조

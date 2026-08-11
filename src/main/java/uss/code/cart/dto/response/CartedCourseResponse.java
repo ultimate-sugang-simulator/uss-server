@@ -23,7 +23,7 @@ public record CartedCourseResponse(
     public static CartedCourseResponse of(final Course course, final Long cartCount) {
         return CartedCourseResponse.builder()
                 .id(course.getId())
-                .classification(course.getClassification().getName())
+                .classification(course.getClassificationName())
                 .courseCode(course.getCourseCode())
                 .haksuCode(course.getHaksuCode())
                 .titleKr(course.getTitleKr())
