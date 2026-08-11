@@ -5,7 +5,14 @@
 
 ## 목표
 
-프론트엔드가 요구한 강의 정보(75분 수업 여부, 수업유형, 집중이수제, 원어강의 구분명)를 제공하고, 카테고리·년도학기·연계전공 목록 조회 API를 추가한다. 코드와 명칭은 학교 연계 API 원문 그대로 저장해 내려주고, enum은 비즈니스 규칙이 필요한 곳에만 남긴다. 시드는 2026-2 기준으로 전량 재생성한다.
+프론트엔드가 요구한 강의 정보(75분 수업 여부, 수업유형, 집중이수제, 원어강의 구분명, HUSS 여부)를 제공하고, 카테고리·년도학기·연계전공 목록 조회와 HUSS 강의 조회 API를 추가한다. 코드와 명칭은 학교 연계 API 원문 그대로 저장해 내려주고, enum은 비즈니스 규칙이 필요한 곳에만 남긴다. 시드는 2026-2 기준으로 전량 재생성한다.
+
+> **HUSS 조회 추가 (구현 중 확정).** 최초 계획은 `isHussCourse` 필드만 두고 조회 API를 범위 밖으로 뒀다.
+> 그 결과 컬럼에 적재만 되고 어떤 경로로도 읽을 수 없는 상태가 됐다.
+> 간접 조회를 실측해보니 연계전공 조회(32건)와 수업유형 `26`,`27`,`28` 필터(34건)를 합쳐도
+> 실제 HUSS 35건 중 34건까지만 잡히고, 나머지 1건(`Global Trade & Service학부`의 `강의(이론)` 유형)은 어느 쪽으로도 잡히지 않는다.
+> 게다가 수업유형 필터는 프론트엔드가 코드 목록을 하드코딩해야 해서, 이 이슈의 설계 방향과 어긋난다.
+> 따라서 전용 조회 API와 응답 필드 노출을 이번 범위에 포함한다.
 
 ## 사전 확인으로 드러난 기존 코드 문제
 
@@ -93,7 +100,8 @@ public boolean is75MinLesson() {
 
 ```sql
 INDEX idx_department_sort (department, grade_code, classification_code, haksu_code),
-INDEX idx_area_sort (area, grade_code, classification_code, haksu_code)
+INDEX idx_area_sort (area, grade_code, classification_code, haksu_code),
+INDEX idx_huss_sort (is_huss_course, grade_code, classification_code, haksu_code)
 ```
 
 `period_code VARCHAR(8) NOT NULL`을 `course_schedules`에 추가한다.
@@ -139,11 +147,20 @@ List<CourseTermInfo> findTerms();
     WHERE c.department IN :departments
 """)
 List<CourseDepartment> findDepartmentsIn(@Param("departments") final List<CourseDepartment> departments);
+
+@Query("""
+    SELECT DISTINCT c
+    FROM Course c
+    LEFT JOIN FETCH c.schedules
+    WHERE c.isHussCourse = true
+    ORDER BY c.gradeCode, c.classificationCode, c.haksuCode
+""")
+List<Course> findHussCourses();
 ```
 
 ### 3. Service
 
-`CourseService`에 3개를 추가한다.
+`CourseService`에 4개를 추가한다.
 
 ```java
 @Transactional(readOnly = true)
@@ -162,6 +179,12 @@ public CourseTermsResponse getTerms()
 public InterdisciplinaryMajorsResponse getInterdisciplinaryMajors()
 ```
 `CourseDepartment`에서 연계전공 목록을 얻어 `findDepartmentsIn(...)`으로 실제 데이터가 있는 것만 남긴다. 이를 위해 `CourseDepartment.isInterdisciplinary()`를 `public static List<CourseDepartment> interdisciplinaryValues()`로 노출한다.
+
+```java
+@Transactional(readOnly = true)
+public MajorCoursesResponse getHussCourses()
+```
+`findByHussCourse()` 결과를 매핑한다. HUSS 강의는 학과가 여러 개에 걸쳐 있어 응답에 학과명이 필요하므로, 타학과 조회와 같이 `MajorCoursesResponse`를 재사용한다.
 
 ### 4. DTO
 
@@ -194,6 +217,7 @@ String  suupTypeName
 String  cnctrIsuCode
 String  cnctrIsuName
 String  englishCourseName
+boolean isHussCourse
 ```
 
 > `englishCourseName`은 `isEnglishCourse`가 `false`면 `null`로 둔다. 원천이 `N`일 때도 `비대상`을 채워 보내지만, 프론트엔드 요구가 "`ENGLISH_YN='Y'`인 경우 연동"이므로 서버에서 걸러 내려준다.
@@ -206,9 +230,10 @@ String  englishCourseName
 GET /api/v1/courses/categories               → CourseController.getCategories()
 GET /api/v1/courses/terms                    → CourseController.getTerms()
 GET /api/v1/courses/interdisciplinary-majors → CourseController.getInterdisciplinaryMajors()
+GET /api/v1/courses/huss                     → CourseController.getHussCourses()
 ```
 
-`CourseControllerDocs`에 3개의 `@Operation`을 추가한다. 세 API 모두 파라미터가 없고 인증만 요구한다.
+`CourseControllerDocs`에 4개의 `@Operation`을 추가한다. 네 API 모두 파라미터가 없고 인증만 요구한다.
 
 ### 6. CORS
 
@@ -257,4 +282,14 @@ https://ultimate-sugang-web.pages.dev
 
 ## Deviation Log
 
-> implement 스킬이 구현 중 계획을 벗어난 지점을 여기에 기록한다. (작성 시점엔 비워둔다)
+- **HUSS 조회 API와 응답 필드를 범위에 추가** (계획서 본문도 함께 갱신) — 이유: 최초 계획은 `isHussCourse`를 적재만 하고 노출하지 않아 컬럼이 읽기 불가 상태였다. 간접 조회 실측 결과 연계전공(32건) + 수업유형 `26`,`27`,`28`(34건)을 합쳐도 35건 중 34건까지만 잡힌다. 사용자 확인 후 `GET /api/v1/courses/huss`와 응답 필드 `isHussCourse`를 추가했다
+- `V1_0__init_table.sql`: `idx_huss_sort` 인덱스 추가 — 이유: HUSS 조회가 다른 목록 조회와 같은 정렬을 쓰므로 같은 형태의 인덱스를 둔다. 실제로 인덱스를 타고 filesort가 없는 것을 확인했다
+- `database/seed/`: 시간표를 9,109행이 아니라 **7,819행** 생성 — 이유: `TERM_CODE='20'` 시간표 9,109행 중 1,290행(488개 학수번호)이 강좌 목록에 없는 학수번호를 가리킨다. 이 학수번호들은 `A_MAP_COURSE_INFO.json` 어디에도 없어(여름계절학기 강좌도 아니다) `course_id`를 붙일 수 없다. 계획서의 9,109는 조인 전 원본 건수를 적은 것이다
+- `.local/generate-seed.sh`: enum 매핑표를 스크립트에 적지 않고 `domain/`의 enum 정의를 파싱해 생성 — 이유: 매핑표를 복사해두면 enum이 바뀔 때 시드가 조용히 어긋난다
+- `.local/generate-seed.sh`: 모든 명칭 값의 공백을 정규화 — 이유: 원천 `COURSE_NM_ENG`에 줄바꿈 2건과 앞뒤 공백 다수가 섞여 있다. 그대로 두면 SQL 문자열에 개행이 들어가고 FULLTEXT 검색과 표기가 흔들린다
+- `database/seed/V1_4__insert_course_schedule.sql`: 시간표를 6개 파일이 아닌 1개 파일로 생성 — 이유: 임시 테이블은 세션 단위라 CREATE·INSERT·JOIN·DROP이 한 마이그레이션 안에 있어야 한다
+- `CourseClassification`, `CourseGrade`: 삭제하지 않고 코드·명칭 상수표로 유지 — 이유: 엔티티 매핑에서는 빠졌지만 테스트 픽스처가 코드와 명칭을 함께 얻는 데 쓴다. `CourseType`을 남긴 것과 같은 이유다
+- `CourseArea.fromCode`, `CourseDepartment.fromCode`: 예외 던지기를 완화하지 않고 그대로 둠 — 이유: 두 메서드는 메인 코드에서 호출되지 않는다(시드 생성이 SQL로 옮겨간 뒤 호출부가 사라졌다). 완화해도 동작이 바뀌는 곳이 없고 기존 테스트만 깨진다
+- `CourseService.getInterdisciplinaryMajors`: 쿼리 결과를 그대로 매핑하지 않고 `interdisciplinaryValues()` 순서로 필터링 — 이유: `SELECT DISTINCT`는 순서를 보장하지 않아 응답 순서가 요청마다 달라질 수 있다
+- `CartedCourseResponse`, `RegistrationCourseResponse`: 계획서 "수정 파일"에 없지만 수정 — 이유: `course.getClassification()`을 호출하고 있어 컴파일이 깨진다
+- `src/test/`: `CourseFixture`, `CourseScheduleFixture`를 새 필드에 맞춰 갱신하고 `CartServiceTest`, `RegistrationServiceTest`의 `getClassification()` 호출을 상수로 교체 — 이유: 테스트 작성은 이 스킬 범위 밖이지만, 두지 않으면 테스트가 컴파일되지 않는다. 계획서 "검증"에 적힌 신규 테스트는 작성하지 않았다
