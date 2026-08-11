@@ -27,6 +27,13 @@ security:
   jwt:
     secret-key: ${JWT_SECRET_KEY}
     access-token-expiration-time: 21600000
+    admin-access-token-expiration-time: 7200000
+
+inu:
+  course-api:
+    base-url: ${INU_API_BASE_URL}
+    auth-key: ${INU_API_AUTH_KEY}
+    mod-date: "20260101"
 
 management:
   server:

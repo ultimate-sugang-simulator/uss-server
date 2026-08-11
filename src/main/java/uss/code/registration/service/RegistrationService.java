@@ -54,6 +54,7 @@ public class RegistrationService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RestApiException(COURSE_NOT_FOUND));
 
+        validateCourseActive(course);
         validateCourseCapacity(course);
         validateDuplicateCourse(registrations, courseId);
         validateCreditLimit(registrations, member, course);
@@ -90,6 +91,12 @@ public class RegistrationService {
     ) {
         if (!CourseValidator.validateCreditLimit(registrations, member, course)) {
             throw new RestApiException(CREDIT_LIMIT_EXCEEDED);
+        }
+    }
+
+    private void validateCourseActive(final Course course) {
+        if (!course.isActive()) {
+            throw new RestApiException(COURSE_CLOSED);
         }
     }
 

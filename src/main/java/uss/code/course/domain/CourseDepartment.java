@@ -7,6 +7,7 @@ import uss.code.member.domain.MemberDepartment;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
 import static uss.code.global.exception.domain.ExceptionCode.INVALID_INTERDISCIPLINARY_DEPARTMENT;
@@ -145,11 +146,15 @@ public enum CourseDepartment {
     private final CourseCollege courseCollege;
     private final String name;
 
-    public static CourseDepartment fromCode(final String code) {
+    public static Optional<CourseDepartment> tryFromCode(final String code) {
         return Arrays.stream(values())
                 .filter(department -> !department.code.isBlank())
                 .filter(department -> department.code.equals(code))
-                .findFirst()
+                .findFirst();
+    }
+
+    public static CourseDepartment fromCode(final String code) {
+        return tryFromCode(code)
                 .orElseThrow(() -> new RestApiException(INVALID_ENUM_TYPE));
     }
 

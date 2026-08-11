@@ -5,8 +5,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uss.code.course.domain.Course;
+import uss.code.course.domain.CourseArea;
 import uss.code.course.domain.CourseClassification;
+import uss.code.course.domain.CourseCollege;
 import uss.code.course.domain.CourseDay;
+import uss.code.course.domain.CourseDepartment;
 import uss.code.course.domain.CourseGrade;
 import uss.code.course.domain.CourseSchedule;
 import uss.code.course.fixture.CourseFixture;
@@ -795,4 +798,73 @@ class RegistrationServiceTest {
             assertThat(registrations).isEmpty();
         }
     }
+
+    @Nested
+    class 폐강_강의_신청_테스트 {
+
+        private Long testMemberId;
+        private Long closedCourseId;
+
+        @BeforeEach
+        void setUp() {
+            final Member member = MemberFixture.createMember();
+            memberRepository.save(member);
+            testMemberId = member.getId();
+
+            final Course closedCourse = CourseFixture.createCourse();
+            closedCourse.close();
+            courseRepository.save(closedCourse);
+            closedCourseId = closedCourse.getId();
+        }
+
+        @Test
+        void 폐강된_강의는_신청할_수_없다() {
+            //when & then
+            assertThatThrownBy(() -> registrationService.registerCourse(testMemberId, closedCourseId))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", COURSE_CLOSED);
+        }
+
+        @Test
+        void 폐강_검증은_정원_검증보다_먼저_수행한다() {
+            //given
+            final Course fullAndClosedCourse = CourseFixture.createCourse(
+                    "정원마감폐강", "Closed And Full", "CSE4010", "CSE4010001",
+                    CourseCollege.INFORMATION_TECHNOLOGY,
+                    CourseDepartment.COMPUTER_ENGINEERING,
+                    CourseClassification.MAJOR_CORE,
+                    CourseArea.MAJOR_CORE,
+                    CourseType.LECTURE,
+                    CourseGrade.SOPHOMORE,
+                    3, false, 30, 30
+            );
+            fullAndClosedCourse.close();
+            courseRepository.save(fullAndClosedCourse);
+
+            //when & then
+            assertThatThrownBy(() -> registrationService.registerCourse(testMemberId, fullAndClosedCourse.getId()))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", COURSE_CLOSED);
+        }
+
+        @Test
+        void 이미_신청한_강의가_폐강돼도_취소할_수_있다() {
+            //given
+            final Course course = CourseFixture.createCourseWithDetails(
+                    "운영체제", "Operating System", "CSE3010", "CSE3010001", CourseGrade.JUNIOR
+            );
+            courseRepository.save(course);
+            registrationService.registerCourse(testMemberId, course.getId());
+
+            course.close();
+            courseRepository.save(course);
+
+            //when
+            registrationService.deleteRegisteredCourse(testMemberId, course.getId());
+
+            //then
+            assertThat(registrationRepository.findByMemberIdAndCourseId(testMemberId, course.getId())).isEmpty();
+        }
+    }
+
 }

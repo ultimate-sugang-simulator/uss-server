@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import uss.code.global.exception.domain.RestApiException;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
 
@@ -34,11 +35,15 @@ public enum CourseCollege {
     private final String code;
     private final String name;
 
-    public static CourseCollege fromCode(final String code) {
+    public static Optional<CourseCollege> tryFromCode(final String code) {
         return Arrays.stream(values())
                 .filter(college -> !college.code.isBlank())
                 .filter(college -> college.code.equals(code))
-                .findFirst()
+                .findFirst();
+    }
+
+    public static CourseCollege fromCode(final String code) {
+        return tryFromCode(code)
                 .orElseThrow(() -> new RestApiException(INVALID_ENUM_TYPE));
     }
 }

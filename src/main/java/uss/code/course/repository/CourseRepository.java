@@ -1,11 +1,13 @@
 package uss.code.course.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import uss.code.course.domain.Course;
 import uss.code.course.domain.CourseArea;
 import uss.code.course.domain.CourseDepartment;
+import uss.code.course.domain.CourseTerm;
 import uss.code.course.dto.common.CourseCategory;
 import uss.code.course.dto.common.CourseTermInfo;
 
@@ -18,6 +20,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         FROM Course c
         LEFT JOIN FETCH c.schedules
         WHERE c.department = :department
+          AND c.status = uss.code.course.domain.CourseStatus.ACTIVE
         ORDER BY c.gradeCode, c.classificationCode, c.haksuCode
     """)
     List<Course> findByDepartment(@Param("department") final CourseDepartment department);
@@ -27,6 +30,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         FROM Course c
         LEFT JOIN FETCH c.schedules
         WHERE c.area = :area
+          AND c.status = uss.code.course.domain.CourseStatus.ACTIVE
         ORDER BY c.gradeCode, c.classificationCode, c.haksuCode
     """)
     List<Course> findByArea(@Param("area") final CourseArea area);
@@ -35,6 +39,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         SELECT DISTINCT c.*
         FROM courses c
         WHERE MATCH(c.course_code, c.haksu_code, c.title_kr, c.title_en) AGAINST(:keyword IN BOOLEAN MODE)
+          AND c.status = 'ACTIVE'
         ORDER BY MATCH(c.course_code, c.haksu_code, c.title_kr, c.title_en) AGAINST(:keyword IN BOOLEAN MODE)
     """, nativeQuery = true)
     List<Course> findByKeyword(@Param("keyword") final String keyword);
@@ -74,7 +79,42 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         FROM Course c
         LEFT JOIN FETCH c.schedules
         WHERE c.isHussCourse = true
+          AND c.status = uss.code.course.domain.CourseStatus.ACTIVE
         ORDER BY c.gradeCode, c.classificationCode, c.haksuCode
     """)
     List<Course> findHussCourses();
+
+    @Query("""
+        SELECT COUNT(c)
+        FROM Course c
+        WHERE c.academicYear = :academicYear
+          AND c.term = :term
+    """)
+    long countBySemester(
+            @Param("academicYear") final int academicYear,
+            @Param("term") final CourseTerm term
+    );
+
+    @Query("""
+        SELECT DISTINCT c
+        FROM Course c
+        LEFT JOIN FETCH c.schedules
+        WHERE c.academicYear = :academicYear
+          AND c.term = :term
+    """)
+    List<Course> findAllBySemesterWithSchedules(
+            @Param("academicYear") final int academicYear,
+            @Param("term") final CourseTerm term
+    );
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        DELETE FROM Course c
+        WHERE c.academicYear = :academicYear
+          AND c.term = :term
+    """)
+    void deleteBySemester(
+            @Param("academicYear") final int academicYear,
+            @Param("term") final CourseTerm term
+    );
 }

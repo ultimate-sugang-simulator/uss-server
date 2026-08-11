@@ -25,3 +25,10 @@ security:
   jwt:
     secret-key: test-secret-key-for-unit-testing-purposes-only
     access-token-expiration-time: 21600000
+    admin-access-token-expiration-time: 7200000
+
+inu:
+  course-api:
+    base-url: http://localhost/test-inu-api
+    auth-key: test-auth-key
+    mod-date: "20260101"

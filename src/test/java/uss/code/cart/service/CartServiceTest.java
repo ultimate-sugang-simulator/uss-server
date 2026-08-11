@@ -657,4 +657,61 @@ class CartServiceTest {
             assertThat(carts).hasSize(6);
         }
     }
+
+    @Nested
+    class 폐강_강의_담기_테스트 {
+
+        private Long testMemberId;
+        private Long closedCourseId;
+
+        @BeforeEach
+        void setUp() {
+            final Member member = MemberFixture.createMember();
+            memberRepository.save(member);
+            testMemberId = member.getId();
+
+            final Course closedCourse = CourseFixture.createCourse();
+            closedCourse.close();
+            courseRepository.save(closedCourse);
+            closedCourseId = closedCourse.getId();
+        }
+
+        @Test
+        void 폐강된_강의는_담을_수_없다() {
+            //when & then
+            assertThatThrownBy(() -> cartService.addCart(testMemberId, closedCourseId))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", COURSE_CLOSED);
+        }
+
+        @Test
+        void 폐강된_강의는_장바구니에_담기지_않는다() {
+            //when
+            assertThatThrownBy(() -> cartService.addCart(testMemberId, closedCourseId))
+                    .isInstanceOf(RestApiException.class);
+
+            //then
+            assertThat(cartRepository.findByMemberId(testMemberId)).isEmpty();
+        }
+
+        @Test
+        void 이미_담은_강의가_폐강돼도_삭제할_수_있다() {
+            //given
+            final Course course = CourseFixture.createCourseWithDetails(
+                    "운영체제", "Operating System", "CSE3010", "CSE3010001", CourseGrade.JUNIOR
+            );
+            courseRepository.save(course);
+            cartService.addCart(testMemberId, course.getId());
+
+            course.close();
+            courseRepository.save(course);
+
+            //when
+            cartService.deleteCartedCourse(testMemberId, course.getId());
+
+            //then
+            assertThat(cartRepository.findByMemberIdAndCourseId(testMemberId, course.getId())).isEmpty();
+        }
+    }
+
 }

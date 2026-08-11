@@ -30,6 +30,7 @@ public enum ExceptionCode {
     INVALID_GENERAL_EDUCATION_AREA(BAD_REQUEST, 2000, "유효하지 않은 교양 영역입니다."),
     INVALID_INTERDISCIPLINARY_DEPARTMENT(BAD_REQUEST, 2001, "유효하지 않은 연계전공과목입니다."),
     COURSE_NOT_FOUND(NOT_FOUND, 2002, "과목을 찾을 수 없습니다."),
+    COURSE_CLOSED(BAD_REQUEST, 2003, "폐강된 과목입니다."),
 
     // 장바구니
     CARTED_COURSE_NOT_FOUND(NOT_FOUND, 3000, "장바구니에 담은 과목을 찾을 수 없습니다."),
@@ -42,7 +43,20 @@ public enum ExceptionCode {
     COURSE_MAX_CAPACITY_EXCEEDED(BAD_REQUEST, 4000, "수강 정원이 마감되었습니다."),
     CREDIT_LIMIT_EXCEEDED(BAD_REQUEST, 4001, "최대 이수 가능 학점을 초과하였습니다."),
     COURSE_ALREADY_REGISTERED(BAD_REQUEST, 4002, "이미 신청된 과목입니다."),
-    REGISTERED_COURSE_NOT_FOUND(NOT_FOUND, 4003, "수강신청한 과목을 찾을 수 없습니다.");
+    REGISTERED_COURSE_NOT_FOUND(NOT_FOUND, 4003, "수강신청한 과목을 찾을 수 없습니다."),
+
+    // 관리자 계정, 인증
+    ADMIN_LOGIN_FAILED(UNAUTHORIZED, 5000, "아이디나 비밀번호가 맞지 않아요."),
+    ADMIN_NOT_FOUND(NOT_FOUND, 5001, "관리자를 찾을 수 없어요."),
+    ADMIN_ACCESS_DENIED(FORBIDDEN, 5002, "관리자 권한이 없어요."),
+
+    // 표시 학기
+    SYSTEM_SEMESTER_NOT_FOUND(NOT_FOUND, 5100, "표시 학기 설정을 찾을 수 없어요."),
+
+    // 강의 동기화
+    SYNC_JOB_ALREADY_RUNNING(CONFLICT, 5200, "이미 업데이트가 진행 중이에요."),
+    SYNC_STRATEGY_MISMATCH(CONFLICT, 5201, "데이터가 변경됐어요. 다시 확인해주세요."),
+    SYNC_JOB_NOT_FOUND(NOT_FOUND, 5202, "업데이트 작업을 찾을 수 없어요.");
 
     private final HttpStatus status;
     private final int code;
