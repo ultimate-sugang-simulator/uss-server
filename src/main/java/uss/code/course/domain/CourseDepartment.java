@@ -6,6 +6,7 @@ import uss.code.global.exception.domain.RestApiException;
 import uss.code.member.domain.MemberDepartment;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
 import static uss.code.global.exception.domain.ExceptionCode.INVALID_INTERDISCIPLINARY_DEPARTMENT;
@@ -166,6 +167,12 @@ public enum CourseDepartment {
         }catch (IllegalArgumentException e){
             throw new RestApiException(INVALID_ENUM_TYPE);
         }
+    }
+
+    public static List<CourseDepartment> interdisciplinaryValues() {
+        return Arrays.stream(values())
+                .filter(CourseDepartment::isInterdisciplinary)
+                .toList();
     }
 
     public static CourseDepartment fromInterdisciplinary(final String department){

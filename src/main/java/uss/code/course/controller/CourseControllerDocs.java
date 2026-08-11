@@ -12,8 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import uss.code.auth.annotation.Auth;
+import uss.code.course.dto.response.CourseCategoriesResponse;
+import uss.code.course.dto.response.CourseTermsResponse;
 import uss.code.course.dto.response.GeneralEducationCoursesResponse;
 import uss.code.course.dto.response.InterdisciplinaryMajorCoursesResponse;
+import uss.code.course.dto.response.InterdisciplinaryMajorsResponse;
 import uss.code.course.dto.response.MajorCoursesResponse;
 import uss.code.course.dto.response.SearchedCoursesResponse;
 import uss.code.global.annotation.ParamValidation;
@@ -113,4 +116,36 @@ public interface CourseControllerDocs {
             @ParamValidation(maxLength = 70)
             @RequestParam("keyword") final String keyword
     );
+
+    @Operation(summary = "HUSS 과목 조회", description = "HUSS 교과목 목록을 조회합니다.<br>" +
+            "🔐 <strong>Jwt 필요</strong><br>")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "✅ HUSS 과목 조회 성공")
+    })
+    @GetMapping("/huss")
+    ResponseEntity<MajorCoursesResponse> getHussCourses();
+
+    @Operation(summary = "과목 카테고리 조회", description = "적재된 과목의 이수구분과 그에 속한 이수영역 목록을 조회합니다.<br>" +
+            "🔐 <strong>Jwt 필요</strong><br>")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "✅ 과목 카테고리 조회 성공")
+    })
+    @GetMapping("/categories")
+    ResponseEntity<CourseCategoriesResponse> getCategories();
+
+    @Operation(summary = "년도, 학기 조회", description = "적재된 과목의 년도와 학기 목록을 조회합니다.<br>" +
+            "🔐 <strong>Jwt 필요</strong><br>")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "✅ 년도, 학기 조회 성공")
+    })
+    @GetMapping("/terms")
+    ResponseEntity<CourseTermsResponse> getTerms();
+
+    @Operation(summary = "연계전공 조회", description = "과목이 적재된 연계전공 목록을 조회합니다.<br>" +
+            "🔐 <strong>Jwt 필요</strong><br>")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "✅ 연계전공 조회 성공")
+    })
+    @GetMapping("/interdisciplinary-majors")
+    ResponseEntity<InterdisciplinaryMajorsResponse> getInterdisciplinaryMajors();
 }

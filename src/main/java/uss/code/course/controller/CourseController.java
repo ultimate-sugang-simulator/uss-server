@@ -8,8 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uss.code.auth.annotation.Auth;
+import uss.code.course.dto.response.CourseCategoriesResponse;
+import uss.code.course.dto.response.CourseTermsResponse;
 import uss.code.course.dto.response.GeneralEducationCoursesResponse;
 import uss.code.course.dto.response.InterdisciplinaryMajorCoursesResponse;
+import uss.code.course.dto.response.InterdisciplinaryMajorsResponse;
 import uss.code.course.dto.response.MajorCoursesResponse;
 import uss.code.course.dto.response.SearchedCoursesResponse;
 import uss.code.course.service.CourseService;
@@ -58,5 +61,25 @@ public class CourseController implements CourseControllerDocs {
             @RequestParam("keyword") final String keyword
     ){
         return ResponseEntity.ok(courseService.searchCourses(keyword.trim()));
+    }
+
+    @GetMapping("/huss")
+    public ResponseEntity<MajorCoursesResponse> getHussCourses(){
+        return ResponseEntity.ok(courseService.getHussCourses());
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<CourseCategoriesResponse> getCategories(){
+        return ResponseEntity.ok(courseService.getCategories());
+    }
+
+    @GetMapping("/terms")
+    public ResponseEntity<CourseTermsResponse> getTerms(){
+        return ResponseEntity.ok(courseService.getTerms());
+    }
+
+    @GetMapping("/interdisciplinary-majors")
+    public ResponseEntity<InterdisciplinaryMajorsResponse> getInterdisciplinaryMajors(){
+        return ResponseEntity.ok(courseService.getInterdisciplinaryMajors());
     }
 }

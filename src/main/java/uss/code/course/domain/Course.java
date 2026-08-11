@@ -59,27 +59,54 @@ public class Course {
     @Column(nullable = false, name = "department")
     private CourseDepartment department;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, name = "classification")
-    private CourseClassification classification;
+    @Column(nullable = false, name = "classification_code")
+    private String classificationCode;
+
+    @Column(nullable = false, name = "classification_name")
+    private String classificationName;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "area")
     private CourseArea area;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, name = "type")
-    private CourseType type;
+    @Column(nullable = false, name = "area_code")
+    private String areaCode;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, name = "grade")
-    private CourseGrade grade;
+    @Column(nullable = false, name = "area_name")
+    private String areaName;
+
+    @Column(nullable = false, name = "type_code")
+    private String typeCode;
+
+    @Column(nullable = false, name = "type_name")
+    private String typeName;
+
+    @Column(nullable = false, name = "grade_code")
+    private String gradeCode;
+
+    @Column(nullable = false, name = "grade_name")
+    private String gradeName;
+
+    @Column(nullable = false, name = "concentration_code")
+    private String concentrationCode;
+
+    @Column(nullable = false, name = "concentration_name")
+    private String concentrationName;
 
     @Column(nullable = false)
     private int credits;
 
     @Column(nullable = false, name = "is_english_course")
     private boolean isEnglishCourse;
+
+    @Column(nullable = false, name = "english_code")
+    private String englishCode;
+
+    @Column(nullable = false, name = "english_name")
+    private String englishName;
+
+    @Column(nullable = false, name = "is_huss_course")
+    private boolean isHussCourse;
 
     @Column(nullable = false, name = "max_capacity")
     private int maxCapacity;
@@ -90,6 +117,10 @@ public class Course {
     public void addCourseSchedule(final CourseSchedule courseSchedule) {
         this.schedules.add(courseSchedule);
         courseSchedule.addCourse(this);
+    }
+
+    public boolean is75MinLesson() {
+        return schedules.stream().anyMatch(CourseSchedule::is75MinLesson);
     }
 
     public boolean isRegisterable(){

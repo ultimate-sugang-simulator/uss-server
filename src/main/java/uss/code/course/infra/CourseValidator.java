@@ -62,17 +62,17 @@ public class CourseValidator {
             final List<Course> existingCourses,
             final Course newCourse
     ) {
-        final var courseType = newCourse.getType();
+        final String typeCode = newCourse.getTypeCode();
 
         long sameTypeCount = existingCourses.stream()
-                .filter(course -> course.getType() == courseType)
+                .filter(course -> course.getTypeCode().equals(typeCode))
                 .count();
 
-        if (courseType == OCU) {
+        if (OCU.getCode().equals(typeCode)) {
             return sameTypeCount < MAX_OCU_COURSE_COUNT;
         }
 
-        if (courseType == K_MOOC) {
+        if (K_MOOC.getCode().equals(typeCode)) {
             return sameTypeCount < MAX_K_MOOC_COURSE_COUNT;
         }
 
