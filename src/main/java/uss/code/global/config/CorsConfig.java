@@ -18,7 +18,9 @@ public class CorsConfig {
     private static final List<String> ALLOWED_ORIGINS = List.of(
             "http://localhost:3000",
             "http://localhost:5173",
-            "https://uss.inuappcenter.kr"
+            "https://uss.inuappcenter.kr",
+            "https://ultimate-sugang-web.inuappcenter.kr",
+            "https://ultimate-sugang-web.pages.dev"
     );
 
     private static final List<String> ALLOWED_METHODS = List.of("GET", "POST", "PUT", "DELETE", "PATCH");
