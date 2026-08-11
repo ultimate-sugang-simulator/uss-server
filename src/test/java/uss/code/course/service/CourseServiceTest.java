@@ -13,10 +13,17 @@ import uss.code.course.domain.CourseDepartment;
 import uss.code.course.domain.CourseGrade;
 import uss.code.course.domain.CourseSchedule;
 import uss.code.course.domain.CourseType;
+import uss.code.course.dto.response.CourseAreaResponse;
+import uss.code.course.dto.response.CourseCategoriesResponse;
+import uss.code.course.dto.response.CourseCategoryResponse;
+import uss.code.course.dto.response.CourseTermResponse;
+import uss.code.course.dto.response.CourseTermsResponse;
 import uss.code.course.dto.response.GeneralEducationCourseResponse;
 import uss.code.course.dto.response.GeneralEducationCoursesResponse;
 import uss.code.course.dto.response.InterdisciplinaryMajorCourseResponse;
 import uss.code.course.dto.response.InterdisciplinaryMajorCoursesResponse;
+import uss.code.course.dto.response.InterdisciplinaryMajorResponse;
+import uss.code.course.dto.response.InterdisciplinaryMajorsResponse;
 import uss.code.course.dto.response.MajorCourseResponse;
 import uss.code.course.dto.response.MajorCoursesResponse;
 import uss.code.course.fixture.CourseFixture;
@@ -37,6 +44,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static uss.code.global.exception.domain.ExceptionCode.*;
 
 @IntegrationTest
@@ -1002,4 +1010,271 @@ class CourseServiceTest {
 //            assertThat(response.searchedCourseResponses()).hasSize(3);
 //        }
 //    }
+
+    @Nested
+    class 목록_정렬_테스트 {
+
+        @BeforeEach
+        void setUp() {
+            // 같은 학년 안에서 이수구분과 학수번호로 갈리도록 일부러 뒤섞어 저장한다
+            courseRepository.saveAll(List.of(
+                    createComputerEngineeringCourse("SORT004", CourseClassification.MAJOR_CORE, CourseGrade.FRESHMAN),
+                    createComputerEngineeringCourse("SORT002", CourseClassification.BASIC_LIBERAL_ARTS, CourseGrade.ALL),
+                    createComputerEngineeringCourse("SORT003", CourseClassification.MAJOR_BASIC, CourseGrade.FRESHMAN),
+                    createComputerEngineeringCourse("SORT001", CourseClassification.BASIC_LIBERAL_ARTS, CourseGrade.ALL)
+            ));
+        }
+
+        @Test
+        void 학년_이수구분_학수번호_순으로_정렬된다() {
+            //given
+
+            //when
+            final MajorCoursesResponse response = courseService.getOtherDepartmentCourses(
+                    CourseDepartment.COMPUTER_ENGINEERING.name()
+            );
+
+            //then
+            assertThat(response.majorCourseResponses())
+                    .extracting(MajorCourseResponse::haksuCode)
+                    .containsExactly("SORT001", "SORT002", "SORT003", "SORT004");
+        }
+    }
+
+    @Nested
+    class 원어강의_표기_테스트 {
+
+        @BeforeEach
+        void setUp() {
+            courseRepository.saveAll(List.of(
+                    createEnglishCourse("ENG001001", true),
+                    createEnglishCourse("KOR001001", false)
+            ));
+        }
+
+        @Test
+        void 원어강의일_때만_원어강의명이_내려간다() {
+            //given
+
+            //when
+            final MajorCoursesResponse response = courseService.getOtherDepartmentCourses(
+                    CourseDepartment.COMPUTER_ENGINEERING.name()
+            );
+
+            //then
+            assertThat(response.majorCourseResponses())
+                    .extracting(MajorCourseResponse::haksuCode, MajorCourseResponse::englishCourseName)
+                    .containsExactlyInAnyOrder(
+                            tuple("ENG001001", "원어강의(EN)"),
+                            tuple("KOR001001", null)
+                    );
+        }
+    }
+
+    @Nested
+    class HUSS_과목_조회_테스트 {
+
+        @BeforeEach
+        void setUp() {
+            courseRepository.saveAll(List.of(
+                    // HUSS 교과목은 학과가 여러 개에 걸쳐 있다
+                    CourseFixture.createHussCourse(
+                            "글로벌리더십", "Global Leadership", "HUSS001", "HUSS001001",
+                            CourseDepartment.HUSS_OTHER_UNIVERSITY
+                    ),
+                    CourseFixture.createHussCourse(
+                            "포용사회의이해", "Understanding Inclusive Society", "HUSS002", "HUSS002001",
+                            CourseDepartment.GLOBAL_TRADE_SERVICE
+                    ),
+                    // 같은 학과의 非HUSS 과목. 섞이면 안 된다
+                    CourseFixture.createCourseWithDepartmentAndDetails(
+                            "무역실무", "Trade Practice", "GTS001", "GTS001001",
+                            CourseDepartment.GLOBAL_TRADE_SERVICE, CourseGrade.SOPHOMORE
+                    )
+            ));
+        }
+
+        @Test
+        void 학과를_가리지_않고_HUSS_교과목만_반환된다() {
+            //given
+
+            //when
+            final MajorCoursesResponse response = courseService.getHussCourses();
+
+            //then
+            assertThat(response.majorCourseResponses())
+                    .extracting(MajorCourseResponse::haksuCode, MajorCourseResponse::isHussCourse)
+                    .containsExactlyInAnyOrder(
+                            tuple("HUSS001001", true),
+                            tuple("HUSS002001", true)
+                    );
+        }
+    }
+
+    @Nested
+    class 카테고리_조회_테스트 {
+
+        @BeforeEach
+        void setUp() {
+            courseRepository.saveAll(List.of(
+                    // 전공핵심(31) - 전공핵심(34)
+                    createCategoryCourse("CAT001001", CourseClassification.MAJOR_CORE, CourseArea.MAJOR_CORE),
+                    // 기초교양(11) - 학문의기초(161), 같은 조합을 두 번 넣어 중복 제거를 확인한다
+                    createCategoryCourse("CAT002001", CourseClassification.BASIC_LIBERAL_ARTS, CourseArea.ACADEMIC_FOUNDATION),
+                    createCategoryCourse("CAT003001", CourseClassification.BASIC_LIBERAL_ARTS, CourseArea.ACADEMIC_FOUNDATION),
+                    // 기초교양(11) - 기초과학·공학(162)
+                    createCategoryCourse("CAT004001", CourseClassification.BASIC_LIBERAL_ARTS, CourseArea.BASIC_SCIENCE_ENGINEERING),
+                    // 핵심교양(21) - (핵심)인문(172)
+                    createCategoryCourse("CAT005001", CourseClassification.CORE_LIBERAL_ARTS, CourseArea.CORE_HUMANITIES)
+            ));
+        }
+
+        @Test
+        void 이수구분별로_이수영역이_묶여서_코드_오름차순으로_반환된다() {
+            //given
+
+            //when
+            final CourseCategoriesResponse response = courseService.getCategories();
+
+            //then
+            assertThat(response.categoryResponses())
+                    .extracting(CourseCategoryResponse::code, CourseCategoryResponse::name)
+                    .containsExactly(
+                            tuple("11", "기초교양"),
+                            tuple("21", "핵심교양"),
+                            tuple("31", "전공핵심")
+                    );
+
+            assertThat(response.categoryResponses().get(0).areaResponses())
+                    .extracting(CourseAreaResponse::code, CourseAreaResponse::name)
+                    .containsExactly(
+                            tuple("161", "학문의기초"),
+                            tuple("162", "기초과학·공학")
+                    );
+        }
+    }
+
+    @Nested
+    class 년도_학기_조회_테스트 {
+
+        @BeforeEach
+        void setUp() {
+            courseRepository.saveAll(List.of(
+                    CourseFixture.createCourseWithDetails("자료구조", "Data Structure", "TERM001", "TERM001001", CourseGrade.ALL),
+                    CourseFixture.createCourseWithDetails("알고리즘", "Algorithm", "TERM002", "TERM002001", CourseGrade.ALL)
+            ));
+        }
+
+        @Test
+        void 적재된_년도와_학기가_중복_없이_반환된다() {
+            //given
+
+            //when
+            final CourseTermsResponse response = courseService.getTerms();
+
+            //then
+            assertThat(response.termResponses())
+                    .extracting(CourseTermResponse::academicYear, CourseTermResponse::termCode, CourseTermResponse::termName)
+                    .containsExactly(tuple(2026, "20", "2학기"));
+        }
+    }
+
+    @Nested
+    class 연계전공_조회_테스트 {
+
+        @BeforeEach
+        void setUp() {
+            courseRepository.saveAll(List.of(
+                    createInterdisciplinaryCourse("SDS001001", CourseDepartment.SOCIAL_DATA_SCIENCE),
+                    createInterdisciplinaryCourse("LOG001001", CourseDepartment.LOGISTICS),
+                    // 연계전공이 아닌 일반 학과. 목록에 섞이면 안 된다
+                    CourseFixture.createCourseWithDepartmentAndDetails(
+                            "미적분학", "Calculus", "MATH101", "MATH101001",
+                            CourseDepartment.MATHEMATICS, CourseGrade.FRESHMAN
+                    )
+            ));
+        }
+
+        @Test
+        void 과목이_적재된_연계전공만_반환된다() {
+            //given
+
+            //when
+            final InterdisciplinaryMajorsResponse response = courseService.getInterdisciplinaryMajors();
+
+            //then
+            assertThat(response.interdisciplinaryMajorResponses())
+                    .extracting(InterdisciplinaryMajorResponse::code, InterdisciplinaryMajorResponse::name)
+                    .containsExactly(
+                            tuple("LOGISTICS", "물류학전공(연계)"),
+                            tuple("SOCIAL_DATA_SCIENCE", "소셜데이터사이언스연계전공")
+                    );
+        }
+    }
+
+    private static Course createComputerEngineeringCourse(
+            final String haksuCode,
+            final CourseClassification classification,
+            final CourseGrade grade
+    ) {
+        return CourseFixture.createCourse(
+                "정렬대상", "Sort Target", haksuCode.substring(0, 7), haksuCode,
+                CourseCollege.INFORMATION_TECHNOLOGY,
+                CourseDepartment.COMPUTER_ENGINEERING,
+                classification,
+                CourseArea.MAJOR_CORE,
+                CourseType.LECTURE,
+                grade,
+                3, false, 50, 30
+        );
+    }
+
+    private static Course createEnglishCourse(
+            final String haksuCode,
+            final boolean isEnglishCourse
+    ) {
+        return CourseFixture.createCourse(
+                "원어강의대상", "English Target", haksuCode.substring(0, 7), haksuCode,
+                CourseCollege.INFORMATION_TECHNOLOGY,
+                CourseDepartment.COMPUTER_ENGINEERING,
+                CourseClassification.MAJOR_CORE,
+                CourseArea.MAJOR_CORE,
+                CourseType.LECTURE,
+                CourseGrade.SOPHOMORE,
+                3, isEnglishCourse, 50, 30
+        );
+    }
+
+    private static Course createCategoryCourse(
+            final String haksuCode,
+            final CourseClassification classification,
+            final CourseArea area
+    ) {
+        return CourseFixture.createCourse(
+                "카테고리대상", "Category Target", haksuCode.substring(0, 7), haksuCode,
+                CourseCollege.GENERAL_EDUCATION,
+                CourseDepartment.GENERAL_EDUCATION,
+                classification,
+                area,
+                CourseType.LECTURE,
+                CourseGrade.ALL,
+                3, false, 50, 30
+        );
+    }
+
+    private static Course createInterdisciplinaryCourse(
+            final String haksuCode,
+            final CourseDepartment department
+    ) {
+        return CourseFixture.createCourse(
+                "연계전공대상", "Interdisciplinary Target", haksuCode.substring(0, 7), haksuCode,
+                department.getCourseCollege(),
+                department,
+                CourseClassification.MAJOR_CORE,
+                CourseArea.MAJOR_CORE,
+                CourseType.LECTURE,
+                CourseGrade.SOPHOMORE,
+                3, false, 50, 30
+        );
+    }
 }

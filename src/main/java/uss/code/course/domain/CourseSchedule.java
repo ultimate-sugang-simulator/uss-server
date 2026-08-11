@@ -22,6 +22,8 @@ import java.time.LocalTime;
 @Table(name = "course_schedules")
 public class CourseSchedule {
 
+    private static final String LONG_LESSON_CODE_PREFIX = "B";
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -32,6 +34,9 @@ public class CourseSchedule {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "day_of_week")
     private CourseDay dayOfWeek;
+
+    @Column(nullable = false, name = "period_code")
+    private String periodCode;
 
     @Column(nullable = false, name = "period_name")
     private String periodName;
@@ -47,5 +52,9 @@ public class CourseSchedule {
 
     public void addCourse(final Course course) {
         this.course = course;
+    }
+
+    public boolean is75MinLesson() {
+        return periodCode.startsWith(LONG_LESSON_CODE_PREFIX);
     }
 }

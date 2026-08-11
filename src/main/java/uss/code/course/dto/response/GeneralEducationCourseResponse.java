@@ -17,21 +17,35 @@ public record GeneralEducationCourseResponse(
         String titleEn,
         int credits,
         boolean isEnglishCourse,
+        String englishCourseName,
         String schedule,
+        boolean is75MinLesson,
+        String suupTypeCode,
+        String suupTypeName,
+        String cnctrIsuCode,
+        String cnctrIsuName,
+        boolean isHussCourse,
         boolean isRegisterable
 ) {
     public static GeneralEducationCourseResponse from(final Course course) {
         return GeneralEducationCourseResponse.builder()
                 .id(course.getId())
-                .classification(course.getClassification().getName())
-                .area(course.getArea().getName())
+                .classification(course.getClassificationName())
+                .area(course.getAreaName())
                 .courseCode(course.getCourseCode())
                 .haksuCode(course.getHaksuCode())
                 .titleKr(course.getTitleKr())
                 .titleEn(course.getTitleEn())
                 .credits(course.getCredits())
                 .isEnglishCourse(course.isEnglishCourse())
+                .englishCourseName(course.isEnglishCourse() ? course.getEnglishName() : null)
                 .schedule(CourseScheduleFormatter.format(course.getSchedules()))
+                .is75MinLesson(course.is75MinLesson())
+                .suupTypeCode(course.getTypeCode())
+                .suupTypeName(course.getTypeName())
+                .cnctrIsuCode(course.getConcentrationCode())
+                .cnctrIsuName(course.getConcentrationName())
+                .isHussCourse(course.isHussCourse())
                 .isRegisterable(course.isRegisterable())
                 .build();
     }

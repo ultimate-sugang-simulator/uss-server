@@ -29,6 +29,13 @@ public class CourseFixture {
     private static final CourseGrade DEFAULT_GRADE = CourseGrade.SOPHOMORE;
     private static final int DEFAULT_CREDITS = 3;
     private static final boolean DEFAULT_IS_ENGLISH = false;
+    private static final String NOT_ENGLISH_CODE = "0";
+    private static final String NOT_ENGLISH_NAME = "비대상";
+    private static final String ENGLISH_CODE = "1";
+    private static final String ENGLISH_NAME = "원어강의(EN)";
+    private static final String DEFAULT_CONCENTRATION_CODE = "0";
+    private static final String DEFAULT_CONCENTRATION_NAME = "일반(1~15주)";
+    private static final boolean DEFAULT_IS_HUSS = false;
     private static final int DEFAULT_MAX_CAPACITY = 50;
     private static final int DEFAULT_CURRENT_ENROLLMENT = 30;
 
@@ -103,6 +110,26 @@ public class CourseFixture {
         );
     }
 
+    public static Course createHussCourse(
+            final String titleKr,
+            final String titleEn,
+            final String courseCode,
+            final String haksuCode,
+            final CourseDepartment department
+    ) {
+        Course course = createCourseWithDepartmentAndDetails(
+                titleKr,
+                titleEn,
+                courseCode,
+                haksuCode,
+                department,
+                DEFAULT_GRADE
+        );
+        ReflectionTestUtils.setField(course, "isHussCourse", true);
+
+        return course;
+    }
+
     public static Course createCourse(
             final String titleKr,
             final String titleEn,
@@ -130,12 +157,22 @@ public class CourseFixture {
         ReflectionTestUtils.setField(course, "haksuCode", haksuCode);
         ReflectionTestUtils.setField(course, "college", college);
         ReflectionTestUtils.setField(course, "department", department);
-        ReflectionTestUtils.setField(course, "classification", classification);
+        ReflectionTestUtils.setField(course, "classificationCode", classification.getCode());
+        ReflectionTestUtils.setField(course, "classificationName", classification.getName());
         ReflectionTestUtils.setField(course, "area", area);
-        ReflectionTestUtils.setField(course, "type", type);
-        ReflectionTestUtils.setField(course, "grade", grade);
+        ReflectionTestUtils.setField(course, "areaCode", area.getCode());
+        ReflectionTestUtils.setField(course, "areaName", area.getName());
+        ReflectionTestUtils.setField(course, "typeCode", type.getCode());
+        ReflectionTestUtils.setField(course, "typeName", type.getName());
+        ReflectionTestUtils.setField(course, "gradeCode", grade.getCode());
+        ReflectionTestUtils.setField(course, "gradeName", grade.getName());
+        ReflectionTestUtils.setField(course, "concentrationCode", DEFAULT_CONCENTRATION_CODE);
+        ReflectionTestUtils.setField(course, "concentrationName", DEFAULT_CONCENTRATION_NAME);
         ReflectionTestUtils.setField(course, "credits", credits);
         ReflectionTestUtils.setField(course, "isEnglishCourse", isEnglishCourse);
+        ReflectionTestUtils.setField(course, "englishCode", isEnglishCourse ? ENGLISH_CODE : NOT_ENGLISH_CODE);
+        ReflectionTestUtils.setField(course, "englishName", isEnglishCourse ? ENGLISH_NAME : NOT_ENGLISH_NAME);
+        ReflectionTestUtils.setField(course, "isHussCourse", DEFAULT_IS_HUSS);
         ReflectionTestUtils.setField(course, "maxCapacity", maxCapacity);
         ReflectionTestUtils.setField(course, "currentEnrollment", currentEnrollment);
 

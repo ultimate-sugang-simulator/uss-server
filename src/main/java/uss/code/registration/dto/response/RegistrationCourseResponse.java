@@ -22,7 +22,7 @@ public record RegistrationCourseResponse(
     public static RegistrationCourseResponse from(final Course course) {
         return RegistrationCourseResponse.builder()
                 .id(course.getId())
-                .classification(course.getClassification().getName())
+                .classification(course.getClassificationName())
                 .courseCode(course.getCourseCode())
                 .haksuCode(course.getHaksuCode())
                 .titleKr(course.getTitleKr())
