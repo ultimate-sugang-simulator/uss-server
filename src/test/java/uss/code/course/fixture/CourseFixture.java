@@ -8,6 +8,7 @@ import uss.code.course.domain.CourseCollege;
 import uss.code.course.domain.CourseDepartment;
 import uss.code.course.domain.CourseGrade;
 import uss.code.course.domain.CourseSchedule;
+import uss.code.course.domain.CourseStatus;
 import uss.code.course.domain.CourseTerm;
 import uss.code.course.domain.CourseType;
 
@@ -36,6 +37,7 @@ public class CourseFixture {
     private static final String DEFAULT_CONCENTRATION_CODE = "0";
     private static final String DEFAULT_CONCENTRATION_NAME = "일반(1~15주)";
     private static final boolean DEFAULT_IS_HUSS = false;
+    private static final CourseStatus DEFAULT_STATUS = CourseStatus.ACTIVE;
     private static final int DEFAULT_MAX_CAPACITY = 50;
     private static final int DEFAULT_CURRENT_ENROLLMENT = 30;
 
@@ -175,6 +177,7 @@ public class CourseFixture {
         ReflectionTestUtils.setField(course, "isHussCourse", DEFAULT_IS_HUSS);
         ReflectionTestUtils.setField(course, "maxCapacity", maxCapacity);
         ReflectionTestUtils.setField(course, "currentEnrollment", currentEnrollment);
+        ReflectionTestUtils.setField(course, "status", DEFAULT_STATUS);
 
         return course;
     }

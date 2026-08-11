@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import tools.jackson.databind.ObjectMapper;
+import uss.code.auth.filter.AdminAuthenticationFilter;
 import uss.code.auth.filter.JwtAuthenticationFilter;
 import uss.code.auth.filter.JwtExceptionFilter;
 import uss.code.auth.infra.JwtProvider;
@@ -20,6 +21,7 @@ public class FilterChainConfig {
     private static final int HTTP_LOGGING_FILTER_ORDER = 1;
     private static final int JWT_EXCEPTION_FILTER_ORDER = 2;
     private static final int JWT_AUTHENTICATION_FILTER_ORDER = 3;
+    private static final int ADMIN_AUTHENTICATION_FILTER_ORDER = 4;
 
     private final ObjectMapper objectMapper;
     private final JwtProvider jwtProvider;
@@ -62,6 +64,16 @@ public class FilterChainConfig {
 
         bean.setFilter(new JwtAuthenticationFilter(jwtProvider));
         bean.setOrder(JWT_AUTHENTICATION_FILTER_ORDER);
+
+        return bean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<AdminAuthenticationFilter> adminAuthenticationFilter() {
+        FilterRegistrationBean<AdminAuthenticationFilter> bean = new FilterRegistrationBean<>();
+
+        bean.setFilter(new AdminAuthenticationFilter(jwtProvider));
+        bean.setOrder(ADMIN_AUTHENTICATION_FILTER_ORDER);
 
         return bean;
     }

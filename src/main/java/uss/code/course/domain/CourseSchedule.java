@@ -11,10 +11,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
+
+import static lombok.AccessLevel.PRIVATE;
 
 @Getter
 @Entity
@@ -49,6 +52,41 @@ public class CourseSchedule {
 
     @Column(nullable = false, name = "end_time")
     private LocalTime endTime;
+
+    @Builder(access = PRIVATE)
+    private CourseSchedule(
+            final CourseDay dayOfWeek,
+            final String periodCode,
+            final String periodName,
+            final String classroom,
+            final LocalTime startTime,
+            final LocalTime endTime
+    ) {
+        this.dayOfWeek = dayOfWeek;
+        this.periodCode = periodCode;
+        this.periodName = periodName;
+        this.classroom = classroom;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
+    public static CourseSchedule create(
+            final CourseDay dayOfWeek,
+            final String periodCode,
+            final String periodName,
+            final String classroom,
+            final LocalTime startTime,
+            final LocalTime endTime
+    ) {
+        return CourseSchedule.builder()
+                .dayOfWeek(dayOfWeek)
+                .periodCode(periodCode)
+                .periodName(periodName)
+                .classroom(classroom)
+                .startTime(startTime)
+                .endTime(endTime)
+                .build();
+    }
 
     public void addCourse(final Course course) {
         this.course = course;

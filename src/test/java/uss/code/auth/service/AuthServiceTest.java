@@ -48,6 +48,7 @@ class AuthServiceTest {
     private static final String MALFORMED_TOKEN = "this-is-not-a-jwt";
     private static final long EXPIRED_VALIDITY_TIME = -60_000L;
     private static final long VALID_VALIDITY_TIME = 600_000L;
+    private static final long ADMIN_VALIDITY_TIME = 7_200_000L;
 
     @Autowired
     private AuthService authService;
@@ -84,13 +85,13 @@ class AuthServiceTest {
     }
 
     private String generateExpiredToken(final long memberId) {
-        return new JwtProvider(secretKey, EXPIRED_VALIDITY_TIME)
+        return new JwtProvider(secretKey, EXPIRED_VALIDITY_TIME, ADMIN_VALIDITY_TIME)
                 .generateAuthToken(memberId)
                 .accessToken();
     }
 
     private String generateTokenSignedWithOtherKey(final long memberId) {
-        return new JwtProvider(OTHER_SECRET_KEY, VALID_VALIDITY_TIME)
+        return new JwtProvider(OTHER_SECRET_KEY, VALID_VALIDITY_TIME, ADMIN_VALIDITY_TIME)
                 .generateAuthToken(memberId)
                 .accessToken();
     }

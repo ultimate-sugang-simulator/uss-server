@@ -63,6 +63,7 @@ public class CartService {
         final Course course = courseRepository.findByIdWithSchedules(courseId)
                 .orElseThrow(() -> new RestApiException(COURSE_NOT_FOUND));
 
+        validateCourseActive(course);
         validateCartLimit(carts);
         validateDuplicateCourse(carts, courseId);
         validateCourseScheduleConflict(carts, course);
@@ -100,6 +101,12 @@ public class CartService {
                 .map(cart -> cart.getCourse().getId())
                 .distinct()
                 .toList();
+    }
+
+    private void validateCourseActive(final Course course) {
+        if (!course.isActive()) {
+            throw new RestApiException(COURSE_CLOSED);
+        }
     }
 
     private void validateCartLimit(List<Cart> carts) {

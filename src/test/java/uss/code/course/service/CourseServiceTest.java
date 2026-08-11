@@ -1277,4 +1277,134 @@ class CourseServiceTest {
                 3, false, 50, 30
         );
     }
+
+    @Nested
+    class 폐강_강의_제외_테스트 {
+
+        private static final String TEST_STUDENT_ID = "202099999";
+        private static final String TEST_NAME = "폐강테스터";
+
+        private long memberId;
+
+        @BeforeEach
+        void setUp() {
+            final Member member = MemberFixture.createMember(
+                    TEST_STUDENT_ID,
+                    TEST_NAME,
+                    MemberCollege.INFORMATION_TECHNOLOGY,
+                    MemberDepartment.COMPUTER_ENGINEERING,
+                    MemberGrade.JUNIOR,
+                    AcademicStatus.ENROLLED,
+                    3.5
+            );
+            memberRepository.save(member);
+            memberId = member.getId();
+
+            final Course activeCourse = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "개설과목", "Active Course", "CSE5010", "CSE5010001",
+                    CourseDepartment.COMPUTER_ENGINEERING, CourseGrade.JUNIOR
+            );
+            final Course closedCourse = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "폐강과목", "Closed Course", "CSE5020", "CSE5020001",
+                    CourseDepartment.COMPUTER_ENGINEERING, CourseGrade.JUNIOR
+            );
+            closedCourse.close();
+
+            courseRepository.saveAll(List.of(activeCourse, closedCourse));
+        }
+
+        @Test
+        void 전공_조회에서_폐강_강의가_빠진다() {
+            //when
+            final MajorCoursesResponse response = courseService.getMajorCourses(memberId);
+
+            //then
+            assertThat(response.majorCourseResponses())
+                    .extracting(MajorCourseResponse::titleKr)
+                    .containsExactly("개설과목");
+        }
+
+        @Test
+        void 타학과_조회에서_폐강_강의가_빠진다() {
+            //when
+            final MajorCoursesResponse response = courseService.getOtherDepartmentCourses(
+                    CourseDepartment.COMPUTER_ENGINEERING.name()
+            );
+
+            //then
+            assertThat(response.majorCourseResponses())
+                    .extracting(MajorCourseResponse::titleKr)
+                    .containsExactly("개설과목");
+        }
+
+        @Test
+        void HUSS_조회에서_폐강_강의가_빠진다() {
+            //given
+            final Course activeHuss = CourseFixture.createHussCourse(
+                    "HUSS개설", "Active Huss", "CSE6010", "CSE6010001",
+                    CourseDepartment.COMPUTER_ENGINEERING
+            );
+            final Course closedHuss = CourseFixture.createHussCourse(
+                    "HUSS폐강", "Closed Huss", "CSE6020", "CSE6020001",
+                    CourseDepartment.COMPUTER_ENGINEERING
+            );
+            closedHuss.close();
+            courseRepository.saveAll(List.of(activeHuss, closedHuss));
+
+            //when
+            final MajorCoursesResponse response = courseService.getHussCourses();
+
+            //then
+            assertThat(response.majorCourseResponses())
+                    .extracting(MajorCourseResponse::titleKr)
+                    .containsExactly("HUSS개설");
+        }
+
+        @Test
+        void 교양_조회에서_폐강_강의가_빠진다() {
+            //given
+            final Course activeGeneral = CourseFixture.createCourse(
+                    "교양개설", "Active General", "GEN1010", "GEN1010001",
+                    CourseCollege.GENERAL_EDUCATION,
+                    CourseDepartment.COMPUTER_ENGINEERING,
+                    CourseClassification.CORE_LIBERAL_ARTS,
+                    CourseArea.CORE_HUMANITIES,
+                    CourseType.LECTURE,
+                    CourseGrade.ALL,
+                    3, false, 50, 0
+            );
+            final Course closedGeneral = CourseFixture.createCourse(
+                    "교양폐강", "Closed General", "GEN1020", "GEN1020001",
+                    CourseCollege.GENERAL_EDUCATION,
+                    CourseDepartment.COMPUTER_ENGINEERING,
+                    CourseClassification.CORE_LIBERAL_ARTS,
+                    CourseArea.CORE_HUMANITIES,
+                    CourseType.LECTURE,
+                    CourseGrade.ALL,
+                    3, false, 50, 0
+            );
+            closedGeneral.close();
+            courseRepository.saveAll(List.of(activeGeneral, closedGeneral));
+
+            //when
+            final GeneralEducationCoursesResponse response = courseService.getGeneralEducationCourses(
+                    CourseArea.CORE_HUMANITIES.name()
+            );
+
+            //then
+            assertThat(response.generalEducationCourseResponses())
+                    .extracting(GeneralEducationCourseResponse::titleKr)
+                    .containsExactly("교양개설");
+        }
+
+        @Test
+        void 폐강_강의도_카테고리_목록에는_남는다() {
+            //when
+            final CourseCategoriesResponse response = courseService.getCategories();
+
+            //then
+            assertThat(response.categoryResponses()).isNotEmpty();
+        }
+    }
+
 }

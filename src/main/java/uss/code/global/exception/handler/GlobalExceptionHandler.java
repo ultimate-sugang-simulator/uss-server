@@ -3,11 +3,13 @@ package uss.code.global.exception.handler;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import tools.jackson.databind.exc.InvalidFormatException;
 import uss.code.global.exception.domain.ExceptionCode;
 import uss.code.global.exception.domain.JwtAuthenticationException;
 import uss.code.global.exception.domain.RestApiException;
@@ -15,6 +17,7 @@ import uss.code.global.exception.dto.response.ErrorResponse;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
 import static uss.code.global.exception.domain.ExceptionCode.INVALID_REQUEST_PARAMETER;
 
 @Log4j2
@@ -56,10 +59,35 @@ public class GlobalExceptionHandler {
         return makeExceptionResponse(INVALID_REQUEST_PARAMETER);
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(final HttpMessageNotReadableException e) {
+        log.error("예외 발생: {}", e.getMessage());
+
+        if (isEnumConversionFailure(e)) {
+            return makeExceptionResponse(INVALID_ENUM_TYPE);
+        }
+
+        return makeExceptionResponse(INVALID_REQUEST_PARAMETER);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(final Exception e){
         log.error("예외 발생: {}", e.getMessage());
         return makeExceptionResponse(ExceptionCode.UNEXPECTED_SERVER_ERROR);
+    }
+
+    private boolean isEnumConversionFailure(final HttpMessageNotReadableException e) {
+        Throwable cause = e.getCause();
+
+        while (cause != null) {
+            if (cause instanceof InvalidFormatException invalidFormat) {
+                final Class<?> targetType = invalidFormat.getTargetType();
+                return targetType != null && targetType.isEnum();
+            }
+            cause = cause.getCause();
+        }
+
+        return false;
     }
 
     private ResponseEntity<ErrorResponse> makeExceptionResponse(final ExceptionCode exceptionCode) {
