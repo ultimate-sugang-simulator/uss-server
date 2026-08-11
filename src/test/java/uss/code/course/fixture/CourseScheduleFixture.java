@@ -9,6 +9,7 @@ import java.time.LocalTime;
 
 public class CourseScheduleFixture {
 
+    private static final String DEFAULT_PERIOD_CODE = "B01";
     private static final String DEFAULT_PERIOD_NAME = "1-2A";
     private static final String DEFAULT_CLASSROOM = "07-401";
 
@@ -39,6 +40,15 @@ public class CourseScheduleFixture {
         );
     }
 
+    public static CourseSchedule createCourseScheduleWithPeriodCode(
+            final Course course,
+            final String periodCode
+    ) {
+        CourseSchedule courseSchedule = createCourseSchedule(course);
+        ReflectionTestUtils.setField(courseSchedule, "periodCode", periodCode);
+        return courseSchedule;
+    }
+
     public static CourseSchedule createCourseSchedule(
             final Course course,
             final CourseDay dayOfWeek,
@@ -50,6 +60,7 @@ public class CourseScheduleFixture {
         CourseSchedule courseSchedule = new CourseSchedule();
         ReflectionTestUtils.setField(courseSchedule, "course", course);
         ReflectionTestUtils.setField(courseSchedule, "dayOfWeek", dayOfWeek);
+        ReflectionTestUtils.setField(courseSchedule, "periodCode", DEFAULT_PERIOD_CODE);
         ReflectionTestUtils.setField(courseSchedule, "periodName", periodName);
         ReflectionTestUtils.setField(courseSchedule, "classroom", classroom);
         ReflectionTestUtils.setField(courseSchedule, "startTime", startTime);

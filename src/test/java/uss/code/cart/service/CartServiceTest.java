@@ -10,6 +10,7 @@ import uss.code.cart.dto.response.CartedCoursesResponse;
 import uss.code.cart.fixture.CartFixture;
 import uss.code.cart.repository.CartRepository;
 import uss.code.course.domain.Course;
+import uss.code.course.domain.CourseClassification;
 import uss.code.course.domain.CourseDay;
 import uss.code.course.domain.CourseGrade;
 import uss.code.course.domain.CourseSchedule;
@@ -516,7 +517,7 @@ class CartServiceTest {
                     "OCU과목1", "OCU Course 1", "OCU001", "OCU001001",
                     CourseFixture.createCourse().getCollege(),
                     CourseFixture.createCourse().getDepartment(),
-                    CourseFixture.createCourse().getClassification(),
+                    CourseClassification.MAJOR_CORE,
                     CourseFixture.createCourse().getArea(),
                     CourseType.OCU,
                     CourseGrade.SOPHOMORE,
@@ -526,7 +527,7 @@ class CartServiceTest {
                     "OCU과목2", "OCU Course 2", "OCU002", "OCU002001",
                     CourseFixture.createCourse().getCollege(),
                     CourseFixture.createCourse().getDepartment(),
-                    CourseFixture.createCourse().getClassification(),
+                    CourseClassification.MAJOR_CORE,
                     CourseFixture.createCourse().getArea(),
                     CourseType.OCU,
                     CourseGrade.SOPHOMORE,
@@ -536,7 +537,7 @@ class CartServiceTest {
                     "OCU과목3", "OCU Course 3", "OCU003", "OCU003001",
                     CourseFixture.createCourse().getCollege(),
                     CourseFixture.createCourse().getDepartment(),
-                    CourseFixture.createCourse().getClassification(),
+                    CourseClassification.MAJOR_CORE,
                     CourseFixture.createCourse().getArea(),
                     CourseType.OCU,
                     CourseGrade.SOPHOMORE,
@@ -564,7 +565,7 @@ class CartServiceTest {
                     "OCU과목1", "OCU Course 1", "OCU001", "OCU001001",
                     CourseFixture.createCourse().getCollege(),
                     CourseFixture.createCourse().getDepartment(),
-                    CourseFixture.createCourse().getClassification(),
+                    CourseClassification.MAJOR_CORE,
                     CourseFixture.createCourse().getArea(),
                     CourseType.OCU,
                     CourseGrade.SOPHOMORE,
@@ -574,7 +575,7 @@ class CartServiceTest {
                     "OCU과목2", "OCU Course 2", "OCU002", "OCU002001",
                     CourseFixture.createCourse().getCollege(),
                     CourseFixture.createCourse().getDepartment(),
-                    CourseFixture.createCourse().getClassification(),
+                    CourseClassification.MAJOR_CORE,
                     CourseFixture.createCourse().getArea(),
                     CourseType.OCU,
                     CourseGrade.SOPHOMORE,
@@ -603,7 +604,7 @@ class CartServiceTest {
                     "K-MOOC과목1", "K-MOOC Course 1", "KMOOC001", "KMOOC001001",
                     CourseFixture.createCourse().getCollege(),
                     CourseFixture.createCourse().getDepartment(),
-                    CourseFixture.createCourse().getClassification(),
+                    CourseClassification.MAJOR_CORE,
                     CourseFixture.createCourse().getArea(),
                     CourseType.K_MOOC,
                     CourseGrade.SOPHOMORE,
@@ -613,7 +614,7 @@ class CartServiceTest {
                     "K-MOOC과목2", "K-MOOC Course 2", "KMOOC002", "KMOOC002001",
                     CourseFixture.createCourse().getCollege(),
                     CourseFixture.createCourse().getDepartment(),
-                    CourseFixture.createCourse().getClassification(),
+                    CourseClassification.MAJOR_CORE,
                     CourseFixture.createCourse().getArea(),
                     CourseType.K_MOOC,
                     CourseGrade.SOPHOMORE,
