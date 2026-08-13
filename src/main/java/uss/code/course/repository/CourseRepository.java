@@ -29,6 +29,16 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         SELECT DISTINCT c
         FROM Course c
         LEFT JOIN FETCH c.schedules
+        WHERE c.department IN :departments
+          AND c.status = uss.code.course.domain.CourseStatus.ACTIVE
+        ORDER BY c.gradeCode, c.classificationCode, c.haksuCode
+    """)
+    List<Course> findByDepartmentIn(@Param("departments") final List<CourseDepartment> departments);
+
+    @Query("""
+        SELECT DISTINCT c
+        FROM Course c
+        LEFT JOIN FETCH c.schedules
         WHERE c.area = :area
           AND c.status = uss.code.course.domain.CourseStatus.ACTIVE
         ORDER BY c.gradeCode, c.classificationCode, c.haksuCode

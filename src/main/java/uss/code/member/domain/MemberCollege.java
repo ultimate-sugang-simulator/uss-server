@@ -23,6 +23,7 @@ public enum MemberCollege {
     URBAN_SCIENCE("도시과학대학"),
     LIFE_SCIENCES_BIOENGINEERING("생명과학기술대학"),
     LIBERAL_ARTS_COLLEGE("융합자유전공대학"),
+    NORTHEAST_ASIA_TRADE_LOGISTICS("동북아국제통상물류학부"),
     LAW("법학부"),
     DEFAULT("미정");
 

@@ -25,6 +25,7 @@ public enum ExceptionCode {
     MEMBER_NOT_FOUND(NOT_FOUND, 1010, "사용자를 찾을 수 없습니다."),
     PASSWORD_NOT_MATCH(UNAUTHORIZED, 1012, "비밀번호가 일치하지 않습니다."),
     PORTAL_LOGIN_FAILED(UNAUTHORIZED, 1013, "포털 로그인에 실패했습니다."),
+    INVALID_DEPARTMENT(BAD_REQUEST, 1014, "유효하지 않은 학과입니다."),
 
     // 과목
     INVALID_GENERAL_EDUCATION_AREA(BAD_REQUEST, 2000, "유효하지 않은 교양 영역입니다."),

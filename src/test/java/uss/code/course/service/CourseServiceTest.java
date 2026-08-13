@@ -226,6 +226,155 @@ class CourseServiceTest {
     }
 
     @Nested
+    class 학부_소속_전공_과목_조회_테스트 {
+
+        private long electronicsMemberId;
+        private long unassignedMemberId;
+
+        @BeforeEach
+        void setUp() {
+            final Member electronicsMember = MemberFixture.createMember(
+                    "202112345",
+                    "김전자",
+                    MemberCollege.ENGINEERING,
+                    MemberDepartment.ELECTRONICS_ENGINEERING_SCHOOL,
+                    MemberGrade.SOPHOMORE,
+                    AcademicStatus.ENROLLED,
+                    3.5
+            );
+            memberRepository.save(electronicsMember);
+            electronicsMemberId = electronicsMember.getId();
+
+            final Member unassignedMember = MemberFixture.createMember(
+                    "202212345",
+                    "박미정",
+                    MemberCollege.DEFAULT,
+                    MemberDepartment.DEFAULT,
+                    MemberGrade.DEFAULT,
+                    AcademicStatus.DEFAULT,
+                    0.0
+            );
+            memberRepository.save(unassignedMember);
+            unassignedMemberId = unassignedMember.getId();
+
+            // 학부로 개설된 과목
+            Course schoolCourse = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "전자회로", "Electronic Circuits", "ELE101", "ELE101001",
+                    CourseDepartment.ELECTRONICS_ENGINEERING_SCHOOL,
+                    CourseGrade.FRESHMAN
+            );
+
+            // 하위 전공으로 개설된 과목
+            Course majorCourse = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "디지털신호처리", "Digital Signal Processing", "ELE201", "ELE201001",
+                    CourseDepartment.ELECTRONICS_ENGINEERING_MAJOR,
+                    CourseGrade.SOPHOMORE
+            );
+            Course semiconductorCourse = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "반도체소자", "Semiconductor Devices", "ELE202", "ELE202001",
+                    CourseDepartment.SEMICONDUCTOR_CONVERGENCE_MAJOR,
+                    CourseGrade.SOPHOMORE
+            );
+
+            // 폐지된 학과로 개설된 구 학번 대상 과목
+            Course abolishedCourse = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "전자공학세미나", "Electronics Seminar", "ELE401", "ELE401001",
+                    CourseDepartment.ELECTRONICS_ENGINEERING,
+                    CourseGrade.SENIOR
+            );
+
+            // 다른 학부 과목
+            Course otherSchoolCourse = CourseFixture.createCourseWithDepartmentAndDetails(
+                    "생명과학개론", "Introduction to Life Science", "LIF101", "LIF101001",
+                    CourseDepartment.LIFE_SCIENCE_SCHOOL,
+                    CourseGrade.FRESHMAN
+            );
+
+            courseRepository.saveAll(List.of(
+                    schoolCourse, majorCourse, semiconductorCourse, abolishedCourse, otherSchoolCourse
+            ));
+        }
+
+        @Test
+        void 학부_소속_학생은_하위_전공_과목까지_함께_조회한다() {
+            //given
+
+            //when
+            final MajorCoursesResponse response = courseService.getMajorCourses(electronicsMemberId);
+
+            //then
+            assertThat(response.majorCourseResponses())
+                    .extracting(MajorCourseResponse::courseCode)
+                    .containsExactlyInAnyOrder("ELE101", "ELE201", "ELE202", "ELE401");
+        }
+
+        @Test
+        void 폐지된_학과의_과목도_후신_학부_학생에게_조회된다() {
+            //given
+
+            //when
+            final MajorCoursesResponse response = courseService.getMajorCourses(electronicsMemberId);
+
+            //then
+            assertThat(response.majorCourseResponses())
+                    .extracting(MajorCourseResponse::department)
+                    .contains("전자공학과");
+        }
+
+        @Test
+        void 다른_학부의_과목은_조회되지_않는다() {
+            //given
+
+            //when
+            final MajorCoursesResponse response = courseService.getMajorCourses(electronicsMemberId);
+
+            //then
+            assertThat(response.majorCourseResponses())
+                    .extracting(MajorCourseResponse::courseCode)
+                    .doesNotContain("LIF101");
+        }
+
+        @Test
+        void 학과가_미정인_회원은_예외없이_빈_목록을_받는다() {
+            //given
+
+            //when
+            final MajorCoursesResponse response = courseService.getMajorCourses(unassignedMemberId);
+
+            //then
+            assertThat(response.majorCourseResponses()).isEmpty();
+        }
+
+        @Test
+        void 타학과로_학부를_조회해도_하위_전공_과목까지_함께_조회된다() {
+            //given
+            final String department = "ELECTRONICS_ENGINEERING_SCHOOL";
+
+            //when
+            final MajorCoursesResponse response = courseService.getOtherDepartmentCourses(department);
+
+            //then
+            assertThat(response.majorCourseResponses())
+                    .extracting(MajorCourseResponse::courseCode)
+                    .containsExactlyInAnyOrder("ELE101", "ELE201", "ELE202", "ELE401");
+        }
+
+        @Test
+        void 학부_소속_조회_결과도_학년_순으로_정렬된다() {
+            //given
+
+            //when
+            final MajorCoursesResponse response = courseService.getMajorCourses(electronicsMemberId);
+            final List<String> grades = response.majorCourseResponses().stream()
+                    .map(MajorCourseResponse::grade)
+                    .toList();
+
+            //then
+            assertThat(grades).containsExactly("1학년", "2학년", "2학년", "4학년");
+        }
+    }
+
+    @Nested
     class 교양_과목_조회_테스트 {
 
         @BeforeEach
@@ -575,6 +724,28 @@ class CourseServiceTest {
             assertThatThrownBy(() -> courseService.getOtherDepartmentCourses(invalidDepartment))
                     .isInstanceOf(RestApiException.class)
                     .hasFieldOrPropertyWithValue("exceptionCode", INVALID_ENUM_TYPE);
+        }
+
+        @Test
+        void 학과가_아닌_값으로_조회하면_예외가_발생한다() {
+            //given
+            final String generalEducation = "GENERAL_EDUCATION";
+
+            //when & then
+            assertThatThrownBy(() -> courseService.getOtherDepartmentCourses(generalEducation))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", INVALID_ENUM_TYPE);
+        }
+
+        @Test
+        void 미정으로_조회하면_예외가_발생한다() {
+            //given
+            final String unassigned = "DEFAULT";
+
+            //when & then
+            assertThatThrownBy(() -> courseService.getOtherDepartmentCourses(unassigned))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", INVALID_DEPARTMENT);
         }
     }
 

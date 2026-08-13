@@ -18,6 +18,7 @@ import uss.code.member.repository.MemberRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static uss.code.global.exception.domain.ExceptionCode.INVALID_DEPARTMENT;
 import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
 import static uss.code.global.exception.domain.ExceptionCode.MEMBER_NOT_FOUND;
 
@@ -100,7 +101,7 @@ class MemberServiceTest {
         private static final double TEST_GPA = 0.0;
 
         private static final String VALID_DEPARTMENT = "COMPUTER_ENGINEERING";
-        private static final String INVALID_DEPARTMENT = "존재하지_않는_학과";
+        private static final String UNKNOWN_DEPARTMENT = "존재하지_않는_학과";
 
         long validMemberId;
         final long invalidMemberId = 999L;
@@ -136,7 +137,7 @@ class MemberServiceTest {
         }
 
         @Test
-        void 학과를_수정해도_단과대학은_바뀌지_않는다(){
+        void 학과를_수정하면_단과대학도_함께_바뀐다(){
             //given
             final DepartmentUpdateRequest request = new DepartmentUpdateRequest(VALID_DEPARTMENT);
 
@@ -145,13 +146,38 @@ class MemberServiceTest {
 
             //then
             final Member updatedMember = memberRepository.findById(validMemberId).orElseThrow();
-            assertThat(updatedMember.getCollege()).isEqualTo(MemberCollege.DEFAULT);
+            assertThat(updatedMember.getCollege()).isEqualTo(MemberCollege.INFORMATION_TECHNOLOGY);
+        }
+
+        @Test
+        void 단과대학이_없던_학부의_학과로_수정하면_새_단과대학이_설정된다(){
+            //given
+            final DepartmentUpdateRequest request = new DepartmentUpdateRequest("IBE_MAJOR");
+
+            //when
+            memberService.updateDepartment(validMemberId, request);
+
+            //then
+            final Member updatedMember = memberRepository.findById(validMemberId).orElseThrow();
+            assertThat(updatedMember.getDepartment()).isEqualTo(MemberDepartment.IBE_MAJOR);
+            assertThat(updatedMember.getCollege()).isEqualTo(MemberCollege.NORTHEAST_ASIA_TRADE_LOGISTICS);
+        }
+
+        @Test
+        void 미정은_학과로_선택할_수_없다(){
+            //given
+            final DepartmentUpdateRequest request = new DepartmentUpdateRequest("DEFAULT");
+
+            //when & then
+            assertThatThrownBy(() -> memberService.updateDepartment(validMemberId, request))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", INVALID_DEPARTMENT);
         }
 
         @Test
         void 유효하지_않은_학과가_들어오면_예외를_반환한다(){
             //given
-            final DepartmentUpdateRequest request = new DepartmentUpdateRequest(INVALID_DEPARTMENT);
+            final DepartmentUpdateRequest request = new DepartmentUpdateRequest(UNKNOWN_DEPARTMENT);
 
             //when & then
             assertThatThrownBy(() -> memberService.updateDepartment(validMemberId, request))
