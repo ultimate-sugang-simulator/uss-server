@@ -49,3 +49,6 @@ TASKS.md
 .local/
 
 docs/roadmap.md
+
+# 백오피스 명세 차이 정리 (공개 레포에 올리지 않는다)
+BACKOFFICE-API-DEVIATIONS.md
