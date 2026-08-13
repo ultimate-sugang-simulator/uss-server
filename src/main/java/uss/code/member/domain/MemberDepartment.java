@@ -6,6 +6,7 @@ import uss.code.global.exception.domain.RestApiException;
 
 import java.util.Arrays;
 
+import static uss.code.global.exception.domain.ExceptionCode.INVALID_DEPARTMENT;
 import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
 
 @Getter
@@ -36,13 +37,15 @@ public enum MemberDepartment {
     PUBLIC_ADMINISTRATION(MemberCollege.COMMERCE_PUBLIC_AFFAIRS, "행정학과"),
     POLITICS_DIPLOMACY(MemberCollege.COMMERCE_PUBLIC_AFFAIRS, "정치외교학과"),
     ECONOMICS(MemberCollege.COMMERCE_PUBLIC_AFFAIRS, "경제학과"),
-    TRADE(MemberCollege.COMMERCE_PUBLIC_AFFAIRS, "무역학부"),
+    ECONOMICS_NIGHT(MemberCollege.COMMERCE_PUBLIC_AFFAIRS, "경제학과(야)"),
+    GLOBAL_TRADE_SERVICE(MemberCollege.COMMERCE_PUBLIC_AFFAIRS, "Global Trade & Service학부"),
+    TRADE_NIGHT(MemberCollege.COMMERCE_PUBLIC_AFFAIRS, "무역학부(야)"),
     CONSUMER_SCIENCE(MemberCollege.COMMERCE_PUBLIC_AFFAIRS, "소비자학과"),
 
     // 공과대학
     MECHANICAL_ENGINEERING(MemberCollege.ENGINEERING, "기계공학과"),
     ELECTRICAL_ENGINEERING(MemberCollege.ENGINEERING, "전기공학과"),
-    ELECTRONICS_ENGINEERING(MemberCollege.ENGINEERING, "전자공학과"),
+    ELECTRONICS_ENGINEERING_SCHOOL(MemberCollege.ENGINEERING, "전자공학부"),
     INDUSTRIAL_MANAGEMENT(MemberCollege.ENGINEERING, "산업경영공학과"),
     MATERIAL_SCIENCE(MemberCollege.ENGINEERING, "신소재공학과"),
     SAFETY_ENGINEERING(MemberCollege.ENGINEERING, "안전공학과"),
@@ -60,7 +63,7 @@ public enum MemberDepartment {
     TAX_ACCOUNTING(MemberCollege.BUSINESS, "세무회계학과"),
 
     // 예술체육대학
-    FINE_ARTS(MemberCollege.ARTS_PHYSICAL_EDUCATION, "조형예술학부"),
+    FINE_ARTS_SCHOOL(MemberCollege.ARTS_PHYSICAL_EDUCATION, "조형예술학부"),
     DESIGN(MemberCollege.ARTS_PHYSICAL_EDUCATION, "디자인학부"),
     PERFORMING_ART(MemberCollege.ARTS_PHYSICAL_EDUCATION, "공연예술학과"),
     SPORTS_SCIENCE(MemberCollege.ARTS_PHYSICAL_EDUCATION, "스포츠과학부"),
@@ -78,16 +81,23 @@ public enum MemberDepartment {
 
     // 도시과학대학
     URBAN_ADMINISTRATION(MemberCollege.URBAN_SCIENCE, "도시행정학과"),
-    CIVIL_ENVIRONMENT_ENGINEERING(MemberCollege.URBAN_SCIENCE, "도시환경공학부"),
+    URBAN_ENVIRONMENT_ENGINEERING_SCHOOL(MemberCollege.URBAN_SCIENCE, "도시환경공학부"),
     URBAN_ENGINEERING(MemberCollege.URBAN_SCIENCE, "도시공학과"),
-    URBAN_ARCHITECTURE(MemberCollege.URBAN_SCIENCE, "도시건축학부"),
+    URBAN_ARCHITECTURE_SCHOOL(MemberCollege.URBAN_SCIENCE, "도시건축학부"),
 
     // 생명과학기술대학
-    LIFE_SCIENCE(MemberCollege.LIFE_SCIENCES_BIOENGINEERING, "생명과학부"),
-    BIOENGINEERING(MemberCollege.LIFE_SCIENCES_BIOENGINEERING, "생명공학부"),
+    LIFE_SCIENCE_SCHOOL(MemberCollege.LIFE_SCIENCES_BIOENGINEERING, "생명과학부"),
+    BIOENGINEERING_SCHOOL(MemberCollege.LIFE_SCIENCES_BIOENGINEERING, "생명공학부"),
 
     // 융합자유전공대학
     LIBERAL_ARTS(MemberCollege.LIBERAL_ARTS_COLLEGE, "자유전공학부"),
+    INTERNATIONAL_LIBERAL_ARTS(MemberCollege.LIBERAL_ARTS_COLLEGE, "국제자유전공학부"),
+    CONVERGENCE(MemberCollege.LIBERAL_ARTS_COLLEGE, "융합학부"),
+
+    // 동북아국제통상물류학부
+    NORTHEAST_ASIAN_TRADE_MAJOR(MemberCollege.NORTHEAST_ASIA_TRADE_LOGISTICS, "동북아국제통상전공"),
+    SMART_LOGISTICS_ENGINEERING_MAJOR(MemberCollege.NORTHEAST_ASIA_TRADE_LOGISTICS, "스마트물류공학전공"),
+    IBE_MAJOR(MemberCollege.NORTHEAST_ASIA_TRADE_LOGISTICS, "IBE전공"),
 
     // 법학부
     LAW(MemberCollege.LAW, "법학부"),
@@ -103,5 +113,15 @@ public enum MemberDepartment {
                 .filter(md -> md.name().equalsIgnoreCase(value))
                 .findAny()
                 .orElseThrow(() -> new RestApiException(INVALID_ENUM_TYPE));
+    }
+
+    public static MemberDepartment fromSelectable(final String value) {
+        final MemberDepartment memberDepartment = from(value);
+
+        if (memberDepartment == DEFAULT) {
+            throw new RestApiException(INVALID_DEPARTMENT);
+        }
+
+        return memberDepartment;
     }
 }

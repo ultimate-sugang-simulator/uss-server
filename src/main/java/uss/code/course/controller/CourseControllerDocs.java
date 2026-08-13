@@ -65,6 +65,8 @@ public interface CourseControllerDocs {
     );
 
     @Operation(summary = "타학과 과목 조회", description = "특정 학과의 과목 목록을 조회합니다.<br>" +
+            "학과는 회원이 소속될 수 있는 학과, 학부 이름으로 넘깁니다. 교양, 교직, 일선, 군사학, 연계전공은 학과가 아니므로 넘길 수 없습니다.<br>" +
+            "학부를 넘기면 그 학부의 하위 전공 과목까지 함께 조회됩니다.<br>" +
             "🔐 <strong>Jwt 필요</strong><br>")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "✅ 타학과 과목 조회 성공"),
@@ -72,8 +74,12 @@ public interface CourseControllerDocs {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             examples = {
                                     @ExampleObject(
-                                            name = "유효하지 않은 학과",
+                                            name = "존재하지 않는 학과",
                                             value = "{\"code\" : 8888, \"message\" : \"유효하지 않은 열거타입입니다.\"}"
+                                    ),
+                                    @ExampleObject(
+                                            name = "학과로 선택할 수 없는 값",
+                                            value = "{\"code\" : 1014, \"message\" : \"유효하지 않은 학과입니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))

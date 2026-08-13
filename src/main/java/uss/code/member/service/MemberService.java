@@ -34,6 +34,6 @@ public class MemberService {
         final Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
-        member.updateDepartment(MemberDepartment.from(request.department()));
+        member.updateDepartment(MemberDepartment.fromSelectable(request.department()));
     }
 }

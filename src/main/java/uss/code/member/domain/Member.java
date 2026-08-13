@@ -93,6 +93,7 @@ public class Member {
 
     public void updateDepartment(final MemberDepartment department) {
         this.department = department;
+        this.college = department.getMemberCollege();
         this.updatedAt = LocalDateTime.now();
     }
 

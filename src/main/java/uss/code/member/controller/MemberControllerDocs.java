@@ -48,8 +48,12 @@ public interface MemberControllerDocs {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             examples = {
                                     @ExampleObject(
-                                            name = "유효하지 않은 학과",
+                                            name = "존재하지 않는 학과",
                                             value = "{\"code\" : 8888, \"message\" : \"유효하지 않은 열거타입입니다.\"}"
+                                    ),
+                                    @ExampleObject(
+                                            name = "학과로 선택할 수 없는 값",
+                                            value = "{\"code\" : 1014, \"message\" : \"유효하지 않은 학과입니다.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
