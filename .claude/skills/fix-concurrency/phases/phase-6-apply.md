@@ -1,0 +1,120 @@
+## Phase 6. 후보 적용
+
+### 목적
+호출자가 고른 기법 하나를 **원본 위에 단독으로** 반영하고, 제어가 실제로 걸렸는지 확인한다.
+
+### 선행 조건
+- Phase 5 완료
+- `git status`가 깨끗하다. 앞 후보의 코드가 남아 있으면 이번 측정이 오염된다
+
+### 참조 파일
+- `.claude/rules/code-convention/`
+- `.claude/rules/migration.md`
+- `.claude/spec/service-policy/`
+
+### 절차
+
+1. **적용 전 상태를 확인한다.** 여기서 어긋나면 이후 비교가 전부 무의미해진다.
+
+   ```bash
+   git status --short
+   ```
+
+   - 출력이 비어 있지 않으면 멈춘다. 앞 후보가 남아 있는지 호출자에게 확인하고 되돌린 뒤 진행한다.
+
+2. Phase 5-B에서 확정한 설계 그대로 구현한다.
+   - **이번 후보의 기법 하나만 넣는다.** 다른 기법이 좋아 보여도 함께 넣지 마라.
+     두 기법이 섞이면 어느 쪽 효과인지 분리되지 않는다.
+   - 설계에 없던 최적화를 끼워 넣지 마라. 다음 후보에서 별도로 잰다.
+   - 수정할 레이어에 맞는 코드 컨벤션 파일을 Read로 읽고 그에 맞춰 작성한다.
+
+3. **역방향 동작에도 같은 제어를 건다.** 증가만 막고 감소를 두면 카운터가 다시 어긋난다.
+   Phase 1에서 정의한 불변식 중 역방향에 걸린 것이 있으면 이번 후보에서 함께 처리한다.
+
+4. 스키마 변경은 `.claude/rules/migration.md`를 따라 Flyway 마이그레이션 파일로 작성한다.
+   - 이미 적용된 마이그레이션 파일을 고치지 마라. 새 버전 파일로 추가한다.
+   - **후보 비교 중에 추가한 마이그레이션은 되돌리기가 까다롭다.** 낙관적 락의 버전 컬럼처럼
+     후보 전용 스키마가 필요하면, 그 후보를 되돌릴 때 컬럼도 함께 지우는 SQL을 미리 확정해
+     `record.md`의 후보 {n} **되돌리기**에 적어둔다.
+
+     ```sql
+     -- 후보 {n} 되돌리기 (Phase 7 종료 시 실행)
+     ALTER TABLE courses DROP COLUMN version;
+     DELETE FROM flyway_schema_history WHERE version = '{추가한 버전}';
+     ```
+
+5. 애플리케이션을 재기동하도록 제시한다.
+
+   ```bash
+   ./gradlew bootRun --args='--spring.profiles.active=conc'
+   ```
+
+6. **제어가 실제로 발행되는지 확인한다.** 재측정 전에 확인해야 Phase 7에서
+   "효과 없음"과 "적용 안 됨"을 구분할 수 있다.
+
+   ```bash
+   # 통계를 비우고 요청 한 건만 보낸다
+   $MYSQL_CONC -e "TRUNCATE TABLE performance_schema.events_statements_summary_by_digest;"
+
+   TOKEN=$(jq -r '.[0].accessToken' $CONC_DIR/tokens.json)
+   curl -s -o /dev/null -w '%{http_code}\n' -X POST \
+     -H "access-token: $TOKEN" \
+     localhost:8080{대상 경로}
+
+   # 발행된 문장을 눈으로 확인한다
+   $MYSQL_CONC -e "
+   SELECT COUNT_STAR AS calls, DIGEST_TEXT
+   FROM performance_schema.events_statements_summary_by_digest
+   WHERE SCHEMA_NAME = 'uss_db'
+     AND DIGEST_TEXT NOT LIKE '%performance_schema%'
+   ORDER BY LAST_SEEN DESC LIMIT 20\G"
+   ```
+
+   기법별로 확인할 것:
+
+   | 기법 | 문장에 나타나야 하는 것 |
+   |---|---|
+   | 원자적 조건부 UPDATE | `UPDATE ... SET col = col + ? WHERE ... AND col < ?` 형태. 절대값 대입이 아니어야 한다 |
+   | 비관적 락 | 대상 조회에 `FOR UPDATE`가 붙어 있어야 한다 |
+   | 낙관적 락 | `UPDATE ... WHERE id = ? AND version = ?` 형태 |
+   | 분산 락, 원자 카운터 | SQL에는 안 나타난다. 애플리케이션 로그나 Redis 명령으로 확인한다 |
+
+   - 기대한 형태가 안 보이면 **여기서 멈춘다.** Phase 7로 넘어가지 마라.
+     JPA 더티 체킹이 여전히 절대값 UPDATE를 만들고 있는 경우가 가장 흔하다.
+   - 되돌리기를 잊지 않는다. 이 확인 요청도 등록을 하나 만든다.
+
+     ```bash
+     $MYSQL_CONC -e "
+     DELETE FROM registrations WHERE course_id = {대상 강의 id};
+     UPDATE courses SET current_enrollment = 0 WHERE id = {대상 강의 id};"
+     ```
+
+7. 테스트를 실행하도록 제시하고 결과를 받는다. **실행은 호출자가 한다.**
+
+   ```bash
+   ./gradlew test
+   ```
+
+   - 실패한 테스트가 있으면 원인을 짚어 보고하고, 해소 전까지 Phase 7로 넘어가지 마라.
+   - 실패 원인이 이번 변경과 무관하다는 판단이 서면 근거를 밝히고 호출자의 확답을 받는다.
+
+8. 무엇을 어떻게 바꿨는지 `record.md`의 후보 {n} **적용 내용**에 수정한 파일 경로와 변경 요지를 적는다.
+   6번의 확인 결과(발행된 문장)와 테스트 결과도 같은 항목에 적는다.
+
+### 출력
+- 코드 변경 (후보 {n}의 기법 하나만)
+- `record.md`의 후보 {n} **적용 내용**이 채워짐
+- 후보 전용 스키마를 추가했으면 **되돌리기** 항목이 채워짐
+- `record.md`의 진행 상태의 후보 {n} Phase 6이 ✅로 기록
+
+### 실패 처리
+
+| 증상 | 처리 |
+|---|---|
+| `git status`가 안 깨끗함 | 앞 후보를 되돌린 뒤 다시 시작한다 |
+| 기대한 문장이 안 나옴 | 원인을 짚어 보고한다. 재측정하지 마라 |
+| 테스트 실패 | 원인을 짚어 보고한다. 무관함이 확인되면 근거를 적고 진행 |
+
+> 다음 Phase 조건: 설계대로 적용되었고 제어가 발행되는 것이 확인되었으며 테스트가 통과했을 때 → Phase 7
+
+> Skip 조건: 없음 (필수 Phase)
