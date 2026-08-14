@@ -1,0 +1,43 @@
+{
+  "target": "register-course",
+  "endpoint": "POST /api/v1/registration/{courseId}",
+  "condition": {
+    "executor": "per-vu-iterations (iterations=1, ramp 없음)",
+    "vus": 500,
+    "target_course_id": 990001,
+    "capacity": 100,
+    "expected_reject_code": 4000,
+    "db_cache": "warm (InnoDB 버퍼 풀은 재기동 없이 비울 수 없다)",
+    "app_cache": "없음"
+  },
+  "requests": 500,
+  "rps": 356.6593289954048,
+  "outcome": {
+    "succeeded": 100,
+    "rejected_expected": 400,
+    "rejected_other_4xx": 0,
+    "failed_5xx": 0,
+    "unparsable": 0
+  },
+  "succeeded_over_capacity": 0,
+  "duration_ms": {
+    "med": 1167.6165,
+    "p95": 1319.5252,
+    "p99": 1331.76286,
+    "max": 1340.237
+  },
+  "waiting_ms": {
+    "med": 1166.8395,
+    "p95": 1319.4239,
+    "p99": 1331.6686,
+    "max": 1340.186
+  },
+  "delta_vs_base": {
+    "from": "k6-burst-summary-0.json",
+    "rps": { "base": 246.52085122663843, "candidate": 356.6593289954048 },
+    "duration_p95_ms": { "base": 1850.62625, "candidate": 1319.5252 },
+    "duration_p99_ms": { "base": 1887.3802999999998, "candidate": 1331.76286 },
+    "succeeded": { "base": 3, "candidate": 100 },
+    "failed_5xx": { "base": 497, "candidate": 0 }
+  }
+}
