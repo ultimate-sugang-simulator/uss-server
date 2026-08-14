@@ -22,6 +22,8 @@ import static uss.code.global.exception.domain.ExceptionCode.*;
 @RequiredArgsConstructor
 public class RegistrationService {
 
+    private static final int NO_AFFECTED_ROW = 0;
+
     private final RegistrationRepository registrationRepository;
     private final MemberRepository memberRepository;
     private final CourseRepository courseRepository;
@@ -55,15 +57,14 @@ public class RegistrationService {
                 .orElseThrow(() -> new RestApiException(COURSE_NOT_FOUND));
 
         validateCourseActive(course);
-        validateCourseCapacity(course);
         validateDuplicateCourse(registrations, courseId);
         validateCreditLimit(registrations, member, course);
         validateCourseScheduleConflict(registrations, course);
         validateCourseTypeLimit(registrations, course);
 
-        final Registration registration = Registration.create(member, course);
+        increaseEnrollment(courseId);
 
-        course.incrementEnrollment();
+        final Registration registration = Registration.create(member, course);
 
         registrationRepository.save(registration);
     }
@@ -100,8 +101,10 @@ public class RegistrationService {
         }
     }
 
-    private void validateCourseCapacity(final Course course) {
-        if (course.getCurrentEnrollment() >= course.getMaxCapacity()) {
+    private void increaseEnrollment(final long courseId) {
+        final int affectedRows = courseRepository.increaseEnrollmentWithinCapacity(courseId);
+
+        if (affectedRows == NO_AFFECTED_ROW) {
             throw new RestApiException(COURSE_MAX_CAPACITY_EXCEEDED);
         }
     }
