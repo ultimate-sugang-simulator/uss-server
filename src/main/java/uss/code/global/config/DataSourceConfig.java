@@ -21,6 +21,7 @@ public class DataSourceConfig {
 
     @Bean
     @Primary
+    @ConfigurationProperties("spring.datasource.hikari")
     public DataSource dataSource(final DataSourceProperties dataSourceProperties) {
         return dataSourceProperties.initializeDataSourceBuilder()
                 .type(HikariDataSource.class)
