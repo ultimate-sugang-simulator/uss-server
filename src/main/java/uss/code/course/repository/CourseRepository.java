@@ -117,6 +117,15 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             @Param("term") final CourseTerm term
     );
 
+    @Modifying(flushAutomatically = true)
+    @Query("""
+        UPDATE Course c
+        SET c.currentEnrollment = c.currentEnrollment + 1
+        WHERE c.id = :id
+          AND c.currentEnrollment < c.maxCapacity
+    """)
+    int increaseEnrollmentWithinCapacity(@Param("id") final long id);
+
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
         DELETE FROM Course c

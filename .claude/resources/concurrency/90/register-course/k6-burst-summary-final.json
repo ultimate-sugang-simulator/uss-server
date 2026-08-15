@@ -1,0 +1,35 @@
+{
+  "target": "register-course",
+  "endpoint": "POST /api/v1/registration/{courseId}",
+  "condition": {
+    "executor": "per-vu-iterations (iterations=1, ramp 없음)",
+    "vus": 500,
+    "target_course_id": 990001,
+    "capacity": 100,
+    "expected_reject_code": 4000,
+    "db_cache": "warm (InnoDB 버퍼 풀은 재기동 없이 비울 수 없다)",
+    "app_cache": "없음"
+  },
+  "requests": 500,
+  "rps": 368.3884405601567,
+  "outcome": {
+    "succeeded": 100,
+    "rejected_expected": 400,
+    "rejected_other_4xx": 0,
+    "failed_5xx": 0,
+    "unparsable": 0
+  },
+  "succeeded_over_capacity": 0,
+  "duration_ms": {
+    "med": 1145.943,
+    "p95": 1280.8788499999998,
+    "p99": 1294.42481,
+    "max": 1298.249
+  },
+  "waiting_ms": {
+    "med": 1144.3874999999998,
+    "p95": 1280.53935,
+    "p99": 1293.89887,
+    "max": 1297.191
+  }
+}

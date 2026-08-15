@@ -1,0 +1,110 @@
+# 동시성 측정 전용 프로파일.
+#
+# 이 파일의 목적은 둘이다.
+#   1. 측정값을 왜곡하는 요소를 끄는 것
+#   2. 경합이 락에서 나게 하고 커넥션 대기에서 나지 않게 하는 것
+#
+# 2번이 optimize-performance의 perf 프로파일과 결정적으로 다른 점이다.
+# perf 프로파일을 복사해 쓰지 마라.
+#
+# 기동: ./gradlew bootRun --args='--spring.profiles.active=conc'
+# 선행: docker-compose -f docker/docker-compose-local.yml up -d mysql
+
+spring:
+  application:
+    name: uss-server-conc
+
+  datasource:
+    # docker-compose-local.yml의 mysql 서비스. 호스트 포트가 3307이다(3306 아님).
+    url: jdbc:mysql://127.0.0.1:3307/uss_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+    username: root
+    password: root
+    # p6spy 드라이버를 쓰지 마라. 쿼리마다 프록시를 한 겹 태우면
+    # 그 오버헤드가 임계 구역 체류 시간에 그대로 들어가 경합 양상 자체를 바꾼다.
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+    hikari:
+      # **부하 VU 이상으로 잡는다.** 풀이 VU보다 작으면 요청이 락이 아니라 커넥션을 기다리게 되고,
+      # 그러면 경합이 줄어들어 결함이 재현되지 않는다. 값을 바꾸면 record.md의 측정 환경에 남긴다.
+      maximum-pool-size: 500
+      minimum-idle: 500
+      # 풀 대기로 요청이 조용히 실패하지 않게 넉넉히 둔다.
+      connection-timeout: 30000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        # SQL 로깅은 요청당 수십 줄을 찍는다. 임계 구역 체류 시간을 늘려 경합 양상을 바꾼다.
+        format_sql: false
+        show_sql: false
+        generate_statistics: false
+    show-sql: false
+    # 뷰 렌더링이 없으므로 열어둘 이유가 없다. 열려 있으면 커넥션 점유 구간이 실제보다 길어진다.
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations:
+      - classpath:database/migration
+      - classpath:database/seed
+
+security:
+  jwt:
+    # 로컬 측정 전용 키다. 이 값을 다른 환경에 쓰지 마라.
+    # HS256 서명에 32바이트 이상이 필요하다.
+    # Phase 3의 mint-tokens.sh가 이 값을 그대로 읽어 토큰을 만든다. 바꾸면 토큰도 다시 만든다.
+    secret-key: conc-only-local-secret-key-not-for-any-real-environment
+    # 측정 중 토큰이 만료되면 401이 섞여 응답 분포가 오염된다. 넉넉히 잡는다.
+    access-token-expiration-time: 86400000
+    admin-access-token-expiration-time: 86400000
+
+inu:
+  course-api:
+    base-url: http://localhost/unused-in-conc-profile
+    auth-key: unused
+    mod-date: "20260101"
+
+# **이 블록을 지우지 마라.** InuMemberRepository가 @ConditionalOnProperty(oracle.enabled=true)이고
+# AuthService가 이를 생성자 주입으로 요구한다. false이거나 없으면 빈이 없어 컨텍스트가 뜨지 않는다.
+# 로컬에서 학교 포털에 접근할 수 없으므로 URL은 도달 불가능한 더미를 둔다.
+# HikariCP는 지연 초기화라 실제 접속 없이도 기동된다. 로그인 API는 이 프로파일에서 쓰지 않는다.
+oracle:
+  enabled: true
+  datasource:
+    jdbc-url: jdbc:oracle:thin:@//127.0.0.1:1521/UNREACHABLE
+    username: unused
+    password: unused
+    driver-class-name: oracle.jdbc.OracleDriver
+    # 혹시 호출되더라도 스레드가 오래 물리지 않게 짧게 끊는다.
+    connection-timeout: 3000
+    maximum-pool-size: 2
+
+management:
+  server:
+    port: 8081
+  # DataSource 헬스 프로브를 끈다. Spring Boot는 DataSource 빈마다 인디케이터를 붙이는데,
+  # 위 oracle 블록은 로컬에서 도달 불가능한 더미라 헬스 호출 때마다 ORA-12541로 DOWN이 된다.
+  # 오라클 것만 골라 끄는 표준 설정이 없어 프로브 자체를 뺀다.
+  # MySQL 연결은 기동 시 Flyway가 증명하고, 이후에는 $MYSQL_CONC 직접 조회로 확인한다.
+  health:
+    db:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  metrics:
+    tags:
+      application: uss-server-conc
+
+logging:
+  level:
+    root: WARN
+    uss.code: WARN
+    org.hibernate.SQL: OFF
+    org.hibernate.orm.jdbc.bind: OFF
+    p6spy: OFF

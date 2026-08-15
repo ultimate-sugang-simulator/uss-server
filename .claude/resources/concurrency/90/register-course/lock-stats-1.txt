@@ -1,0 +1,198 @@
+=== BEFORE ===
++-------------------------------+--------+
+| Variable_name                 | Value  |
++-------------------------------+--------+
+| Innodb_row_lock_current_waits | 0      |
+| Innodb_row_lock_time          | 142500 |
+| Innodb_row_lock_time_avg      | 171    |
+| Innodb_row_lock_time_max      | 646    |
+| Innodb_row_lock_waits         | 829    |
++-------------------------------+--------+
++---------------------+-------+
+| NAME                | COUNT |
++---------------------+-------+
+| lock_deadlocks      |   497 |
+| lock_timeouts       |     0 |
+| lock_row_lock_waits |   829 |
++---------------------+-------+
+=== AFTER ===
++-------------------------------+--------+
+| Variable_name                 | Value  |
++-------------------------------+--------+
+| Innodb_row_lock_current_waits | 0      |
+| Innodb_row_lock_time          | 278959 |
+| Innodb_row_lock_time_avg      | 210    |
+| Innodb_row_lock_time_max      | 646    |
+| Innodb_row_lock_waits         | 1328   |
++-------------------------------+--------+
++---------------------+-------+
+| NAME                | COUNT |
++---------------------+-------+
+| lock_deadlocks      |   497 |
+| lock_timeouts       |     0 |
+| lock_row_lock_waits |  1328 |
++---------------------+-------+
+=== LATEST DEADLOCK ===
+LATEST DETECTED DEADLOCK
+------------------------
+2026-08-14 20:19:37 281472814608128
+*** (1) TRANSACTION:
+TRANSACTION 43195, ACTIVE 0 sec starting index read
+mysql tables in use 1, locked 1
+LOCK WAIT 7 lock struct(s), heap size 1128, 3 row lock(s), undo log entries 1
+MySQL thread id 343, OS thread handle 281472245387008, query id 10781 192.168.65.1 root updating
+update courses set academic_year=2026,area='MAJOR_CORE',area_code='34',area_name='전공핵심',classification_code='31',classification_name='전공핵심',college='ENGINEERING',concentration_code='0',concentration_name='일반(1~15주)',course_code='9999999',credits=3,current_enrollment=2,department='COMPUTER_ENGINEERING',english_code='0',english_name='비대상',grade_code='1',grade_name='1학년',haksu_code='9999999001',is_english_course=0,is_huss_course=0,max_capacity=100,status='ACTIVE',term='SECOND',title_en='Concurrency Test Course',title_kr='동시성측정용강의',type_code='1',type_name='강의(이론)' where id=990001
+
+*** (1) HOLDS THE LOCK(S):
+RECORD LOCKS space id 64 page no 141 n bits 72 index PRIMARY of table `uss_db`.`courses` trx id 43195 lock mode S locks rec but not gap
+Record lock, heap no 5 PHYSICAL RECORD: n_fields 31; compact format; info bits 0
+ 0: len 8; hex 80000000000f1b31; asc        1;;
+ 1: len 6; hex 00000000a748; asc      H;;
+ 2: len 7; hex 02000001ae1ce7; asc        ;;
+ 3: len 4; hex 800007ea; asc     ;;
+ 4: len 6; hex 5345434f4e44; asc SECOND;;
+ 5: len 30; hex c3abc28fe284a2c3ace280b9c593c3ace2809ec2b1c3acc2b8c2a1c3acc2; asc                               ; (total 53 bytes);
+ 6: len 23; hex 436f6e63757272656e6379205465737420436f75727365; asc Concurrency Test Course;;
+ 7: len 7; hex 39393939393939; asc 9999999;;
+ 8: len 10; hex 39393939393939303031; asc 9999999001;;
+ 9: len 11; hex 454e47494e454552494e47; asc ENGINEERING;;
+ 10: len 20; hex 434f4d50555445525f454e47494e454552494e47; asc COMPUTER_ENGINEERING;;
+ 11: len 2; hex 3331; asc 31;;
+ 12: len 27; hex c3acc2a0e2809ec3aac2b3c2b5c3ade280a2c2b5c3ace280b9c2ac; asc                            ;;
+ 13: len 10; hex 4d414a4f525f434f5245; asc MAJOR_CORE;;
+ 14: len 2; hex 3334; asc 34;;
+ 15: len 27; hex c3acc2a0e2809ec3aac2b3c2b5c3ade280a2c2b5c3ace280b9c2ac; asc                            ;;
+ 16: len 1; hex 31; asc 1;;
+ 17: len 27; hex c3aac2b0e280a2c3acc29dcb9c28c3acc29dc2b4c3abc2a1c2a029; asc              (            );;
+ 18: len 1; hex 31; asc 1;;
+ 19: len 17; hex 31c3ade280a2e284a2c3abe280a6e2809e; asc 1                ;;
+ 20: len 1; hex 30; asc 0;;
+ 21: len 24; hex c3acc29dc2bcc3abc2b0cb9c28317e3135c3acc2a3c2bc29; asc             (1~15      );;
+ 22: len 4; hex 80000003; asc     ;;
+ 23: len 1; hex 80; asc  ;;
+ 24: len 1; hex 30; asc 0;;
+ 25: len 20; hex c3abc2b9e2809ec3abc592e282acc3acc692c281; asc                     ;;
+ 26: len 1; hex 80; asc  ;;
+ 27: len 4; hex 80000064; asc    d;;
+ 28: len 4; hex 80000001; asc     ;;
+ 29: len 6; hex 414354495645; asc ACTIVE;;
+ 30: len 8; hex 000000000000098a; asc         ;;
+
+
+*** (1) WAITING FOR THIS LOCK TO BE GRANTED:
+RECORD LOCKS space id 64 page no 141 n bits 72 index PRIMARY of table `uss_db`.`courses` trx id 43195 lock_mode X locks rec but not gap waiting
+Record lock, heap no 5 PHYSICAL RECORD: n_fields 31; compact format; info bits 0
+ 0: len 8; hex 80000000000f1b31; asc        1;;
+ 1: len 6; hex 00000000a748; asc      H;;
+ 2: len 7; hex 02000001ae1ce7; asc        ;;
+ 3: len 4; hex 800007ea; asc     ;;
+ 4: len 6; hex 5345434f4e44; asc SECOND;;
+ 5: len 30; hex c3abc28fe284a2c3ace280b9c593c3ace2809ec2b1c3acc2b8c2a1c3acc2; asc                               ; (total 53 bytes);
+ 6: len 23; hex 436f6e63757272656e6379205465737420436f75727365; asc Concurrency Test Course;;
+ 7: len 7; hex 39393939393939; asc 9999999;;
+ 8: len 10; hex 39393939393939303031; asc 9999999001;;
+ 9: len 11; hex 454e47494e454552494e47; asc ENGINEERING;;
+ 10: len 20; hex 434f4d50555445525f454e47494e454552494e47; asc COMPUTER_ENGINEERING;;
+ 11: len 2; hex 3331; asc 31;;
+ 12: len 27; hex c3acc2a0e2809ec3aac2b3c2b5c3ade280a2c2b5c3ace280b9c2ac; asc                            ;;
+ 13: len 10; hex 4d414a4f525f434f5245; asc MAJOR_CORE;;
+ 14: len 2; hex 3334; asc 34;;
+ 15: len 27; hex c3acc2a0e2809ec3aac2b3c2b5c3ade280a2c2b5c3ace280b9c2ac; asc                            ;;
+ 16: len 1; hex 31; asc 1;;
+ 17: len 27; hex c3aac2b0e280a2c3acc29dcb9c28c3acc29dc2b4c3abc2a1c2a029; asc              (            );;
+ 18: len 1; hex 31; asc 1;;
+ 19: len 17; hex 31c3ade280a2e284a2c3abe280a6e2809e; asc 1                ;;
+ 20: len 1; hex 30; asc 0;;
+ 21: len 24; hex c3acc29dc2bcc3abc2b0cb9c28317e3135c3acc2a3c2bc29; asc             (1~15      );;
+ 22: len 4; hex 80000003; asc     ;;
+ 23: len 1; hex 80; asc  ;;
+ 24: len 1; hex 30; asc 0;;
+ 25: len 20; hex c3abc2b9e2809ec3abc592e282acc3acc692c281; asc                     ;;
+ 26: len 1; hex 80; asc  ;;
+ 27: len 4; hex 80000064; asc    d;;
+ 28: len 4; hex 80000001; asc     ;;
+ 29: len 6; hex 414354495645; asc ACTIVE;;
+ 30: len 8; hex 000000000000098a; asc         ;;
+
+
+*** (2) TRANSACTION:
+TRANSACTION 43257, ACTIVE 0 sec starting index read
+mysql tables in use 1, locked 1
+LOCK WAIT 7 lock struct(s), heap size 1128, 3 row lock(s), undo log entries 1
+MySQL thread id 320, OS thread handle 281472271105792, query id 10797 192.168.65.1 root updating
+update courses set academic_year=2026,area='MAJOR_CORE',area_code='34',area_name='전공핵심',classification_code='31',classification_name='전공핵심',college='ENGINEERING',concentration_code='0',concentration_name='일반(1~15주)',course_code='9999999',credits=3,current_enrollment=2,department='COMPUTER_ENGINEERING',english_code='0',english_name='비대상',grade_code='1',grade_name='1학년',haksu_code='9999999001',is_english_course=0,is_huss_course=0,max_capacity=100,status='ACTIVE',term='SECOND',title_en='Concurrency Test Course',title_kr='동시성측정용강의',type_code='1',type_name='강의(이론)' where id=990001
+
+*** (2) HOLDS THE LOCK(S):
+RECORD LOCKS space id 64 page no 141 n bits 72 index PRIMARY of table `uss_db`.`courses` trx id 43257 lock mode S locks rec but not gap
+Record lock, heap no 5 PHYSICAL RECORD: n_fields 31; compact format; info bits 0
+ 0: len 8; hex 80000000000f1b31; asc        1;;
+ 1: len 6; hex 00000000a748; asc      H;;
+ 2: len 7; hex 02000001ae1ce7; asc        ;;
+ 3: len 4; hex 800007ea; asc     ;;
+ 4: len 6; hex 5345434f4e44; asc SECOND;;
+ 5: len 30; hex c3abc28fe284a2c3ace280b9c593c3ace2809ec2b1c3acc2b8c2a1c3acc2; asc                               ; (total 53 bytes);
+ 6: len 23; hex 436f6e63757272656e6379205465737420436f75727365; asc Concurrency Test Course;;
+ 7: len 7; hex 39393939393939; asc 9999999;;
+ 8: len 10; hex 39393939393939303031; asc 9999999001;;
+ 9: len 11; hex 454e47494e454552494e47; asc ENGINEERING;;
+ 10: len 20; hex 434f4d50555445525f454e47494e454552494e47; asc COMPUTER_ENGINEERING;;
+ 11: len 2; hex 3331; asc 31;;
+ 12: len 27; hex c3acc2a0e2809ec3aac2b3c2b5c3ade280a2c2b5c3ace280b9c2ac; asc                            ;;
+ 13: len 10; hex 4d414a4f525f434f5245; asc MAJOR_CORE;;
+ 14: len 2; hex 3334; asc 34;;
+ 15: len 27; hex c3acc2a0e2809ec3aac2b3c2b5c3ade280a2c2b5c3ace280b9c2ac; asc                            ;;
+ 16: len 1; hex 31; asc 1;;
+ 17: len 27; hex c3aac2b0e280a2c3acc29dcb9c28c3acc29dc2b4c3abc2a1c2a029; asc              (            );;
+ 18: len 1; hex 31; asc 1;;
+ 19: len 17; hex 31c3ade280a2e284a2c3abe280a6e2809e; asc 1                ;;
+ 20: len 1; hex 30; asc 0;;
+ 21: len 24; hex c3acc29dc2bcc3abc2b0cb9c28317e3135c3acc2a3c2bc29; asc             (1~15      );;
+ 22: len 4; hex 80000003; asc     ;;
+ 23: len 1; hex 80; asc  ;;
+ 24: len 1; hex 30; asc 0;;
+ 25: len 20; hex c3abc2b9e2809ec3abc592e282acc3acc692c281; asc                     ;;
+ 26: len 1; hex 80; asc  ;;
+ 27: len 4; hex 80000064; asc    d;;
+ 28: len 4; hex 80000001; asc     ;;
+ 29: len 6; hex 414354495645; asc ACTIVE;;
+ 30: len 8; hex 000000000000098a; asc         ;;
+
+
+*** (2) WAITING FOR THIS LOCK TO BE GRANTED:
+RECORD LOCKS space id 64 page no 141 n bits 72 index PRIMARY of table `uss_db`.`courses` trx id 43257 lock_mode X locks rec but not gap waiting
+Record lock, heap no 5 PHYSICAL RECORD: n_fields 31; compact format; info bits 0
+ 0: len 8; hex 80000000000f1b31; asc        1;;
+ 1: len 6; hex 00000000a748; asc      H;;
+ 2: len 7; hex 02000001ae1ce7; asc        ;;
+ 3: len 4; hex 800007ea; asc     ;;
+ 4: len 6; hex 5345434f4e44; asc SECOND;;
+ 5: len 30; hex c3abc28fe284a2c3ace280b9c593c3ace2809ec2b1c3acc2b8c2a1c3acc2; asc                               ; (total 53 bytes);
+ 6: len 23; hex 436f6e63757272656e6379205465737420436f75727365; asc Concurrency Test Course;;
+ 7: len 7; hex 39393939393939; asc 9999999;;
+ 8: len 10; hex 39393939393939303031; asc 9999999001;;
+ 9: len 11; hex 454e47494e454552494e47; asc ENGINEERING;;
+ 10: len 20; hex 434f4d50555445525f454e47494e454552494e47; asc COMPUTER_ENGINEERING;;
+ 11: len 2; hex 3331; asc 31;;
+ 12: len 27; hex c3acc2a0e2809ec3aac2b3c2b5c3ade280a2c2b5c3ace280b9c2ac; asc                            ;;
+ 13: len 10; hex 4d414a4f525f434f5245; asc MAJOR_CORE;;
+ 14: len 2; hex 3334; asc 34;;
+ 15: len 27; hex c3acc2a0e2809ec3aac2b3c2b5c3ade280a2c2b5c3ace280b9c2ac; asc                            ;;
+ 16: len 1; hex 31; asc 1;;
+ 17: len 27; hex c3aac2b0e280a2c3acc29dcb9c28c3acc29dc2b4c3abc2a1c2a029; asc              (            );;
+ 18: len 1; hex 31; asc 1;;
+ 19: len 17; hex 31c3ade280a2e284a2c3abe280a6e2809e; asc 1                ;;
+ 20: len 1; hex 30; asc 0;;
+ 21: len 24; hex c3acc29dc2bcc3abc2b0cb9c28317e3135c3acc2a3c2bc29; asc             (1~15      );;
+ 22: len 4; hex 80000003; asc     ;;
+ 23: len 1; hex 80; asc  ;;
+ 24: len 1; hex 30; asc 0;;
+ 25: len 20; hex c3abc2b9e2809ec3abc592e282acc3acc692c281; asc                     ;;
+ 26: len 1; hex 80; asc  ;;
+ 27: len 4; hex 80000064; asc    d;;
+ 28: len 4; hex 80000001; asc     ;;
+ 29: len 6; hex 414354495645; asc ACTIVE;;
+ 30: len 8; hex 000000000000098a; asc         ;;
+
+*** WE ROLL BACK TRANSACTION (2)
+------------
+TRANSACTIONS
