@@ -7,6 +7,8 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Builder(access = PRIVATE)
 public record MemberProfileResponse(
+        String email,
+
         String department,
         String studentId,
         String name,
@@ -17,6 +19,7 @@ public record MemberProfileResponse(
             final Member member
     ){
         return MemberProfileResponse.builder()
+                .email(member.getEmail())
                 .department(member.getDepartment().getName())
                 .studentId(member.getStudentId())
                 .name(member.getName())

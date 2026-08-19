@@ -6,5 +6,8 @@ import uss.code.member.domain.Member;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
-    Optional<Member> findByStudentId(final String studentId);
+
+    Optional<Member> findByEmail(final String email);
+
+    boolean existsByEmail(final String email);
 }
