@@ -3,7 +3,7 @@ name: review-feedback
 description: |
   PR에 달린 코드래빗 피드백을 수집해 코드베이스 기준으로 타당성을 상중하로 판정하고, 사용자가 고른 항목만 수정한다.
   Trigger: "코드래빗 피드백 봐줘", "리뷰 피드백 검토해줘", "PR 리뷰 확인해줘", "코드래빗 뭐라는지 봐줘"
-  Do NOT use for: 자체 코드 리뷰(→ logic-reviewer 등 리뷰 에이전트), PR 생성(→ open-pr), 계획 기반 구현(→ implement)
+  Do NOT use for: PR 생성(→ open-pr), 계획 기반 구현(→ implement)
   Boundary: 피드백 판정, 사용자가 선택한 항목의 수정, 반영한 항목의 스레드 resolve까지 수행한다. 판정만으로 코드를 고치지 않는다.
 allowed-tools: Read, Grep, Glob, Edit, Bash(gh *), Bash(git *)
 model: opus

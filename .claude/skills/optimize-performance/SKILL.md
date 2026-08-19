@@ -3,7 +3,7 @@ name: optimize-performance
 description: |
   지정한 API의 성능을 측정, 진단하고 개선 기법을 근거와 함께 제시한다. 기법 선택과 부하 테스트 실행은 호출자가 한다.
   Trigger: "/optimize-performance {엔드포인트}", "이 API 성능 개선하자", "느린 API 최적화하자"
-  Do NOT use for: 코드만 보고 하는 정적 성능 리뷰(→ performance-reviewer), 구현 계획 수립(→ write-plan), 계획 기반 구현(→ implement)
+  Do NOT use for: 구현 계획 수립(→ write-plan), 계획 기반 구현(→ implement)
   Boundary: 측정 설계, 관측 결과 정리, 기법 제시, 호출자와의 설계 협의, 확정된 설계의 적용, 기록까지 수행한다. 부하 테스트와 DB 조회 실행은 호출자가 직접 한다. 무엇이 병목인지, 어떤 기법을 쓸지, 어떻게 설계할지는 스킬이 단독으로 정하지 않는다.
 allowed-tools: Read, Grep, Glob, Edit, Write, Skill, Bash(git *), Bash(gh *)
 model: opus

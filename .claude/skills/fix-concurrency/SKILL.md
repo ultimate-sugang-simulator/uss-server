@@ -3,7 +3,7 @@ name: fix-concurrency
 description: |
   동시 요청에서 깨지는 불변식을 재현하고, 동시성 제어 기법을 비교 검증해 하나를 채택한다. 기법 선택과 부하 실행은 호출자가 한다.
   Trigger: "/fix-concurrency {대상}", "동시성 문제 해결하자", "정원 초과 막자", "락 걸어서 정합성 맞추자"
-  Do NOT use for: 응답시간, 처리량이 목표인 성능 개선(→ optimize-performance), 코드만 보고 하는 정적 리뷰(→ performance-reviewer), 구현 계획 수립(→ write-plan)
+  Do NOT use for: 응답시간, 처리량이 목표인 성능 개선(→ optimize-performance), 구현 계획 수립(→ write-plan)
   Boundary: 불변식 정의, 경합 재현, 기법 제시, 후보별 적용과 검증, 채택 결정 기록까지 수행한다. 부하 테스트와 데이터베이스 조회 실행은 호출자가 직접 한다. 어떤 기법을 채택할지는 스킬이 단독으로 정하지 않는다.
 allowed-tools: Read, Grep, Glob, Edit, Write, Skill, Bash(git *), Bash(gh *)
 model: opus
