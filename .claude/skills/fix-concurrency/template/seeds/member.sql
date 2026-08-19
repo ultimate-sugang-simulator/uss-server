@@ -3,8 +3,8 @@
 -- 필요한 변수: @member_start, @member_count, @student_id_start
 --
 -- id를 명시 삽입하므로 mint-tokens.sh의 --start / --count와 그대로 맞아떨어진다.
--- 이 프로젝트의 members에는 비밀번호 컬럼이 없다(인증을 학교 포털에 위임한다).
--- 따라서 로그인용 해시를 넣을 자리가 없고, 측정 토큰은 서명키로 직접 만든다.
+-- password는 BCrypt 해시가 아닌 더미 문자열이다. 측정 토큰은 mint-tokens.sh로 직접 서명해
+-- 만들므로 로그인 경로를 타지 않고, BCrypt 형식이 아니면 로그인 시도도 실패로 끝난다.
 --
 -- 회원 수는 VU 수와 반드시 같아야 한다.
 -- 적으면 같은 회원이 두 번 신청해 uk_member_course에 걸리고, 그 실패가 위반 건수를 왜곡한다.
@@ -12,7 +12,7 @@
 SELECT '[member.sql] members 적재' AS '';
 
 INSERT IGNORE INTO members
-    (id, student_id, name, college, department, grade,
+    (id, email, password, student_id, name, college, department, grade,
      academic_status, last_semester_gpa, created_at, updated_at)
 WITH RECURSIVE seq AS (
     SELECT 0 AS n
@@ -20,11 +20,14 @@ WITH RECURSIVE seq AS (
     SELECT n + 1 FROM seq WHERE n < @member_count - 1
 )
 SELECT @member_start + n,
+       -- 이메일은 uk_email 제약 때문에 행마다 달라야 한다.
+       CONCAT('conc', n, '@uss.local'),
+       'not-a-bcrypt-hash',
        CAST(@student_id_start + n AS CHAR),
        CONCAT('conc', n),
-       -- 수강신청은 소속을 보지 않는다. 분기를 만들 이유가 없으므로 DEFAULT로 고정한다.
-       'DEFAULT',
-       'DEFAULT',
+       -- 수강신청은 소속을 보지 않는다. 분기를 만들 이유가 없으므로 한 값으로 고정한다.
+       'INFORMATION_TECHNOLOGY',
+       'COMPUTER_ENGINEERING',
        'FRESHMAN',
        'ENROLLED',
        -- 최대 이수 학점을 24로 만든다(4.0 이상). 학점 상한에 먼저 걸리면

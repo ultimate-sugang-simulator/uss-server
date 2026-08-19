@@ -69,21 +69,6 @@ inu:
     auth-key: unused
     mod-date: "20260101"
 
-# **이 블록을 지우지 마라.** InuMemberRepository가 @ConditionalOnProperty(oracle.enabled=true)이고
-# AuthService가 이를 생성자 주입으로 요구한다. false이거나 없으면 빈이 없어 컨텍스트가 뜨지 않는다.
-# 로컬에서 학교 포털에 접근할 수 없으므로 URL은 도달 불가능한 더미를 둔다.
-# HikariCP는 지연 초기화라 실제 접속 없이도 기동된다. 로그인 API는 이 프로파일에서 쓰지 않는다.
-oracle:
-  enabled: true
-  datasource:
-    jdbc-url: jdbc:oracle:thin:@//127.0.0.1:1521/UNREACHABLE
-    username: unused
-    password: unused
-    driver-class-name: oracle.jdbc.OracleDriver
-    # 혹시 호출되더라도 스레드가 오래 물리지 않게 짧게 끊는다.
-    connection-timeout: 3000
-    maximum-pool-size: 2
-
 management:
   server:
     port: 8081
