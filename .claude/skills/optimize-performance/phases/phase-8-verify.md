@@ -115,17 +115,21 @@
    | 산출물 | 개선 후 (이번 사이클) | 개선 전 (비교 대상) |
    |---|---|---|
    | k6 요약 | `k6-test-summary-{n}.json` | `k6-test-summary-{n-1}.json` |
-   | 쿼리 통계 | `query-stats-summary-{n}.md` | `query-stats-summary-{n-1}.md` |
    | 실행계획 | `query-plan-{n}.txt` | `query-plan-{n-1}.txt` |
 
+   쿼리 통계는 여기서 읽지 않는다. `{n}` 1차 출력은 절차 3에서 위임으로 가공하고,
+   가공이 끝난 뒤 `{n}`과 `{n-1}` 가공본을 읽는다.
    최초 상태와의 누적 변화가 필요하면 `-0` 파일을 함께 읽는다.
 
    - `checks_rate`가 Phase 4보다 떨어졌으면 응답 내용이 달라진 것이다. 수치 비교보다 이 사실을 먼저 보고한다.
 
 3. 두 산출물을 가공본으로 다시 쓴다.
 
-   - `query-stats-summary-{n}.md`: `template/query-stats-template.md`의 작성 규칙을 따라 같은 경로에 덮어쓴다.
-     헤더의 **직전 상태 대비** 줄에 `{n-1}` 파일과의 델타를 적는다.
+   - `query-stats-summary-{n}.md`: Agent 도구로 `query-source-mapper`에 위임한다. 1차 출력을 메인에서 Read하지 마라.
+     프롬프트에 넘길 것 (전체 경로로): 1차 출력(`query-stats-summary-{n}.md`), 템플릿(`template/query-stats-template.md`),
+     `record.md`, 상태 번호 `n`, k6 요약(`k6-test-summary-{n}.json`), 직전 가공본(`query-stats-summary-{n-1}.md`).
+     헤더의 **직전 상태 대비**는 에이전트가 `{n-1}` 가공본과 대조해 적는다.
+     반환된 출처 미상 목록과 잘림 여부만 확인하고, 위임이 끝난 뒤 가공본을 Read해 절차 4의 제시에 쓴다.
    - `k6-test-summary-{n}.json`: 최상위에 `delta_vs_prev` 객체를 덧붙인다. 다른 필드는 손대지 마라.
 
      ```json

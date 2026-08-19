@@ -98,28 +98,27 @@
    - `examined_per_sent`는 **읽은 행 대 돌려준 행의 비율**이다. PostgreSQL의 `Rows Removed by Filter`에 해당하는
      하드웨어 독립 지표이고, 인덱스 필요성을 가장 직접적으로 보여준다. 이 칼럼을 빼지 마라.
 
-2. 실행이 끝나면 아래 두 파일을 Read로 읽는다.
-
-   | 산출물 | 파일 |
-   |---|---|
-   | k6 요약 | `.claude/resources/perf/{이슈번호}/{슬러그}/k6-test-summary-0.json` |
-   | 쿼리 통계 | `.claude/resources/perf/{이슈번호}/{슬러그}/query-stats-summary-0.md` |
+2. 실행이 끝나면 k6 요약(`.claude/resources/perf/{이슈번호}/{슬러그}/k6-test-summary-0.json`)을 Read로 읽는다.
+   쿼리 통계 1차 출력(`query-stats-summary-0.md`)은 메인에서 Read하지 않는다. 절차 3의 위임이 끝난 뒤 가공본을 읽는다.
 
    - 터미널 출력을 붙여넣게 하지 마라. 파일이 없으면 원인을 확인하고 재실행을 요청한다. 추정으로 채우지 마라.
    - k6 요약에는 스크립트가 선별해 내보낸 값만 있다. 담기지 않은 지표가 필요해지면 재측정해야 한다.
    - `checks_rate`가 1이 아니면 `checks[]`에서 어떤 항목이 깨졌는지 먼저 확인한다.
      데이터 검증 check가 깨진 측정은 진단에 쓰지 마라.
 
-3. `query-stats-summary-0.md`를 가공본으로 다시 쓴다.
-   `template/query-stats-template.md`를 Read하고 작성 규칙을 따른다.
+3. 가공본 작성을 Agent 도구로 `query-source-mapper`에 위임한다.
+   1차 출력을 메인에서 Read하거나 직접 가공하지 마라. Grep 탐색 흔적이 메인 컨텍스트에 남지 않게 하는 위임이다.
 
-   - 1차 출력을 읽어 **같은 경로에 덮어쓴다.** 1차 출력을 따로 보존하지 않는다.
-   - 각 쿼리를 어느 코드가 날렸는지 Grep으로 찾아 **출처** 칸을 채운다.
-     Phase 1에서 확정한 예상 쿼리 목록이 1차 후보다. 목록에 없는 쿼리는 인터셉터, Hibernate 내부 조회를 의심한다.
-   - 출처를 특정하지 못한 쿼리는 `미상`으로 두고 넘어간다. 그럴듯한 이름을 지어내지 마라.
-   - **판정을 쓰지 마라.** 이 파일에는 사실만 남긴다.
+   프롬프트에 넘길 것 (전체 경로로):
+   - 1차 출력: `.claude/resources/perf/{이슈번호}/{슬러그}/query-stats-summary-0.md`
+   - 템플릿: `.claude/skills/optimize-performance/template/query-stats-template.md`
+   - `record.md` (예상 쿼리 목록이 출처 매핑의 1차 후보)
+   - 상태 번호 `n=0`
+   - k6 요약: `.claude/resources/perf/{이슈번호}/{슬러그}/k6-test-summary-0.json`
 
-4. 가공된 두 파일의 내용을 호출자에게 제시하고 **병목 판정을 묻는다.**
+   반환된 출처 미상 목록과 `DIGEST_TEXT` 잘림 여부를 확인한다. 미상이 남는 것은 정상이다. 채우라고 재호출하지 마라.
+
+4. 가공본(`query-stats-summary-0.md`)을 Read해 k6 요약과 함께 호출자에게 제시하고 **병목 판정을 묻는다.**
    `SKILL.md`의 **분석 주도 규칙**을 따른다.
 
    - 제시할 것: 응답시간 분포, 처리량, check 결과, 쿼리별 요청당 호출 수, 총 시간 비중, `examined_per_sent`.

@@ -5,7 +5,7 @@ description: |
   Trigger: "코드래빗 피드백 봐줘", "리뷰 피드백 검토해줘", "PR 리뷰 확인해줘", "코드래빗 뭐라는지 봐줘"
   Do NOT use for: PR 생성(→ open-pr), 계획 기반 구현(→ implement)
   Boundary: 피드백 판정, 사용자가 선택한 항목의 수정, 반영한 항목의 스레드 resolve까지 수행한다. 판정만으로 코드를 고치지 않는다.
-allowed-tools: Read, Grep, Glob, Edit, Bash(gh *), Bash(git *)
+allowed-tools: Read, Grep, Glob, Edit, Bash(gh *), Bash(git *), Bash(jq *), Agent(feedback-judge)
 model: opus
 effort: xhigh
 ---
@@ -38,10 +38,15 @@ effort: xhigh
 빠뜨린 페이지는 오류 없이 조용히 사라진다. `--slurp`은 `--jq`와 같이 못 쓰므로(gh가 거부한다)
 페이지마다 적용되는 스트리밍 필터로 쓴다.
 
-1. 판정 대상인 코드래빗 최상위 인라인 피드백을 가져와라:
+**피드백 원문(body)은 메인 컨텍스트에 올리지 않는다.** 원문이 포함된 출력은 세션 스크래치패드 파일로
+리다이렉트하고, 컨텍스트에는 body를 뺀 인덱스만 남긴다. `{스크래치패드}`는 세션 스크래치패드 디렉토리의
+전체 경로다.
+
+1. 판정 대상인 코드래빗 최상위 인라인 피드백의 원문을 파일로 수집하라. 화면에 출력하지 마라:
    ```bash
    gh api --paginate "repos/{owner}/{repo}/pulls/{번호}/comments" \
-     --jq '.[] | select(.user.login == "coderabbitai[bot]") | select(.in_reply_to_id == null) | {id, path, line, body}'
+     --jq '.[] | select(.user.login == "coderabbitai[bot]") | select(.in_reply_to_id == null) | {id, path, line, body}' \
+     > {스크래치패드}/rf-{번호}-items.jsonl
    ```
 2. 답글이 달린 원본 코멘트 id를 따로 모아라. 1번은 답글과 사람 코멘트를 이미 걸러낸 결과라
    여기서 답글 여부를 판정할 수 없다. 작성자를 가리지 말고 전부 가져와야 사람이 단 답글도 잡힌다:
@@ -49,37 +54,38 @@ effort: xhigh
    gh api --paginate "repos/{owner}/{repo}/pulls/{번호}/comments" \
      --jq '.[] | select(.in_reply_to_id != null) | .in_reply_to_id'
    ```
-3. 요약 리뷰를 가져와라 (Nitpick과 Outside diff range 항목이 여기에 접혀 있다):
+3. 요약 리뷰 원문을 파일로 수집하라 (Nitpick과 Outside diff range 항목이 여기에 접혀 있다):
    ```bash
    gh api --paginate "repos/{owner}/{repo}/pulls/{번호}/reviews" \
-     --jq '.[] | select(.user.login == "coderabbitai[bot]") | .body'
+     --jq '.[] | select(.user.login == "coderabbitai[bot]") | .body' \
+     > {스크래치패드}/rf-{번호}-reviews.txt
    ```
-4. 항목마다 대상과 라인, 지적 요지를 정리하라.
-   본문 머리의 코드래빗 자체 심각도(`🔴 Critical`, `🟠 Major`, `🟡 Minor`, `🔵 Trivial`)는 참고로만 기록하고,
-   **판정에 그대로 옮기지 마라.** 코드래빗은 diff만 보고 매긴 값이다.
-5. 1번 결과 중 `id`가 2번 목록에 있는 항목은 처리 이력이 있으므로 판정 대상에서 빼고 개수만 보고에 남겨라.
-6. 코드래빗 피드백이 0건이면 그 사실을 알리고 종료하라.
+4. 판정 대상 인덱스만 컨텍스트로 가져와라. 원문 파일을 Read하지 마라:
+   ```bash
+   jq -c '{id, path, line}' {스크래치패드}/rf-{번호}-items.jsonl
+   ```
+5. 4번 결과 중 `id`가 2번 목록에 있는 항목은 처리 이력이 있으므로 판정 대상에서 빼고 개수만 보고에 남겨라.
+6. 인라인 항목이 0건이고 요약 리뷰 파일도 비어 있으면 코드래빗 피드백이 없는 것이다. 그 사실을 알리고 종료하라.
 
 > 다음 Phase 조건: 판정 대상 항목 목록이 정리되었을 때
 
 > Skip 조건: 없음 (필수 Phase)
 
-## Phase 3: 타당성 판정
+## Phase 3: 타당성 판정 (feedback-judge 위임)
 
-1. 항목마다 지목된 파일과 그 호출부들을 Read로 직접 읽어라. **피드백 본문만 읽고 판정하지 마라.**
-2. 판정 근거로 아래를 확인하라:
-   - `.claude/rules/code-convention/` - 컨벤션과 충돌하는 제안인지
-   - `.claude/spec/service-policy/`의 해당 도메인 파일 - 서비스 정책에 어긋나는 제안인지
-   - 상위, 하위 레이어 - 지적한 위험이 이미 다른 계층에서 막히는지
-3. 아래 기준으로 상, 중, 하를 매겨라:
-   - **상**: 코드베이스에서 재현 경로가 확인되는 결함이거나, 컨벤션 또는 서비스 정책 위반
-   - **중**: 지적 자체는 맞지만 현재 동작에 문제는 없다. 개선 여지 또는 트레이드오프 선택의 문제
-   - **하**: 이 코드베이스에서는 부적절하다. 이미 다른 계층에서 방어되거나, 컨벤션과 충돌하거나, 근거 없는 일반론
-4. 판정마다 근거를 한 줄로 남겨라. 근거에는 확인한 대상의 이름까지만 쓰고 파일 경로 전체는 쓰지 마라.
-   Java 코드는 클래스명(필요하면 `클래스:라인`), 클래스가 없는 대상(마이그레이션 SQL, 설정, 문서)은 파일명과
-   필요하면 행 번호를 쓴다. 대상 표기 규칙은 `template/verdict-table.md`와 같다.
+판정은 전용 에이전트 `feedback-judge`가 한다. 메인 컨텍스트에서 피드백 원문과 대상 코드를 읽지 마라.
+판정 기준과 반환 형식은 `.claude/agents/feedback-judge.md`에 있다. 여기에 중복해 적지 마라.
 
-> 다음 Phase 조건: 모든 항목에 판정과 근거가 붙었을 때
+1. 판정 대상 인라인 항목마다 Agent 도구로 `feedback-judge`를 호출하라.
+   - 프롬프트에 넘길 것: 항목 id, `rf-{번호}-items.jsonl`의 전체 경로
+   - 항목들은 서로 독립이므로 한 메시지에 병렬로 호출하되, 한 번에 최대 10개까지만 띄운다.
+     초과분은 앞 배치가 끝난 뒤 다음 배치로 호출하라.
+2. 요약 리뷰 파일(`rf-{번호}-reviews.txt`)이 비어 있지 않으면 `feedback-judge`를 1회 더 호출해
+   접힌 항목의 추출과 판정을 함께 위임하라. 프롬프트에 파일 전체 경로를 넘긴다.
+3. 반환된 행을 모아라. 행이 형식(`항목id | 판정 | 대상 | 요지 | 근거 | 수정 지침`)에 맞지 않으면
+   해당 항목만 재호출하라.
+
+> 다음 Phase 조건: 모든 판정 대상 항목에 판정 행이 확보되었을 때
 
 > Skip 조건: 없음 (필수 Phase)
 
@@ -95,9 +101,14 @@ effort: xhigh
 ## Phase 5: 선택 항목 수정
 
 1. 사용자가 고른 번호만 수정하라. 고르지 않은 항목은 건드리지 마라.
-2. 수정은 `.claude/rules/code-convention/`을 따른다. 코드래빗이 제안한 diff를 그대로 붙여넣지 말고, 이 코드베이스의 패턴에 맞춰 다시 써라.
-3. 수정으로 서비스 정책이 바뀌면 `.claude/spec/service-policy/`의 해당 도메인 파일도 함께 고쳐라.
-4. 수정 범위가 계획서 한 건 수준으로 커지면 여기서 멈추고 `write-plan`을 권하라.
+2. 판정 행의 수정 지침으로 부족해 피드백 원문이 필요하면 해당 항목의 body만 추출해 읽어라.
+   원문 파일 전체를 Read하지 마라:
+   ```bash
+   jq -r 'select(.id == {항목id}) | .body' {스크래치패드}/rf-{번호}-items.jsonl
+   ```
+3. 수정은 `.claude/rules/code-convention/`을 따른다. 코드래빗이 제안한 diff를 그대로 붙여넣지 말고, 이 코드베이스의 패턴에 맞춰 다시 써라.
+4. 수정으로 서비스 정책이 바뀌면 `.claude/spec/service-policy/`의 해당 도메인 파일도 함께 고쳐라.
+5. 수정 범위가 계획서 한 건 수준으로 커지면 여기서 멈추고 `write-plan`을 권하라.
 
 > 다음 Phase 조건: 선택된 항목이 모두 반영되었을 때
 
