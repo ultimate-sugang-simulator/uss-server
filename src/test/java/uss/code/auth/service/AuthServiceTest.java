@@ -6,42 +6,42 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import uss.code.auth.dto.request.LoginRequest;
+import uss.code.auth.dto.request.SignUpRequest;
 import uss.code.auth.dto.response.AuthTokenResponse;
+import uss.code.auth.dto.response.EmailAvailabilityResponse;
 import uss.code.auth.infra.JwtProvider;
+import uss.code.auth.infra.MemberPasswordEncoder;
 import uss.code.global.exception.domain.JwtTokenInvalidException;
 import uss.code.global.exception.domain.JwtTokenMissingException;
 import uss.code.global.exception.domain.RestApiException;
 import uss.code.global.infra.IntegrationTest;
-import uss.code.member.domain.AcademicStatus;
 import uss.code.member.domain.Member;
 import uss.code.member.domain.MemberCollege;
-import uss.code.member.domain.MemberDepartment;
-import uss.code.member.domain.MemberGrade;
 import uss.code.member.fixture.MemberFixture;
-import uss.code.member.repository.InuMemberRepository;
 import uss.code.member.repository.MemberRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.reset;
 import static uss.code.global.exception.domain.ExceptionCode.*;
 
 @IntegrationTest
 class AuthServiceTest {
 
-    private static final String TEST_STUDENT_ID = "202012345";
+    private static final String TEST_EMAIL = "student@inu.ac.kr";
     private static final String TEST_RAW_PASSWORD = "password1234";
+    private static final String TEST_STUDENT_ID = "202012345";
     private static final String TEST_NAME = "홍길동";
-    private static final MemberCollege TEST_COLLEGE = MemberCollege.INFORMATION_TECHNOLOGY;
-    private static final MemberDepartment TEST_DEPARTMENT = MemberDepartment.COMPUTER_ENGINEERING;
-    private static final MemberGrade TEST_GRADE = MemberGrade.JUNIOR;
-    private static final AcademicStatus TEST_ACADEMIC_STATUS = AcademicStatus.ENROLLED;
+    private static final String TEST_COLLEGE = "INFORMATION_TECHNOLOGY";
+    private static final String TEST_DEPARTMENT = "COMPUTER_ENGINEERING";
+    private static final String TEST_GRADE = "JUNIOR";
+    private static final String TEST_ACADEMIC_STATUS = "ENROLLED";
     private static final double TEST_GPA = 3.5;
 
-    private static final String UNKNOWN_STUDENT_ID = "209999999";
+    private static final String UNKNOWN_EMAIL = "unknown@inu.ac.kr";
     private static final String WRONG_PASSWORD = "wrongPassword1234";
+    private static final String MISMATCHED_COLLEGE = "ENGINEERING";
+    private static final String UNKNOWN_DEPARTMENT = "존재하지_않는_학과";
     private static final long UNKNOWN_MEMBER_ID = 999_999L;
 
     private static final String OTHER_SECRET_KEY = "another-secret-key-for-signature-mismatch-test";
@@ -54,34 +54,34 @@ class AuthServiceTest {
     private AuthService authService;
     @Autowired
     private JwtProvider jwtProvider;
+    @Autowired
+    private MemberPasswordEncoder passwordEncoder;
 
     @Autowired
     private MemberRepository memberRepository;
-    @Autowired
-    private InuMemberRepository inuMemberRepository;
 
     @Value("${security.jwt.secret-key}")
     private String secretKey;
 
-    private long savedMemberId;
-
-    @BeforeEach
-    void setUp() {
-        reset(inuMemberRepository);
-
-        final Member member = MemberFixture.createMember(
+    private SignUpRequest createSignUpRequest(
+            final String college,
+            final String department
+    ) {
+        return new SignUpRequest(
+                TEST_EMAIL,
+                TEST_RAW_PASSWORD,
                 TEST_STUDENT_ID,
                 TEST_NAME,
-                TEST_COLLEGE,
-                TEST_DEPARTMENT,
+                college,
+                department,
                 TEST_GRADE,
                 TEST_ACADEMIC_STATUS,
                 TEST_GPA
         );
+    }
 
-        memberRepository.save(member);
-
-        savedMemberId = member.getId();
+    private SignUpRequest createSignUpRequest() {
+        return createSignUpRequest(TEST_COLLEGE, TEST_DEPARTMENT);
     }
 
     private String generateExpiredToken(final long memberId) {
@@ -97,55 +97,155 @@ class AuthServiceTest {
     }
 
     @Nested
-    class 로그인_테스트 {
+    class 회원가입할_때 {
 
         @Test
-        void 포털_인증에_성공하고_가입된_회원이면_액세스_토큰을_발급한다() {
+        void 유효한_요청이면_가입에_성공하고_토큰을_반환한다() {
             //given
-            given(inuMemberRepository.verifyInuMember(TEST_STUDENT_ID, TEST_RAW_PASSWORD)).willReturn(true);
+            final SignUpRequest request = createSignUpRequest();
 
-            final LoginRequest request = new LoginRequest(TEST_STUDENT_ID, TEST_RAW_PASSWORD);
+            //when
+            final AuthTokenResponse response = authService.signUp(request);
+
+            //then
+            assertThat(response.accessToken()).isNotBlank();
+
+            final Member member = memberRepository.findByEmail(TEST_EMAIL).orElseThrow();
+            assertThat(jwtProvider.getMemberId(response.accessToken())).isEqualTo(member.getId());
+            assertThat(member.getCollege()).isEqualTo(MemberCollege.INFORMATION_TECHNOLOGY);
+        }
+
+        @Test
+        void 비밀번호는_평문으로_저장되지_않는다() {
+            //given
+            final SignUpRequest request = createSignUpRequest();
+
+            //when
+            authService.signUp(request);
+
+            //then
+            final Member member = memberRepository.findByEmail(TEST_EMAIL).orElseThrow();
+            assertThat(member.getPassword()).isNotEqualTo(TEST_RAW_PASSWORD);
+            assertThat(passwordEncoder.matches(TEST_RAW_PASSWORD, member.getPassword())).isTrue();
+        }
+
+        @Test
+        void 이미_사용_중인_이메일이면_예외를_반환한다() {
+            //given
+            authService.signUp(createSignUpRequest());
+
+            //when & then
+            assertThatThrownBy(() -> authService.signUp(createSignUpRequest()))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", EMAIL_ALREADY_EXISTS);
+        }
+
+        @Test
+        void 학과와_단과대학이_어긋나면_예외를_반환한다() {
+            //given
+            final SignUpRequest request = createSignUpRequest(MISMATCHED_COLLEGE, TEST_DEPARTMENT);
+
+            //when & then
+            assertThatThrownBy(() -> authService.signUp(request))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", COLLEGE_DEPARTMENT_MISMATCH);
+        }
+
+        @Test
+        void 유효하지_않은_학과면_예외를_반환한다() {
+            //given
+            final SignUpRequest request = createSignUpRequest(TEST_COLLEGE, UNKNOWN_DEPARTMENT);
+
+            //when & then
+            assertThatThrownBy(() -> authService.signUp(request))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", INVALID_ENUM_TYPE);
+        }
+    }
+
+    @Nested
+    class 이메일_중복을_검사할_때 {
+
+        @Test
+        void 쓰이지_않은_이메일이면_사용_가능으로_응답한다() {
+            //given
+
+            //when
+            final EmailAvailabilityResponse response = authService.checkEmailAvailability(UNKNOWN_EMAIL);
+
+            //then
+            assertThat(response.available()).isTrue();
+        }
+
+        @Test
+        void 이미_쓰이는_이메일이면_사용_불가로_응답한다() {
+            //given
+            authService.signUp(createSignUpRequest());
+
+            //when
+            final EmailAvailabilityResponse response = authService.checkEmailAvailability(TEST_EMAIL);
+
+            //then
+            assertThat(response.available()).isFalse();
+        }
+    }
+
+    @Nested
+    class 로그인할_때 {
+
+        @BeforeEach
+        void setUp() {
+            authService.signUp(createSignUpRequest());
+        }
+
+        @Test
+        void 이메일과_비밀번호가_맞으면_토큰을_반환한다() {
+            //given
+            final LoginRequest request = new LoginRequest(TEST_EMAIL, TEST_RAW_PASSWORD);
 
             //when
             final AuthTokenResponse response = authService.login(request);
 
             //then
             assertThat(response.accessToken()).isNotBlank();
-            assertThat(jwtProvider.getMemberId(response.accessToken())).isEqualTo(savedMemberId);
+
+            final Member member = memberRepository.findByEmail(TEST_EMAIL).orElseThrow();
+            assertThat(jwtProvider.getMemberId(response.accessToken())).isEqualTo(member.getId());
         }
 
         @Test
-        void 포털_인증에_성공하고_미가입_회원이면_회원을_생성하고_토큰을_발급한다() {
+        void 없는_이메일이면_예외를_반환한다() {
             //given
-            given(inuMemberRepository.verifyInuMember(UNKNOWN_STUDENT_ID, TEST_RAW_PASSWORD)).willReturn(true);
-            assertThat(memberRepository.findByStudentId(UNKNOWN_STUDENT_ID)).isEmpty();
-
-            final LoginRequest request = new LoginRequest(UNKNOWN_STUDENT_ID, TEST_RAW_PASSWORD);
-
-            //when
-            final AuthTokenResponse response = authService.login(request);
-
-            //then
-            assertThat(response.accessToken()).isNotBlank();
-            assertThat(memberRepository.findByStudentId(UNKNOWN_STUDENT_ID)).isPresent();
-        }
-
-        @Test
-        void 포털_인증에_실패하면_예외가_발생한다() {
-            //given
-            given(inuMemberRepository.verifyInuMember(TEST_STUDENT_ID, WRONG_PASSWORD)).willReturn(false);
-
-            final LoginRequest request = new LoginRequest(TEST_STUDENT_ID, WRONG_PASSWORD);
+            final LoginRequest request = new LoginRequest(UNKNOWN_EMAIL, TEST_RAW_PASSWORD);
 
             //when & then
             assertThatThrownBy(() -> authService.login(request))
                     .isInstanceOf(RestApiException.class)
-                    .hasFieldOrPropertyWithValue("exceptionCode", PORTAL_LOGIN_FAILED);
+                    .hasFieldOrPropertyWithValue("exceptionCode", MEMBER_NOT_FOUND);
+        }
+
+        @Test
+        void 비밀번호가_틀리면_예외를_반환한다() {
+            //given
+            final LoginRequest request = new LoginRequest(TEST_EMAIL, WRONG_PASSWORD);
+
+            //when & then
+            assertThatThrownBy(() -> authService.login(request))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", PASSWORD_NOT_MATCH);
         }
     }
 
     @Nested
     class 액세스_토큰_재발급_테스트 {
+
+        private long savedMemberId;
+
+        @BeforeEach
+        void setUp() {
+            final Member member = memberRepository.save(MemberFixture.createMember());
+            savedMemberId = member.getId();
+        }
 
         @Test
         void 만료된_토큰이어도_서명이_유효하면_재발급에_성공한다() {
@@ -169,10 +269,7 @@ class AuthServiceTest {
         @Test
         void 아직_만료되지_않은_토큰으로도_재발급에_성공한다() {
             //given
-            given(inuMemberRepository.verifyInuMember(TEST_STUDENT_ID, TEST_RAW_PASSWORD)).willReturn(true);
-
-            final String validToken = authService.login(new LoginRequest(TEST_STUDENT_ID, TEST_RAW_PASSWORD))
-                    .accessToken();
+            final String validToken = jwtProvider.generateAuthToken(savedMemberId).accessToken();
 
             //when
             final AuthTokenResponse response = authService.reIssue(validToken);

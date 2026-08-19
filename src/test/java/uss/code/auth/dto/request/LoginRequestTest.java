@@ -22,51 +22,36 @@ class LoginRequestTest {
         }
     }
 
-    private boolean isValid(final String studentId) {
-        return validator.validate(new LoginRequest(studentId, VALID_PASSWORD)).isEmpty();
+    private boolean isValid(final String email) {
+        return validator.validate(new LoginRequest(email, VALID_PASSWORD)).isEmpty();
     }
 
     @Nested
-    class 학번_형식_검증_테스트 {
+    class 이메일_형식_검증_테스트 {
 
         @Test
-        void 기존_9자리_숫자_학번은_통과한다() {
-            assertThat(isValid("202012345")).isTrue();
+        void 학교_이메일이면_통과한다() {
+            assertThat(isValid("student@inu.ac.kr")).isTrue();
         }
 
         @Test
-        void 영문자가_섞여도_통과한다() {
-            assertThat(isValid("a2020b12345")).isTrue();
+        void 일반_도메인_이메일도_통과한다() {
+            assertThat(isValid("user123@gmail.com")).isTrue();
         }
 
         @Test
-        void 영문자로만_이뤄져도_통과한다() {
-            assertThat(isValid("teststudent")).isTrue();
+        void 골뱅이가_없으면_실패한다() {
+            assertThat(isValid("student.inu.ac.kr")).isFalse();
         }
 
         @Test
-        void 스무자면_통과한다() {
-            assertThat(isValid("a1234567890123456789")).isTrue();
-        }
-
-        @Test
-        void 스물한자면_실패한다() {
-            assertThat(isValid("a12345678901234567890")).isFalse();
+        void 공백이_들어가면_실패한다() {
+            assertThat(isValid("stu dent@inu.ac.kr")).isFalse();
         }
 
         @Test
         void 비어있으면_실패한다() {
             assertThat(isValid("")).isFalse();
-        }
-
-        @Test
-        void 특수문자가_들어가면_실패한다() {
-            assertThat(isValid("2020-12345")).isFalse();
-        }
-
-        @Test
-        void 공백이_들어가면_실패한다() {
-            assertThat(isValid("2020 12345")).isFalse();
         }
     }
 }

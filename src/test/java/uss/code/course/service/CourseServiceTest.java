@@ -229,7 +229,7 @@ class CourseServiceTest {
     class 학부_소속_전공_과목_조회_테스트 {
 
         private long electronicsMemberId;
-        private long unassignedMemberId;
+        private long liberalArtsMemberId;
 
         @BeforeEach
         void setUp() {
@@ -245,17 +245,17 @@ class CourseServiceTest {
             memberRepository.save(electronicsMember);
             electronicsMemberId = electronicsMember.getId();
 
-            final Member unassignedMember = MemberFixture.createMember(
+            final Member liberalArtsMember = MemberFixture.createMember(
                     "202212345",
-                    "박미정",
-                    MemberCollege.DEFAULT,
-                    MemberDepartment.DEFAULT,
-                    MemberGrade.DEFAULT,
-                    AcademicStatus.DEFAULT,
-                    0.0
+                    "박자유",
+                    MemberCollege.LIBERAL_ARTS_COLLEGE,
+                    MemberDepartment.INTERNATIONAL_LIBERAL_ARTS,
+                    MemberGrade.FRESHMAN,
+                    AcademicStatus.ENROLLED,
+                    3.0
             );
-            memberRepository.save(unassignedMember);
-            unassignedMemberId = unassignedMember.getId();
+            memberRepository.save(liberalArtsMember);
+            liberalArtsMemberId = liberalArtsMember.getId();
 
             // 학부로 개설된 과목
             Course schoolCourse = CourseFixture.createCourseWithDepartmentAndDetails(
@@ -335,11 +335,11 @@ class CourseServiceTest {
         }
 
         @Test
-        void 학과가_미정인_회원은_예외없이_빈_목록을_받는다() {
+        void 대응_강의_학과가_없는_소속의_회원은_예외없이_빈_목록을_받는다() {
             //given
 
             //when
-            final MajorCoursesResponse response = courseService.getMajorCourses(unassignedMemberId);
+            final MajorCoursesResponse response = courseService.getMajorCourses(liberalArtsMemberId);
 
             //then
             assertThat(response.majorCourseResponses()).isEmpty();
@@ -737,16 +737,6 @@ class CourseServiceTest {
                     .hasFieldOrPropertyWithValue("exceptionCode", INVALID_ENUM_TYPE);
         }
 
-        @Test
-        void 미정으로_조회하면_예외가_발생한다() {
-            //given
-            final String unassigned = "DEFAULT";
-
-            //when & then
-            assertThatThrownBy(() -> courseService.getOtherDepartmentCourses(unassigned))
-                    .isInstanceOf(RestApiException.class)
-                    .hasFieldOrPropertyWithValue("exceptionCode", INVALID_DEPARTMENT);
-        }
     }
 
     @Nested
