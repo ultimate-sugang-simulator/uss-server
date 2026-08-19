@@ -18,7 +18,6 @@ import uss.code.member.repository.MemberRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static uss.code.global.exception.domain.ExceptionCode.INVALID_DEPARTMENT;
 import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
 import static uss.code.global.exception.domain.ExceptionCode.MEMBER_NOT_FOUND;
 
@@ -96,8 +95,8 @@ class MemberServiceTest {
 
         private static final String TEST_STUDENT_ID = "202054321";
         private static final String TEST_NAME = "김인천";
-        private static final MemberGrade TEST_GRADE = MemberGrade.DEFAULT;
-        private static final AcademicStatus TEST_ACADEMIC_STATUS = AcademicStatus.DEFAULT;
+        private static final MemberGrade TEST_GRADE = MemberGrade.FRESHMAN;
+        private static final AcademicStatus TEST_ACADEMIC_STATUS = AcademicStatus.ENROLLED;
         private static final double TEST_GPA = 0.0;
 
         private static final String VALID_DEPARTMENT = "COMPUTER_ENGINEERING";
@@ -111,8 +110,8 @@ class MemberServiceTest {
             final Member member = MemberFixture.createMember(
                     TEST_STUDENT_ID,
                     TEST_NAME,
-                    MemberCollege.DEFAULT,
-                    MemberDepartment.DEFAULT,
+                    MemberCollege.ENGINEERING,
+                    MemberDepartment.MECHANICAL_ENGINEERING,
                     TEST_GRADE,
                     TEST_ACADEMIC_STATUS,
                     TEST_GPA
@@ -161,17 +160,6 @@ class MemberServiceTest {
             final Member updatedMember = memberRepository.findById(validMemberId).orElseThrow();
             assertThat(updatedMember.getDepartment()).isEqualTo(MemberDepartment.IBE_MAJOR);
             assertThat(updatedMember.getCollege()).isEqualTo(MemberCollege.NORTHEAST_ASIA_TRADE_LOGISTICS);
-        }
-
-        @Test
-        void 미정은_학과로_선택할_수_없다(){
-            //given
-            final DepartmentUpdateRequest request = new DepartmentUpdateRequest("DEFAULT");
-
-            //when & then
-            assertThatThrownBy(() -> memberService.updateDepartment(validMemberId, request))
-                    .isInstanceOf(RestApiException.class)
-                    .hasFieldOrPropertyWithValue("exceptionCode", INVALID_DEPARTMENT);
         }
 
         @Test

@@ -31,10 +31,6 @@ jobs:
 
           security.jwt.secret-key: ${{secrets.JWT_SECRET_KEY}}
 
-          oracle.datasource.jdbc-url: ${{secrets.ORACLE_URL}}
-          oracle.datasource.username: ${{secrets.ORACLE_USERNAME}}
-          oracle.datasource.password: ${{secrets.ORACLE_PASSWORD}}
-
           inu.course-api.base-url: ${{secrets.INU_API_BASE_URL}}
           inu.course-api.auth-key: ${{secrets.INU_API_AUTH_KEY}}
 

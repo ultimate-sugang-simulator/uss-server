@@ -10,17 +10,65 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import uss.code.auth.dto.request.LoginRequest;
+import uss.code.auth.dto.request.SignUpRequest;
 import uss.code.auth.dto.response.AuthTokenResponse;
+import uss.code.auth.dto.response.EmailAvailabilityResponse;
+import uss.code.global.annotation.ParamValidation;
 import uss.code.global.exception.dto.response.ErrorResponse;
 
 @Tag(name = "Auth API", description = "인증 관련 API")
 public interface AuthControllerDocs {
 
-    @Operation(summary = "로그인", description = "학번과 비밀번호로 로그인합니다.<br>" +
+    @Operation(summary = "회원가입", description = "이메일, 비밀번호와 프로필을 받아 회원을 생성하고 액세스 토큰을 발급합니다.<br>" +
+            "🔓 <strong>Jwt 불필요</strong><br>")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "✅ 회원가입 성공"),
+            @ApiResponse(responseCode = "400", description = "🚨 유효하지 않은 입력",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            examples = {
+                                    @ExampleObject(
+                                            name = "존재하지 않는 열거값 (단과대학, 학과, 학년, 학적 상태)",
+                                            value = "{\"code\" : 8888, \"message\" : \"유효하지 않은 열거타입입니다.\"}"
+                                    ),
+                                    @ExampleObject(
+                                            name = "학과와 단과대학 불일치",
+                                            value = "{\"code\" : 1016, \"message\" : \"학과의 소속 단과대학과 일치하지 않습니다.\"}"
+                                    )
+                            },
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "409", description = "🚨 이메일 중복",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            examples = {
+                                    @ExampleObject(
+                                            name = "이메일 중복",
+                                            value = "{\"code\" : 1015, \"message\" : \"이미 사용 중인 이메일입니다.\"}"
+                                    )
+                            },
+                            schema = @Schema(implementation = ErrorResponse.class))
+            )
+    })
+    @PostMapping("/sign-up")
+    ResponseEntity<AuthTokenResponse> signUp(@Valid @RequestBody final SignUpRequest request);
+
+    @Operation(summary = "이메일 사용 가능 여부 조회", description = "이메일이 이미 가입에 쓰이고 있는지 확인합니다.<br>" +
+            "🔓 <strong>Jwt 불필요</strong><br>")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "✅ 이메일 사용 가능 여부 조회 성공")
+    })
+    @GetMapping("/email-availability")
+    ResponseEntity<EmailAvailabilityResponse> checkEmailAvailability(
+            @ParamValidation(maxLength = 255)
+            @RequestParam("email") final String email
+    );
+
+    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인합니다.<br>" +
             "🔓 <strong>Jwt 불필요</strong><br>")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "✅ 로그인 성공"),

@@ -8,8 +8,13 @@ import uss.code.member.domain.MemberDepartment;
 import uss.code.member.domain.MemberGrade;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class MemberFixture {
+
+    private static final String ENCODED_PASSWORD = "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
+
+    private static final AtomicLong EMAIL_SEQUENCE = new AtomicLong();
 
     public static Member createMember() {
         return createMember(
@@ -32,8 +37,34 @@ public class MemberFixture {
             final AcademicStatus academicStatus,
             final double lastSemesterGpa
     ) {
+        return createMember(
+                "member" + EMAIL_SEQUENCE.incrementAndGet() + "@inu.ac.kr",
+                ENCODED_PASSWORD,
+                studentId,
+                name,
+                college,
+                department,
+                grade,
+                academicStatus,
+                lastSemesterGpa
+        );
+    }
+
+    public static Member createMember(
+            final String email,
+            final String password,
+            final String studentId,
+            final String name,
+            final MemberCollege college,
+            final MemberDepartment department,
+            final MemberGrade grade,
+            final AcademicStatus academicStatus,
+            final double lastSemesterGpa
+    ) {
         Member member = new Member();
 
+        ReflectionTestUtils.setField(member, "email", email);
+        ReflectionTestUtils.setField(member, "password", password);
         ReflectionTestUtils.setField(member, "studentId", studentId);
         ReflectionTestUtils.setField(member, "name", name);
         ReflectionTestUtils.setField(member, "college", college);

@@ -4,8 +4,8 @@
 규모를 키우는 것이 목적인 optimize-performance의 시드와 목적이 다르다.
 
 > **optimize-performance의 시드 모듈을 가져다 쓰지 마라.**
-> 그 모듈은 `members`에 `email`, `password`, `member_college` 컬럼이 있던 시절에 작성되어
-> 현재 스키마(`database/migration/V1_0__init_table.sql`)와 맞지 않는다. 적재하면 실패한다.
+> 그 모듈은 현재 스키마와 컬럼 구성이 다르던 시절(`member_college` 등)에 작성되어
+> 그대로 적재하면 실패한다.
 
 ## 쓰는 법
 

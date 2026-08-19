@@ -6,7 +6,6 @@ import uss.code.global.exception.domain.RestApiException;
 
 import java.util.Arrays;
 
-import static uss.code.global.exception.domain.ExceptionCode.INVALID_DEPARTMENT;
 import static uss.code.global.exception.domain.ExceptionCode.INVALID_ENUM_TYPE;
 
 @Getter
@@ -100,10 +99,7 @@ public enum MemberDepartment {
     IBE_MAJOR(MemberCollege.NORTHEAST_ASIA_TRADE_LOGISTICS, "IBE전공"),
 
     // 법학부
-    LAW(MemberCollege.LAW, "법학부"),
-
-    // 기본값 (포털 로그인으로 신규 생성된 회원의 미설정 상태)
-    DEFAULT(MemberCollege.DEFAULT, "미정");
+    LAW(MemberCollege.LAW, "법학부");
 
     private final MemberCollege memberCollege;
     private final String name;
@@ -113,15 +109,5 @@ public enum MemberDepartment {
                 .filter(md -> md.name().equalsIgnoreCase(value))
                 .findAny()
                 .orElseThrow(() -> new RestApiException(INVALID_ENUM_TYPE));
-    }
-
-    public static MemberDepartment fromSelectable(final String value) {
-        final MemberDepartment memberDepartment = from(value);
-
-        if (memberDepartment == DEFAULT) {
-            throw new RestApiException(INVALID_DEPARTMENT);
-        }
-
-        return memberDepartment;
     }
 }

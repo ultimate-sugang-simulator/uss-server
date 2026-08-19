@@ -2,9 +2,8 @@
 # 측정용 JWT를 서명키로 직접 만든다.
 #
 # 왜 로그인 API를 쓰지 않는가:
-#   이 프로젝트의 로그인은 학교 포털 Oracle 함수(F_LOGIN_CHECK)에 위임되어 있고,
-#   포털은 IP 화이트리스트로 막혀 있어 로컬에서 성공하지 않는다.
-#   members 테이블에는 비밀번호 컬럼 자체가 없으므로 시드로도 우회할 수 없다.
+#   시드(seeds/member.sql)가 넣는 비밀번호는 BCrypt 해시가 아니라 로그인 API를 탈 수 없고,
+#   수백 개 계정을 가입 API로 만드는 것보다 시드 id에 맞춰 직접 서명하는 편이 측정 준비에 맞다.
 #   토큰은 JwtProvider와 같은 방식으로 직접 서명해서 만든다.
 #
 # JwtProvider가 만드는 회원 토큰의 형태 (auth/infra/JwtProvider.java):

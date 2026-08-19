@@ -157,7 +157,6 @@ class CourseDepartmentTest {
             //given
 
             //when & then
-            assertThat(CourseDepartment.ownedBy(MemberDepartment.DEFAULT)).isEmpty();
             assertThat(CourseDepartment.ownedBy(MemberDepartment.INTERNATIONAL_LIBERAL_ARTS)).isEmpty();
             assertThat(CourseDepartment.ownedBy(MemberDepartment.CONVERGENCE)).isEmpty();
         }

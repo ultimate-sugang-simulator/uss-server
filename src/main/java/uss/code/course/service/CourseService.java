@@ -76,7 +76,7 @@ public class CourseService {
 
     @Transactional(readOnly = true)
     public MajorCoursesResponse getOtherDepartmentCourses(final String department) {
-        final MemberDepartment memberDepartment = MemberDepartment.fromSelectable(department);
+        final MemberDepartment memberDepartment = MemberDepartment.from(department);
 
         final List<CourseDepartment> departments = CourseDepartment.ownedBy(memberDepartment);
         if (departments.isEmpty()) {

@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,11 +20,22 @@ import static lombok.AccessLevel.PRIVATE;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "members")
+@Table(
+        name = "members",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"email"})
+        }
+)
 public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, name = "email")
+    private String email;
+
+    @Column(nullable = false, name = "password")
+    private String password;
 
     @Column(nullable = false, name = "student_id")
     private String studentId;
@@ -58,6 +70,8 @@ public class Member {
 
     @Builder(access = PRIVATE)
     private Member(
+            final String email,
+            final String password,
             final String studentId,
             final String name,
             final MemberCollege college,
@@ -66,6 +80,8 @@ public class Member {
             final AcademicStatus academicStatus,
             final double lastSemesterGpa
     ) {
+        this.email = email;
+        this.password = password;
         this.studentId = studentId;
         this.name = name;
         this.college = college;
@@ -77,17 +93,26 @@ public class Member {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public static Member createDefault(
-            final String studentId
+    public static Member create(
+            final String email,
+            final String encodedPassword,
+            final String studentId,
+            final String name,
+            final MemberDepartment department,
+            final MemberGrade grade,
+            final AcademicStatus academicStatus,
+            final double lastSemesterGpa
     ) {
         return Member.builder()
+                .email(email)
+                .password(encodedPassword)
                 .studentId(studentId)
-                .name(studentId)
-                .college(MemberCollege.DEFAULT)
-                .department(MemberDepartment.DEFAULT)
-                .grade(MemberGrade.DEFAULT)
-                .academicStatus(AcademicStatus.DEFAULT)
-                .lastSemesterGpa(0.0)
+                .name(name)
+                .college(department.getMemberCollege())
+                .department(department)
+                .grade(grade)
+                .academicStatus(academicStatus)
+                .lastSemesterGpa(lastSemesterGpa)
                 .build();
     }
 
