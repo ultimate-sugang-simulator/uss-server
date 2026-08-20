@@ -48,7 +48,7 @@ Phase 4의 재현 결과에 근거해 동시성 제어 기법 후보를 제시�
    - 대상 테이블의 제약과 인덱스
 
      ```bash
-     $MYSQL_CONC -e "SHOW CREATE TABLE {테이블}\G"
+     mysqlc -e "SHOW CREATE TABLE {테이블}\G"
      ```
 
    - 재현 결과의 위반 양상 (상한 초과인지, 카운터 유실인지, 둘 다인지)

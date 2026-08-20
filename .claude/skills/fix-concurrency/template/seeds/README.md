@@ -9,8 +9,8 @@
 
 ## 쓰는 법
 
-`.claude/resources/concurrency/{이슈번호}/seeds.sql`을 아래 형태로 만든다.
-변수 블록과 `SOURCE` 줄만 있으면 된다. **모듈 본문을 복사하지 마라.**
+`.claude/resources/concurrency/{이슈번호}/seeds.sql`은 **변수 블록만** 담는다.
+**모듈 본문을 복사하지 마라.** 모듈은 실행 시점에 이어 붙인다.
 
 ```sql
 -- CONC-{이슈번호} 시드
@@ -27,20 +27,22 @@ SET @student_id_start = 900000001;
 -- 경합 대상 강의: 딱 하나만 만든다.
 SET @target_course_id = 990001;
 SET @target_capacity  = 100;
-
-SOURCE .claude/skills/fix-concurrency/template/seeds/member.sql
-SOURCE .claude/skills/fix-concurrency/template/seeds/contention-course.sql
 ```
 
-실행은 호출자가 프로젝트 루트에서 한다.
+실행은 호출자가 프로젝트 루트에서 한다. 변수 블록과 모듈을 `cat`으로 이어 붙여
+**한 세션으로** 흘려보낸다. 세션이 하나라 사용자 변수가 모듈까지 그대로 이어진다.
 
 ```bash
-$MYSQL_CONC < $CONC_DIR/seeds.sql
+cat $CONC_DIR/seeds.sql \
+    .claude/skills/fix-concurrency/template/seeds/member.sql \
+    .claude/skills/fix-concurrency/template/seeds/contention-course.sql \
+  | mysqlc -t
 ```
 
-> `SOURCE`는 mysql 클라이언트의 명령이라 **경로가 실행 위치 기준**이다.
-> 반드시 프로젝트 루트에서 실행해야 한다. `-e "SOURCE ..."` 형태로는 동작하지 않으므로
-> 위처럼 파일을 표준입력으로 넘긴다.
+> **`SOURCE`를 쓰지 마라.** `SOURCE`는 mysql 클라이언트가 직접 파일을 여는 명령이라
+> 경로를 **클라이언트가 있는 곳** 기준으로 찾는다. 이 환경의 클라이언트는 컨테이너 안에 있어
+> 호스트의 스킬 경로를 볼 수 없고, `SOURCE` 줄이 조용히 실패해 변수만 들어간 채 0건이 적재된다.
+> `-e "SOURCE ..."` 형태도 동작하지 않는다.
 
 ## 모듈
 

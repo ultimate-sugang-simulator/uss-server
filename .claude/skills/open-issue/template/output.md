@@ -9,4 +9,4 @@
 
 - **이슈**: [#{번호}]({URL}) - {종류} (담당자: {assignee}, 라벨: {라벨})
 - **브랜치**: `{브랜치명}` (base: {base}, 원격 push와 upstream 설정 완료)
-- **다음**: `write-plan` or `optimize-performance`
+- **다음**: `write-plan` or `optimize-performance` or `fix-concurrency`

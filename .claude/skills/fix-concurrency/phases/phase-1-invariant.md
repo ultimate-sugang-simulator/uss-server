@@ -92,9 +92,11 @@
      export CONC_DIR=.claude/resources/concurrency/{이슈번호}
      export TARGET_DIR=$CONC_DIR/{슬러그}
 
-     export MYSQL_PWD=root
-     export MYSQL_CONC="mysql -h 127.0.0.1 -P 3307 -u root uss_db"
+     mysqlc() { docker exec -i -e MYSQL_PWD=root uss-mysql mysql -uroot uss_db "$@"; }
      ```
+
+   - `mysqlc`는 문자열 변수가 아니라 함수다. 이유는 `SKILL.md`의 **측정 스택**을 보라.
+     `Read`와 `Write`의 대상 경로에는 셸 변수가 통하지 않으므로 전체 경로를 쓴다.
 
 ### 출력
 - `.claude/resources/concurrency/{이슈번호}/{슬러그}/record.md` 생성

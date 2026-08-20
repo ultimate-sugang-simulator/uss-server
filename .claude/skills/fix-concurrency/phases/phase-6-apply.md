@@ -46,15 +46,21 @@
 5. 애플리케이션을 재기동하도록 제시한다.
 
    ```bash
-   ./gradlew bootRun --args='--spring.profiles.active=conc'
+   bash .claude/skills/fix-concurrency/template/restart-app.sh
    ```
+
+   - **기존 인스턴스를 내리지 않고 `./gradlew bootRun`을 다시 돌리면 안 된다.**
+     `Port 8080 was already in use`로 새 프로세스만 죽고 **옛 코드가 계속 응답한다.**
+     그 상태로 6번을 확인하면 후보를 적용하지 않은 문장이 찍히고, Phase 7에서
+     "효과 없음"으로 오판하게 된다. `restart-app.sh`가 포트 정리와 기동 확인을 함께 한다.
+   - 스크립트가 `!! 기동 실패`로 끝나면 출력된 로그를 보고 원인을 짚는다. 6번으로 넘어가지 마라.
 
 6. **제어가 실제로 발행되는지 확인한다.** 재측정 전에 확인해야 Phase 7에서
    "효과 없음"과 "적용 안 됨"을 구분할 수 있다.
 
    ```bash
    # 통계를 비우고 요청 한 건만 보낸다
-   $MYSQL_CONC -e "TRUNCATE TABLE performance_schema.events_statements_summary_by_digest;"
+   mysqlc -e "TRUNCATE TABLE performance_schema.events_statements_summary_by_digest;"
 
    TOKEN=$(jq -r '.[0].accessToken' $CONC_DIR/tokens.json)
    curl -s -o /dev/null -w '%{http_code}\n' -X POST \
@@ -62,7 +68,7 @@
      localhost:8080{대상 경로}
 
    # 발행된 문장을 눈으로 확인한다
-   $MYSQL_CONC -e "
+   mysqlc -e "
    SELECT COUNT_STAR AS calls, DIGEST_TEXT
    FROM performance_schema.events_statements_summary_by_digest
    WHERE SCHEMA_NAME = 'uss_db'
@@ -84,7 +90,7 @@
    - 되돌리기를 잊지 않는다. 이 확인 요청도 등록을 하나 만든다.
 
      ```bash
-     $MYSQL_CONC -e "
+     mysqlc -e "
      DELETE FROM registrations WHERE course_id = {대상 강의 id};
      UPDATE courses SET current_enrollment = 0 WHERE id = {대상 강의 id};"
      ```
