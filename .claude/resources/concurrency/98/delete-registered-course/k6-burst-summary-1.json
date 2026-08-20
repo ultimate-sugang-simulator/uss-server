@@ -1,0 +1,41 @@
+{
+  "target": "delete-registered-course",
+  "endpoint": "DELETE /api/v1/registration/{courseId}",
+  "condition": {
+    "executor": "per-vu-iterations (iterations=1, ramp 없음)",
+    "vus": 500,
+    "target_course_id": 990001,
+    "capacity": 500,
+    "expected_reject_code": 4003,
+    "db_cache": "warm (InnoDB 버퍼 풀은 재기동 없이 비울 수 없다)",
+    "app_cache": "없음"
+  },
+  "requests": 500,
+  "rps": 246.81619449905938,
+  "outcome": {
+    "succeeded": 500,
+    "rejected_expected": 0,
+    "rejected_other_4xx": 0,
+    "failed_5xx": 0,
+    "unparsable": 0
+  },
+  "succeeded_over_capacity": 0,
+  "duration_ms": {
+    "med": 1448.4865,
+    "p95": 1903.4141499999998,
+    "p99": 1964.6279200000001,
+    "max": 1976.712
+  },
+  "waiting_ms": {
+    "med": 1443.4965,
+    "p95": 1903.0461,
+    "p99": 1964.35072,
+    "max": 1976.427
+  },
+  "delta_vs_base": {
+    "from": "k6-burst-summary-0.json",
+    "rps": { "base": 58.9483890348451, "candidate": 246.81619449905938 },
+    "duration_p95_ms": { "base": 8074.8233, "candidate": 1903.4141499999998 },
+    "duration_p99_ms": { "base": 8175.550560000001, "candidate": 1964.6279200000001 }
+  }
+}

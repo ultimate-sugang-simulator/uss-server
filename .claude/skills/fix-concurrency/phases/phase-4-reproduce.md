@@ -19,17 +19,18 @@
 
 1. 아래 블록을 호출자에게 제시하고 결과를 받는다. **실행은 호출자가 한다.**
 
+   **레포 루트에서 이 블록 전체를 한 번에 붙여넣는다.** 변수와 함수 정의를 매번 포함하므로
+   새 터미널이든 아니든 그대로 돈다(`SKILL.md`의 **명령 전달**).
+
    ```bash
-   # 새 터미널이면 먼저:
-   #   export CONC_DIR=.claude/resources/concurrency/{이슈번호}
-   #   export TARGET_DIR=$CONC_DIR/{슬러그}
-   #   export MYSQL_PWD=root
-   #   export MYSQL_CONC="mysql -h 127.0.0.1 -P 3307 -u root uss_db"
+   CONC_DIR=.claude/resources/concurrency/{이슈번호}
+   TARGET_DIR=$CONC_DIR/{슬러그}
+   mysqlc() { docker exec -i -e MYSQL_PWD=root uss-mysql mysql -uroot uss_db "$@"; }
 
    N=0   # 후보 번호. 원본은 0이다
 
    # 1) 되돌리기 - record.md에 적어둔 SQL을 그대로 실행한다
-   $MYSQL_CONC -e "
+   mysqlc -e "
    DELETE FROM registrations WHERE course_id = {대상 강의 id};
    UPDATE courses SET current_enrollment = 0 WHERE id = {대상 강의 id};
    SELECT (SELECT COUNT(*) FROM registrations WHERE course_id = {대상 강의 id}) AS rows_left,
@@ -38,8 +39,8 @@
    # 2) 락 카운터 - 부하 직전 스냅샷
    {
      echo "=== BEFORE ==="
-     $MYSQL_CONC -e "SHOW GLOBAL STATUS LIKE 'Innodb_row_lock%';"
-     $MYSQL_CONC -e "
+     mysqlc -e "SHOW GLOBAL STATUS LIKE 'Innodb_row_lock%';"
+     mysqlc -e "
      SELECT NAME, COUNT FROM information_schema.INNODB_METRICS
      WHERE NAME IN ('lock_deadlocks','lock_timeouts','lock_row_lock_waits');"
    } > $TARGET_DIR/lock-stats-$N.txt
@@ -50,18 +51,18 @@
    # 4) 락 카운터 - 부하 직후 스냅샷
    {
      echo "=== AFTER ==="
-     $MYSQL_CONC -e "SHOW GLOBAL STATUS LIKE 'Innodb_row_lock%';"
-     $MYSQL_CONC -e "
+     mysqlc -e "SHOW GLOBAL STATUS LIKE 'Innodb_row_lock%';"
+     mysqlc -e "
      SELECT NAME, COUNT FROM information_schema.INNODB_METRICS
      WHERE NAME IN ('lock_deadlocks','lock_timeouts','lock_row_lock_waits');"
 
      echo "=== LATEST DEADLOCK ==="
-     $MYSQL_CONC -e "SHOW ENGINE INNODB STATUS\G" \
+     mysqlc -e "SHOW ENGINE INNODB STATUS\G" \
        | sed -n '/LATEST DETECTED DEADLOCK/,/^---/p'
    } >> $TARGET_DIR/lock-stats-$N.txt
 
    # 5) 불변식 검증 - Phase 1에서 확정한 SQL을 그대로 쓴다
-   $MYSQL_CONC -t < .claude/resources/concurrency/{이슈번호}/{슬러그}/invariant-check.sql \
+   mysqlc -t < $TARGET_DIR/invariant-check.sql \
      | tee $TARGET_DIR/invariant-$N.txt
    ```
 

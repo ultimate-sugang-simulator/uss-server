@@ -1,0 +1,23 @@
+=== BEFORE ===
+Variable_name	Value
+Innodb_row_lock_current_waits	0
+Innodb_row_lock_time	1104367
+Innodb_row_lock_time_avg	2213
+Innodb_row_lock_time_max	3844
+Innodb_row_lock_waits	499
+NAME	COUNT
+lock_deadlocks	0
+lock_timeouts	0
+lock_row_lock_waits	499
+=== AFTER ===
+Variable_name	Value
+Innodb_row_lock_current_waits	0
+Innodb_row_lock_time	1414005
+Innodb_row_lock_time_avg	1416
+Innodb_row_lock_time_max	3844
+Innodb_row_lock_waits	998
+NAME	COUNT
+lock_deadlocks	0
+lock_timeouts	0
+lock_row_lock_waits	998
+=== LATEST DEADLOCK ===

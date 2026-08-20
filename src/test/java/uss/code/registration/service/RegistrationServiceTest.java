@@ -1,5 +1,6 @@
 package uss.code.registration.service;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,8 @@ class RegistrationServiceTest {
     private MemberRepository memberRepository;
     @Autowired
     private CourseRepository courseRepository;
+    @Autowired
+    private EntityManager entityManager;
 
     @Nested
     class 수강신청_과목_조회_테스트 {
@@ -796,6 +799,46 @@ class RegistrationServiceTest {
             //then
             final List<Registration> registrations = registrationRepository.findByMemberId(testMemberId);
             assertThat(registrations).isEmpty();
+        }
+
+        @Test
+        void 수강신청을_삭제하면_현재_수강인원이_1_줄어든다() {
+            //given
+            final int before = courseRepository.findById(course1Id).orElseThrow().getCurrentEnrollment();
+
+            //when
+            registrationService.deleteRegisteredCourse(testMemberId, course1Id);
+
+            //then
+            // 감소는 벌크 UPDATE라 영속성 컨텍스트의 Course는 갱신되지 않는다. 비우고 다시 읽는다.
+            entityManager.clear();
+            final int after = courseRepository.findById(course1Id).orElseThrow().getCurrentEnrollment();
+            assertThat(after).isEqualTo(before - 1);
+        }
+
+        @Test
+        void 현재_수강인원이_0인_과목은_취소할_수_없다() {
+            //given
+            // 신청 내역은 남아 있는데 수강인원이 0인, 이미 어긋난 상태를 만든다
+            final Course zeroEnrollmentCourse = CourseFixture.createCourse(
+                    "인원0과목", "Zero Enrollment Course", "CSE998", "CSE998001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseClassification.MAJOR_CORE,
+                    CourseFixture.createCourse().getArea(),
+                    CourseType.LECTURE,
+                    CourseGrade.SOPHOMORE,
+                    3, false, 50, 0
+            );
+            courseRepository.save(zeroEnrollmentCourse);
+
+            final Member member = memberRepository.findById(testMemberId).orElseThrow();
+            registrationRepository.save(RegistrationFixture.createRegistration(member, zeroEnrollmentCourse));
+
+            //when & then
+            assertThatThrownBy(() -> registrationService.deleteRegisteredCourse(testMemberId, zeroEnrollmentCourse.getId()))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", REGISTRATION_CANCEL_CONFLICT);
         }
     }
 

@@ -53,7 +53,7 @@
 4. 시드를 적재하고 결과를 받는다. 실행은 호출자가 프로젝트 루트에서 한다.
 
    ```bash
-   $MYSQL_CONC < $CONC_DIR/seeds.sql
+   mysqlc < $CONC_DIR/seeds.sql
    ```
 
    - 각 모듈 말미의 검증 쿼리 결과로 행 수와 대상 강의의 정원을 확인한다.
@@ -62,11 +62,11 @@
 #### 3-C. 토큰
 
 5. **측정용 토큰을 서명키로 직접 만든다.** 로그인 API를 쓰지 마라.
-   로그인은 학교 포털 Oracle 함수를 호출하므로 로컬에서 성공하지 않는다.
+   시드가 넣는 `password`는 BCrypt 해시가 아닌 더미 문자열이라 로그인 대조를 통과하지 못한다.
 
    ```bash
    bash .claude/skills/fix-concurrency/template/mint-tokens.sh \
-     --secret "$(grep -A2 'jwt:' src/main/resources/application-conc.yml | grep 'secret-key' | sed 's/.*secret-key: *//')" \
+     --secret "$(grep 'secret-key:' src/main/resources/application-conc.yml | head -1 | sed 's/.*secret-key: *//')" \
      --start {시드 회원 id 시작값} \
      --count {VU 수} \
      --out $CONC_DIR/tokens.json

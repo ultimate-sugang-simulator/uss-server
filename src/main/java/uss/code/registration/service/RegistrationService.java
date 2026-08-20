@@ -77,10 +77,7 @@ public class RegistrationService {
         final Registration registration = registrationRepository.findByMemberIdAndCourseId(memberId, courseId)
                 .orElseThrow(() -> new RestApiException(REGISTERED_COURSE_NOT_FOUND));
 
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RestApiException(COURSE_NOT_FOUND));
-
-        course.decrementEnrollment();
+        decreaseEnrollment(courseId);
 
         registrationRepository.delete(registration);
     }
@@ -106,6 +103,14 @@ public class RegistrationService {
 
         if (affectedRows == NO_AFFECTED_ROW) {
             throw new RestApiException(COURSE_MAX_CAPACITY_EXCEEDED);
+        }
+    }
+
+    private void decreaseEnrollment(final long courseId) {
+        final int affectedRows = courseRepository.decreaseEnrollmentAboveZero(courseId);
+
+        if (affectedRows == NO_AFFECTED_ROW) {
+            throw new RestApiException(REGISTRATION_CANCEL_CONFLICT);
         }
     }
 

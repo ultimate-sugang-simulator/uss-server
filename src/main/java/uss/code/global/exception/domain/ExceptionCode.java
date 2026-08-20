@@ -45,6 +45,7 @@ public enum ExceptionCode {
     CREDIT_LIMIT_EXCEEDED(BAD_REQUEST, 4001, "최대 이수 가능 학점을 초과하였습니다."),
     COURSE_ALREADY_REGISTERED(BAD_REQUEST, 4002, "이미 신청된 과목입니다."),
     REGISTERED_COURSE_NOT_FOUND(NOT_FOUND, 4003, "수강신청한 과목을 찾을 수 없습니다."),
+    REGISTRATION_CANCEL_CONFLICT(CONFLICT, 4004, "수강 취소를 반영할 수 없습니다. 다시 확인해주세요."),
 
     // 관리자 계정, 인증
     ADMIN_LOGIN_FAILED(UNAUTHORIZED, 5000, "아이디나 비밀번호가 맞지 않아요."),

@@ -3,7 +3,7 @@
 -- Phase 4와 7에서 **그대로** 재사용한다. 후보마다 바꾸지 마라. 바꾸면 전후 비교가 성립하지 않는다.
 --
 -- 실행:
---   $MYSQL_CONC -t < .claude/resources/concurrency/{이슈번호}/{슬러그}/invariant-check.sql \
+--   mysqlc -t < .claude/resources/concurrency/{이슈번호}/{슬러그}/invariant-check.sql \
 --     | tee $TARGET_DIR/invariant-{n}.txt
 --
 -- ── 작성 규칙 ──────────────────────────────────────────────

@@ -98,7 +98,7 @@ Phase 4와 **완전히 동일한 조건**으로 재측정해 이 후보가 불�
    # 후보 전용 스키마를 추가했으면 Phase 6의 되돌리기 SQL을 실행한다
 
    # 데이터
-   $MYSQL_CONC -e "
+   mysqlc -e "
    DELETE FROM registrations WHERE course_id = {대상 강의 id};
    UPDATE courses SET current_enrollment = 0 WHERE id = {대상 강의 id};
    SELECT (SELECT COUNT(*) FROM registrations WHERE course_id = {대상 강의 id}) AS rows_left,

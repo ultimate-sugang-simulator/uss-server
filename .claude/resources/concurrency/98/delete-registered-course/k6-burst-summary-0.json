@@ -1,0 +1,35 @@
+{
+  "target": "delete-registered-course",
+  "endpoint": "DELETE /api/v1/registration/{courseId}",
+  "condition": {
+    "executor": "per-vu-iterations (iterations=1, ramp 없음)",
+    "vus": 500,
+    "target_course_id": 990001,
+    "capacity": 500,
+    "expected_reject_code": 4003,
+    "db_cache": "warm (InnoDB 버퍼 풀은 재기동 없이 비울 수 없다)",
+    "app_cache": "없음"
+  },
+  "requests": 500,
+  "rps": 58.9483890348451,
+  "outcome": {
+    "succeeded": 500,
+    "rejected_expected": 0,
+    "rejected_other_4xx": 0,
+    "failed_5xx": 0,
+    "unparsable": 0
+  },
+  "succeeded_over_capacity": 0,
+  "duration_ms": {
+    "med": 6502.228999999999,
+    "p95": 8074.8233,
+    "p99": 8175.550560000001,
+    "max": 8214.385
+  },
+  "waiting_ms": {
+    "med": 6501.814,
+    "p95": 8074.20725,
+    "p99": 8168.525449999999,
+    "max": 8214.313
+  }
+}
