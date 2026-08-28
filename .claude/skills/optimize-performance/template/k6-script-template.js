@@ -1,60 +1,33 @@
 // 부하 테스트 스크립트 템플릿.
 // {…} 자리를 채워 .claude/resources/perf/{이슈번호}/{슬러그}/test-script.js 로 저장한다.
-//
-// 실행: 토큰 발급, warmup, measure를 각각 따로 돌린다. 통계 리셋은 토큰 발급이 끝난 뒤에 한다.
-//
-//   (토큰 발급 - Phase 4, 8의 명령 블록 참조. $PERF_DIR/tokens.json 생성)
-//   k6 run -e PHASE=warmup $TARGET_DIR/test-script.js
-//   $MYSQL_PERF -e "TRUNCATE TABLE performance_schema.events_statements_summary_by_digest;"
-//   k6 run -e PHASE=measure -e SUMMARY_OUT=$TARGET_DIR/k6-test-summary-{n}.json \
-//     $TARGET_DIR/test-script.js
-//
-// {n}은 상태 번호다. 0 = 아무것도 적용하지 않은 원본(Phase 4), n = 사이클 n 적용 후(Phase 8).
-// 실행은 호출자가 한다. 스킬은 명령어만 제시한다.
+// 실행 명령은 template/commands.md에 있다. 실행은 호출자가 한다.
 //
 // ── 작성 규칙 ──────────────────────────────────────────────
-// 1. 이 파일을 복사해 고친다. 빈 파일에서 새로 쓰지 않는다.
-// 2. 고치는 자리는 상단 상수 블록(TARGET, ENDPOINT, CONDITION, STUDENT_ID_START, USER_COUNT),
-//    default 함수의 요청 한 줄, check의 세 번째 항목, VU와 duration뿐이다.
-//    그 외 구조는 아래 3~12 규칙 안에서만 손댄다.
-// 3. PHASE 분기를 유지한다. 두 시나리오를 한 프로세스에서 같이 돌리지 않는다.
-// 4. 토큰은 init 컨텍스트에서 이슈 디렉토리의 tokens.json으로 읽는다. setup()에서 로그인을 호출하지 마라.
-//    측정 프로세스가 로그인 요청을 보내면 그 SQL(회원 조회 + BCrypt 검증)과 응답시간이 측정값에 섞인다.
-//    tokens.json은 이슈 전체가 공유한다. `../tokens.json` 경로를 대상 디렉토리 안쪽으로 바꾸지 마라.
-// 5. **이 서버는 access-token과 refresh-token 헤더를 둘 다 요구한다.** 하나만 보내면 401이 떨어진다.
-//    Authorization: Bearer 형식이 아니다. 헤더 이름을 바꾸지 마라.
-//    (근거: JwtAuthenticationFilter가 두 헤더를 각각 읽어 JwtProvider.validateTokens로 넘긴다)
-// 6. tokens.json은 `[{accessToken, refreshToken}, ...]` 형태다. 문자열 배열이 아니다.
-// 7. 토큰 수가 USER_COUNT와 다르면 중단한다. 일부만 발급된 채로 측정하지 마라.
-// 8. 토큰은 `exec.scenario.iterationInTest`로 고른다. 이 값은 시나리오 전체에서 반복마다 1씩 늘어나므로
-//    VU 수와 무관하게 USER_COUNT 전체를 균등하게 돈다.
-//    `__VU`로 고르지 마라. VU가 50개면 토큰도 50개만 쓰여 요약의 user_count와 실제 사용자 수가 어긋난다.
-// 9. 응답시간 임계를 thresholds에 넣지 않는다. 판정은 스킬이 전후 비교로 한다.
-//    summaryTrendStats는 지우지 않는다. 지우면 p(99)가 요약에서 사라진다(k6 기본값에 없다).
-// 10. check에는 실제 데이터가 실렸는지 확인하는 항목을 반드시 하나 넣는다.
-//     리스트 응답이면 `body.{필드}.length > 0`, 객체 응답이면 `body.{필드} !== undefined`.
-//     **`r.json()`은 반드시 try/catch로 감싼다.** 비JSON 응답(502 HTML, 빈 본문)에서 예외가 나면
-//     무엇이 깨졌는지 알 수 없게 된다. 파싱 실패는 명시적인 check 실패로 떨어뜨린다.
-//     쓰기 엔드포인트는 본문이 없다(204/201 + 빈 body). 그 경우 status만 검증하고
-//     `body is not empty` check는 지운다. 지웠다는 사실을 record.md에 남긴다.
-// 11. VU와 duration은 Phase 3에서 호출자와 확정한 값으로, STUDENT_ID_START와 USER_COUNT는
-//     seeds.sql로 실제 만든 학번 범위와 일치시킨다. 기본값을 그대로 두지 않는다.
-// 12. TARGET에는 대상 디렉토리 슬러그를, ENDPOINT에는 경로를, CONDITION에는 Phase 3-B에서
-//     확정한 부하 조건을 적는다. 요약 파일만 보고 어떤 측정인지 알 수 있어야 한다.
-//     duration은 유지 구간만 적지 말고 ramp 구간과 총 실행시간을 분리해 적는다.
-//     **캐시 상태는 항상 warm이다.** InnoDB 버퍼 풀은 재기동 없이 비울 수 없고 애플리케이션 캐시는 없다.
-//     cold라고 적지 마라.
+// 1. 이 파일을 복사해 고친다. 고치는 자리는 상수 블록(TARGET, ENDPOINT, CONDITION, USER_COUNT 기본값),
+//    measure 시나리오의 VU와 duration, default 함수의 요청 한 줄, check의 세 번째 항목뿐이다.
+// 2. PHASE 분기를 유지한다. warmup과 measure를 한 프로세스에서 같이 돌리지 않는다.
+// 3. 토큰은 init 컨텍스트에서 이슈 디렉토리의 tokens.json을 읽는다. 형태는 [{memberId, accessToken}] (mint-tokens.sh 출력).
+//    setup()에서 로그인을 호출하지 마라. 로그인 SQL과 응답시간이 측정에 섞인다. '../tokens.json' 경로를 바꾸지 마라.
+// 4. 인증 헤더는 access-token 하나다. JwtAuthenticationFilter가 읽는 유일한 헤더이며 Bearer 형식이 아니다.
+// 5. 토큰 수가 USER_COUNT와 다르면 중단한다. 일부만 발급된 채로 측정하지 않는다.
+// 6. 토큰은 exec.scenario.iterationInTest로 고른다. __VU로 고르면 VU 수만큼만 쓰여 user_count와 실제가 어긋난다.
+// 7. thresholds에 응답시간 임계를 넣지 않는다. 판정은 스킬이 전후 비교로 한다.
+//    summaryTrendStats는 지우지 않는다. 지우면 p(99)가 요약에서 사라진다.
+// 8. check에 실제 데이터가 실렸는지 확인하는 항목을 하나 넣는다. r.json()은 parseBody로 감싼다.
+//    비JSON 응답(502 HTML, 빈 본문)의 예외를 check 실패로 떨어뜨리기 위해서다.
+//    본문 없는 쓰기 응답(201/204)이면 status만 검증하고 나머지 check를 지운 사실을 record.md에 남긴다.
+// 9. 경로 변수와 쿼리 값은 iterationInTest나 __ITER로 흩는다. 고정값은 한 행만 반복 조회해 버퍼 풀에 완전히 올라간 상태를 잰다.
+// 10. CONDITION에는 Phase 3-B에서 확정한 값을 적는다. 요약 파일만 보고 어떤 측정인지 알 수 있어야 한다.
+//     duration은 ramp 구간과 유지 구간을 분리한다. 캐시는 항상 warm이다.
 //
-// measure 실행의 요청은 전부 대상 API다. 요청당 쿼리 수의 분모는 요약의 `requests`를 그대로 쓴다.
+// measure 실행의 요청은 전부 대상 API다. 요청당 쿼리 수의 분모는 요약의 requests를 그대로 쓴다.
 //
-// 대상 엔드포인트 형태별 요청 한 줄:
+// 요청 한 줄의 형태:
 //   GET               http.get(`${BASE_URL}/api/v1/courses/major`, params)
-//   GET + 쿼리        http.get(`${BASE_URL}/api/v1/courses/general-education?courseArea=${AREAS[__ITER % AREAS.length]}`, params)
-//   POST 경로변수만   http.post(`${BASE_URL}/api/v1/carts/${1 + (exec.scenario.iterationInTest % COURSE_COUNT)}`, null, params)
+//   GET + 쿼리        http.get(`${BASE_URL}/api/v1/courses/search?keyword=${KEYWORDS[__ITER % KEYWORDS.length]}`, params)
+//   POST 경로변수     http.post(`${BASE_URL}/api/v1/carts/${1 + (exec.scenario.iterationInTest % COURSE_COUNT)}`, null, params)
 //   POST + 바디       http.post(`${BASE_URL}/api/v1/...`, JSON.stringify({…}),
 //                       { headers: { ...params.headers, 'Content-Type': 'application/json' } })
-// 경로 변수나 쿼리에 들어갈 식별자는 `exec.scenario.iterationInTest`나 `__ITER`로 흩는다.
-// 고정값을 박으면 한 행만 반복 조회해 버퍼 풀에 완전히 올라간 상태를 재게 된다.
 // ──────────────────────────────────────────────────────────
 
 import http from 'k6/http';
@@ -62,11 +35,9 @@ import exec from 'k6/execution';
 import { check } from 'k6';
 
 const BASE_URL = __ENV.BASE_URL || 'http://localhost:8080';
-const STUDENT_ID_START = Number(__ENV.STUDENT_ID_START || 200000001);
-const USER_COUNT = Number(__ENV.USER_COUNT || 50);
+const USER_COUNT = Number(__ENV.USER_COUNT || {USER_COUNT});
 const PHASE = __ENV.PHASE || 'measure';
 
-// 이 측정이 무엇이었는지 요약 파일만 보고 알 수 있게 한다.
 const TARGET = '{슬러그}';
 const ENDPOINT = '{HTTP} {경로}';
 const CONDITION = {
@@ -75,21 +46,16 @@ const CONDITION = {
     ramp_up: '30s',
     ramp_down: '30s',
     total_duration: '{ramp_up + duration + ramp_down}',
-    db_cache: 'warm (InnoDB 버퍼 풀은 재기동 없이 비울 수 없다)',
+    db_cache: 'warm',
     app_cache: '없음',
-    student_id_start: STUDENT_ID_START,
     user_count: USER_COUNT,
 };
 
-// tokens.json은 이슈 디렉토리에 있다(대상 간 공유).
-// 형태: [{ "accessToken": "...", "refreshToken": "..." }, ...]
+// 형태: [{ "memberId": 900001, "accessToken": "..." }, ...]
 const tokens = JSON.parse(open('../tokens.json'));
 
 if (tokens.length !== USER_COUNT) {
-    throw new Error(
-        `토큰 ${tokens.length}건 / 필요 ${USER_COUNT}건. 로그인에 실패한 학번이 있다. ` +
-        'tokens.json을 다시 만들고, 학번 범위와 시드의 비밀번호 해시(@pw_hash)가 맞는지 확인하라.'
-    );
+    throw new Error(`토큰 ${tokens.length}건 / 필요 ${USER_COUNT}건. mint-tokens.sh의 --count와 USER_COUNT를 맞춰라.`);
 }
 
 const scenarios = {
@@ -131,16 +97,8 @@ function parseBody(res) {
 }
 
 export default function () {
-    // 시나리오 전체의 반복 번호로 고른다. VU 수와 무관하게 토큰 USER_COUNT개를 균등하게 돈다.
     const token = tokens[exec.scenario.iterationInTest % tokens.length];
-
-    // 이 서버는 두 헤더를 모두 요구한다. 하나라도 빠지면 401이다.
-    const params = {
-        headers: {
-            'access-token': token.accessToken,
-            'refresh-token': token.refreshToken,
-        },
-    };
+    const params = { headers: { 'access-token': token.accessToken } };
 
     const res = http.get(`${BASE_URL}{대상 엔드포인트}`, params);
 
@@ -183,7 +141,7 @@ export function handleSummary(data) {
         bytes_received: val('data_received', 'count'),
     };
 
-    // 아래 반올림은 터미널 한 줄 출력에만 쓴다. summary 객체의 값은 손대지 않는다.
+    // 반올림은 터미널 한 줄에만 쓴다. summary의 값은 손대지 않는다.
     const num = (x, d) => (typeof x === 'number' ? x.toFixed(d) : '-');
     const line = [
         `[${PHASE}] ${TARGET}`,
@@ -195,10 +153,8 @@ export function handleSummary(data) {
     ].join(' / ');
 
     const out = { stdout: `\n${line}\n\n` };
-
     if (__ENV.SUMMARY_OUT) {
         out[__ENV.SUMMARY_OUT] = JSON.stringify(summary, null, 2);
     }
-
     return out;
 }

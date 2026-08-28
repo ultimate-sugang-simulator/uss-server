@@ -92,7 +92,7 @@
      export CONC_DIR=.claude/resources/concurrency/{이슈번호}
      export TARGET_DIR=$CONC_DIR/{슬러그}
 
-     mysqlc() { docker exec -i -e MYSQL_PWD=root uss-mysql mysql -uroot uss_db "$@"; }
+     mysqlc() { docker exec -i -e MYSQL_PWD=root uss-mysql mysql -uroot --default-character-set=utf8mb4 --init-command="SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci" uss_db "$@"; }
      ```
 
    - `mysqlc`는 문자열 변수가 아니라 함수다. 이유는 `SKILL.md`의 **측정 스택**을 보라.

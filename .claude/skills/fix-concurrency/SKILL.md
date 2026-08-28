@@ -76,7 +76,7 @@ effort: xhigh
 이 프로젝트는 MySQL 8.0 / InnoDB다. 접속은 아래 함수를 쓴다.
 
 ```bash
-mysqlc() { docker exec -i -e MYSQL_PWD=root uss-mysql mysql -uroot uss_db "$@"; }
+mysqlc() { docker exec -i -e MYSQL_PWD=root uss-mysql mysql -uroot --default-character-set=utf8mb4 --init-command="SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci" uss_db "$@"; }
 ```
 
 **문자열 변수로 만들지 마라.** `MYSQL_CONC="mysql -h 127.0.0.1 -P 3307 -u root uss_db"` 형태는
@@ -87,6 +87,11 @@ mysqlc() { docker exec -i -e MYSQL_PWD=root uss-mysql mysql -uroot uss_db "$@"; 
   통째로 명령어 하나로 해석되어 `command not found`가 난다.
 
 함수는 두 문제를 한 번에 피한다. `docker exec`의 `-i`는 `mysqlc < 파일.sql` 형태를 위해 필요하다.
+
+charset과 collation 옵션도 빼지 마라. 컨테이너 안의 클라이언트는 로케일이 없어 `latin1`로 붙는다.
+`--default-character-set=utf8mb4`가 없으면 쿼리 안의 한글 리터럴이 `?`가 되어 결과가 조용히 틀리고,
+`--init-command="SET NAMES ... COLLATE utf8mb4_unicode_ci"`가 없으면 collation이 서버 기본(`utf8mb4_0900_ai_ci`)으로 남아
+`utf8mb4_unicode_ci`인 컬럼과 사용자 변수의 비교가 `ERROR 1267`로 죽는다.
 
 **동시성 측정에서만 걸리는 것**
 
@@ -155,7 +160,7 @@ mysqlc() { docker exec -i -e MYSQL_PWD=root uss-mysql mysql -uroot uss_db "$@"; 
 | 파일 | 위치 | 만드는 Phase | 템플릿 |
 |---|---|---|---|
 | `seeds.sql` | 이슈 | 3 | `template/seeds/` 모듈 조합 |
-| `tokens.json` | 이슈 | 3 | `template/mint-tokens.sh` |
+| `tokens.json` | 이슈 | 3 | `.claude/skills/_shared/mint-tokens.sh` |
 | `record.md` | 대상 | 1 | `template/CONCURRENCY-template.md` |
 | `invariant-check.sql` | 대상 | 1 | `template/invariant-check.sql` |
 | `burst-script.js` | 대상 | 3 | `template/k6-burst-template.js` |

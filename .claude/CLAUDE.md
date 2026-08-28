@@ -6,7 +6,7 @@
 
 - Java 17 / Spring Boot 4.0.1 / Gradle
 - JPA + MySQL + Flyway (스키마 마이그레이션 `database/migration/` + 시드 데이터 `database/seed/`)
-- 커스텀 JWT 인증 (`@Auth` 파라미터 주입 + `JwtAuthenticationFilter`) + 이메일 인증(회원가입)
+- 커스텀 JWT 인증 (`@Auth` 파라미터 주입 + `JwtAuthenticationFilter`)
 - FULLTEXT(ngram) 기반 강의 검색
 - springdoc-openapi (Swagger UI)
 - H2 (통합 테스트) / p6spy (SQL 로깅)

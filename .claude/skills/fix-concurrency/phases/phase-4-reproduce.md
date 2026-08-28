@@ -25,7 +25,7 @@
    ```bash
    CONC_DIR=.claude/resources/concurrency/{이슈번호}
    TARGET_DIR=$CONC_DIR/{슬러그}
-   mysqlc() { docker exec -i -e MYSQL_PWD=root uss-mysql mysql -uroot uss_db "$@"; }
+   mysqlc() { docker exec -i -e MYSQL_PWD=root uss-mysql mysql -uroot --default-character-set=utf8mb4 --init-command="SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci" uss_db "$@"; }
 
    N=0   # 후보 번호. 원본은 0이다
 
