@@ -15,7 +15,7 @@
 #   bash mint-tokens.sh --secret {서명키} --start {회원 id 시작값} --count {개수} --out {경로}
 #
 # 예:
-#   bash .claude/skills/fix-concurrency/template/mint-tokens.sh \
+#   bash .claude/skills/_shared/mint-tokens.sh \
 #     --secret conc-only-local-secret-key-not-for-any-real-environment \
 #     --start 900001 --count 500 \
 #     --out .claude/resources/concurrency/90/tokens.json

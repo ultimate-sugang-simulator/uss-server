@@ -10,7 +10,7 @@
 
 ### 참조 파일
 - `.claude/skills/fix-concurrency/template/seeds/README.md`
-- `.claude/skills/fix-concurrency/template/mint-tokens.sh`
+- `.claude/skills/_shared/mint-tokens.sh`
 - `.claude/skills/fix-concurrency/template/k6-burst-template.js`
 
 ### 절차
@@ -65,7 +65,7 @@
    시드가 넣는 `password`는 BCrypt 해시가 아닌 더미 문자열이라 로그인 대조를 통과하지 못한다.
 
    ```bash
-   bash .claude/skills/fix-concurrency/template/mint-tokens.sh \
+   bash .claude/skills/_shared/mint-tokens.sh \
      --secret "$(grep 'secret-key:' src/main/resources/application-conc.yml | head -1 | sed 's/.*secret-key: *//')" \
      --start {시드 회원 id 시작값} \
      --count {VU 수} \

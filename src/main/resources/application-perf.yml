@@ -1,4 +1,4 @@
-# 성능 측정 전용 프로파일. Phase 2에서 src/main/resources/application-perf.yml 이 없으면 이 내용으로 생성한다.
+# 성능 측정 전용 프로파일. 원본은 .claude/skills/optimize-performance/template/application-perf.yml 이다.
 #
 # 목적은 하나다. 측정값을 왜곡하는 요소를 전부 끄는 것. 값을 바꿀 때는 주석의 이유를 먼저 읽어라.
 #

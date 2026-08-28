@@ -23,7 +23,7 @@ MGMT_PORT=${MGMT_PORT:-8081}
 POOL_MIN=${POOL_MIN:-500}          # Hikari minimum-idle. 0이면 풀 충전 대기를 건너뛴다
 BOOT_LOG=${BOOT_LOG:-build/conc-boot.log}
 
-mysqlc() { docker exec -i -e MYSQL_PWD=root uss-mysql mysql -uroot uss_db "$@"; }
+mysqlc() { docker exec -i -e MYSQL_PWD=root uss-mysql mysql -uroot --default-character-set=utf8mb4 --init-command="SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci" uss_db "$@"; }
 
 echo "레포 루트: $REPO_ROOT"
 echo
