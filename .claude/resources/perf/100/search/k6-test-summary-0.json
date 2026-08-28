@@ -1,0 +1,63 @@
+{
+  "phase": "measure",
+  "target": "search",
+  "endpoint": "GET /api/v1/courses/search",
+  "condition": {
+    "vus": 30,
+    "steady_state_duration": "1m",
+    "ramp_up": "30s",
+    "ramp_down": "30s",
+    "total_duration": "2m",
+    "db_cache": "warm (InnoDB 버퍼 풀은 재기동 없이 비울 수 없다)",
+    "app_cache": "없음",
+    "user_count": 50,
+    "course_rows": 26439,
+    "keyword_match_rows": "조합당 24건 (시드 24,000 / 1,000 조합)"
+  },
+  "keywords": [
+    "컴퓨터공학",
+    "기계설계",
+    "전자시스템",
+    "화학실험",
+    "경영분석",
+    "미디어데이터",
+    "바이오실험",
+    "로봇제어",
+    "금융최적화",
+    "스포츠계측"
+  ],
+  "requests": 43545,
+  "rps": 362.8612868672005,
+  "failed_rate": 0,
+  "checks_rate": 1,
+  "checks": [
+    {
+      "name": "status is 200",
+      "passes": 43545,
+      "fails": 0
+    },
+    {
+      "name": "body is not empty",
+      "passes": 43545,
+      "fails": 0
+    },
+    {
+      "name": "searchedCourseResponses가 실려 있다",
+      "passes": 43545,
+      "fails": 0
+    }
+  ],
+  "duration_ms": {
+    "med": 63.861,
+    "p95": 114.4194,
+    "p99": 172.74107999999995,
+    "max": 933.574
+  },
+  "waiting_ms": {
+    "med": 63.739,
+    "p95": 114.21539999999999,
+    "p99": 172.54923999999988,
+    "max": 933.434
+  },
+  "bytes_received": 543902071
+}

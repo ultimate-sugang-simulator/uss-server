@@ -23,8 +23,8 @@ const CONDITION = {
     db_cache: 'warm (InnoDB 버퍼 풀은 재기동 없이 비울 수 없다)',
     app_cache: '없음',
     user_count: USER_COUNT,
-    course_rows: 2002440,
-    keyword_match_rows: '조합당 약 2000건',
+    course_rows: 26439,
+    keyword_match_rows: '조합당 24건 (시드 24,000 / 1,000 조합)',
 };
 
 // 시드의 접두 40개 x 접미 25개 조합에서 고르게 흩어 뽑았다.
