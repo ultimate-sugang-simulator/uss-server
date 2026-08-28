@@ -4,7 +4,7 @@ description: 테스트 코드 작성 규칙 (모든 테스트는 통합 테스�
 
 # Test Convention
 
-모든 서비스 테스트는 통합 테스트(`@IntegrationTest`)로 작성한다. Mockito 기반 단위 테스트는 쓰지 않는다.
+모든 서비스 테스트는 통합 테스트로 작성한다. 기본은 `@IntegrationTest`(H2)다. Mockito 기반 단위 테스트는 쓰지 않는다.
 
 ## 네이밍 & 설정
 
@@ -35,6 +35,16 @@ assertThatThrownBy(() -> courseService.getMajorCourses(invalidMemberId))
         .isInstanceOf(RestApiException.class)
         .hasFieldOrPropertyWithValue("exceptionCode", MEMBER_NOT_FOUND);
 ```
+
+## MySQL 전용 쿼리 테스트
+
+FULLTEXT 등 H2가 실행하지 못하는 네이티브 쿼리는 `@MySqlIntegrationTest`(Testcontainers MySQL)로 검증한다.
+
+- 별도 클래스로 분리하고 이름은 `{Class}{기능}Test`로 짓는다 (예: `CourseServiceSearchTest`)
+- 트랜잭션 롤백 격리가 없다. InnoDB FULLTEXT는 커밋된 행만 검색하므로 저장이 그대로 커밋된다.
+  `@AfterEach`에서 `deleteAllInBatch()`로 직접 지워라
+- Docker가 없는 환경에서는 skip된다. CI에서는 항상 실행된다
+- 관련도를 검증할 때는 검색어와 무관한 행을 함께 넣어라. 모든 행이 검색어를 포함하면 idf가 0이라 관련도가 전부 같아진다
 
 ## Fixture
 

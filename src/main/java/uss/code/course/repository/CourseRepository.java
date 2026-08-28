@@ -50,7 +50,9 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         FROM courses c
         WHERE MATCH(c.course_code, c.haksu_code, c.title_kr, c.title_en) AGAINST(:keyword IN BOOLEAN MODE)
           AND c.status = 'ACTIVE'
-        ORDER BY MATCH(c.course_code, c.haksu_code, c.title_kr, c.title_en) AGAINST(:keyword IN BOOLEAN MODE)
+        ORDER BY c.grade_code,
+                 MATCH(c.course_code, c.haksu_code, c.title_kr, c.title_en) AGAINST(:keyword IN BOOLEAN MODE) DESC,
+                 c.haksu_code
     """, nativeQuery = true)
     List<Course> findByKeyword(@Param("keyword") final String keyword);
 
