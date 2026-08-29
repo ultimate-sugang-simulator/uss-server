@@ -1,0 +1,252 @@
+=== [세트 A / IN 1개 / COMPUTER_ENGINEERING] EXPLAIN ANALYZE ===
+*************************** 1. row ***************************
+EXPLAIN: -> Sort: c1_0.grade_code, c1_0.classification_code, c1_0.haksu_code  (actual time=53.5..54.4 rows=2735 loops=1)
+    -> Table scan on <temporary>  (cost=3062..3074 rows=750) (actual time=44.1..45.1 rows=2735 loops=1)
+        -> Temporary table with deduplication  (cost=3062..3062 rows=750) (actual time=44.1..44.1 rows=2735 loops=1)
+            -> Nested loop left join  (cost=2987 rows=750) (actual time=0.227..33.5 rows=2735 loops=1)
+                -> Filter: ((c1_0.department = 'COMPUTER_ENGINEERING') and (c1_0.`status` = 'ACTIVE'))  (cost=2725 rows=260) (actual time=0.192..28.8 rows=879 loops=1)
+                    -> Table scan on c1_0  (cost=2725 rows=26046) (actual time=0.0628..26.6 rows=26439 loops=1)
+                -> Index lookup on s1_0 using idx_course_id (course_id=c1_0.id)  (cost=0.721 rows=2.88) (actual time=0.00423..0.00501 rows=3.11 loops=879)
+
+=== [세트 A] EXPLAIN FORMAT=JSON ===
+*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "3737.29"
+    },
+    "ordering_operation": {
+      "using_temporary_table": true,
+      "using_filesort": true,
+      "duplicates_removal": {
+        "using_temporary_table": true,
+        "using_filesort": false,
+        "cost_info": {
+          "sort_cost": "749.96"
+        },
+        "nested_loop": [
+          {
+            "table": {
+              "table_name": "c1_0",
+              "access_type": "ALL",
+              "rows_examined_per_scan": 26046,
+              "rows_produced_per_join": 260,
+              "filtered": "1.00",
+              "cost_info": {
+                "read_cost": "2698.80",
+                "eval_cost": "26.05",
+                "prefix_cost": "2724.85",
+                "data_read_per_join": "1M"
+              },
+              "used_columns": [
+                "id",
+                "academic_year",
+                "term",
+                "title_kr",
+                "title_en",
+                "course_code",
+                "haksu_code",
+                "college",
+                "department",
+                "classification_code",
+                "classification_name",
+                "area",
+                "area_code",
+                "area_name",
+                "type_code",
+                "type_name",
+                "grade_code",
+                "grade_name",
+                "concentration_code",
+                "concentration_name",
+                "credits",
+                "is_english_course",
+                "english_code",
+                "english_name",
+                "is_huss_course",
+                "max_capacity",
+                "current_enrollment",
+                "status"
+              ],
+              "attached_condition": "((`uss_db`.`c1_0`.`department` = 'COMPUTER_ENGINEERING') and (`uss_db`.`c1_0`.`status` = 'ACTIVE'))"
+            }
+          },
+          {
+            "table": {
+              "table_name": "s1_0",
+              "access_type": "ref",
+              "possible_keys": [
+                "idx_course_id"
+              ],
+              "key": "idx_course_id",
+              "used_key_parts": [
+                "course_id"
+              ],
+              "key_length": "8",
+              "ref": [
+                "uss_db.c1_0.id"
+              ],
+              "rows_examined_per_scan": 2,
+              "rows_produced_per_join": 749,
+              "filtered": "100.00",
+              "cost_info": {
+                "read_cost": "187.49",
+                "eval_cost": "75.00",
+                "prefix_cost": "2987.33",
+                "data_read_per_join": "1M"
+              },
+              "used_columns": [
+                "id",
+                "course_id",
+                "day_of_week",
+                "period_code",
+                "period_name",
+                "classroom",
+                "start_time",
+                "end_time"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+=== [세트 A] STATUS COUNTERS ===
+Handler_commit	1
+Handler_external_lock	4
+Handler_read_first	1
+Handler_read_key	3615
+Handler_read_next	2732
+Handler_read_rnd_next	29176
+Handler_write	2735
+Sort_merge_passes	3
+Sort_rows	2735
+Sort_scan	1
+=== [세트 B / IN 4개 / ELECTRONICS_ENGINEERING_SCHOOL] EXPLAIN ANALYZE ===
+*************************** 1. row ***************************
+EXPLAIN: -> Sort: c1_0.grade_code, c1_0.classification_code, c1_0.haksu_code  (actual time=130..134 rows=10246 loops=1)
+    -> Table scan on <temporary>  (cost=4075..4115 rows=3000) (actual time=88.1..91.6 rows=10246 loops=1)
+        -> Temporary table with deduplication  (cost=4075..4075 rows=3000) (actual time=88.1..88.1 rows=10246 loops=1)
+            -> Nested loop left join  (cost=3775 rows=3000) (actual time=0.0854..46.8 rows=10246 loops=1)
+                -> Filter: ((c1_0.department in ('ELECTRONICS_ENGINEERING_SCHOOL','ELECTRONICS_ENGINEERING_MAJOR','ELECTRONICS_ENGINEERING','SEMICONDUCTOR_CONVERGENCE_MAJOR')) and (c1_0.`status` = 'ACTIVE'))  (cost=2725 rows=1042) (actual time=0.0597..32.3 rows=3378 loops=1)
+                    -> Table scan on c1_0  (cost=2725 rows=26046) (actual time=0.052..26.8 rows=26439 loops=1)
+                -> Index lookup on s1_0 using idx_course_id (course_id=c1_0.id)  (cost=0.72 rows=2.88) (actual time=0.0033..0.00394 rows=3.03 loops=3378)
+
+=== [세트 B] EXPLAIN FORMAT=JSON ===
+*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "6774.61"
+    },
+    "ordering_operation": {
+      "using_temporary_table": true,
+      "using_filesort": true,
+      "duplicates_removal": {
+        "using_temporary_table": true,
+        "using_filesort": false,
+        "cost_info": {
+          "sort_cost": "2999.83"
+        },
+        "nested_loop": [
+          {
+            "table": {
+              "table_name": "c1_0",
+              "access_type": "ALL",
+              "rows_examined_per_scan": 26046,
+              "rows_produced_per_join": 1041,
+              "filtered": "4.00",
+              "cost_info": {
+                "read_cost": "2620.67",
+                "eval_cost": "104.18",
+                "prefix_cost": "2724.85",
+                "data_read_per_join": "4M"
+              },
+              "used_columns": [
+                "id",
+                "academic_year",
+                "term",
+                "title_kr",
+                "title_en",
+                "course_code",
+                "haksu_code",
+                "college",
+                "department",
+                "classification_code",
+                "classification_name",
+                "area",
+                "area_code",
+                "area_name",
+                "type_code",
+                "type_name",
+                "grade_code",
+                "grade_name",
+                "concentration_code",
+                "concentration_name",
+                "credits",
+                "is_english_course",
+                "english_code",
+                "english_name",
+                "is_huss_course",
+                "max_capacity",
+                "current_enrollment",
+                "status"
+              ],
+              "attached_condition": "((`uss_db`.`c1_0`.`department` in ('ELECTRONICS_ENGINEERING_SCHOOL','ELECTRONICS_ENGINEERING_MAJOR','ELECTRONICS_ENGINEERING','SEMICONDUCTOR_CONVERGENCE_MAJOR')) and (`uss_db`.`c1_0`.`status` = 'ACTIVE'))"
+            }
+          },
+          {
+            "table": {
+              "table_name": "s1_0",
+              "access_type": "ref",
+              "possible_keys": [
+                "idx_course_id"
+              ],
+              "key": "idx_course_id",
+              "used_key_parts": [
+                "course_id"
+              ],
+              "key_length": "8",
+              "ref": [
+                "uss_db.c1_0.id"
+              ],
+              "rows_examined_per_scan": 2,
+              "rows_produced_per_join": 2999,
+              "filtered": "100.00",
+              "cost_info": {
+                "read_cost": "749.96",
+                "eval_cost": "299.98",
+                "prefix_cost": "3774.79",
+                "data_read_per_join": "6M"
+              },
+              "used_columns": [
+                "id",
+                "course_id",
+                "day_of_week",
+                "period_code",
+                "period_name",
+                "classroom",
+                "start_time",
+                "end_time"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+=== [세트 B] STATUS COUNTERS ===
+Handler_commit	1
+Handler_external_lock	4
+Handler_read_first	1
+Handler_read_key	13625
+Handler_read_next	10243
+Handler_read_rnd_next	36687
+Handler_write	10246
+Sort_merge_passes	9
+Sort_rows	10246
+Sort_scan	1
