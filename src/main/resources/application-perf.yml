@@ -3,7 +3,7 @@
 # 목적은 하나다. 측정값을 왜곡하는 요소를 전부 끄는 것. 값을 바꿀 때는 주석의 이유를 먼저 읽어라.
 #
 # 기동: ./gradlew bootRun --args='--spring.profiles.active=perf'
-# 선행: docker-compose -f docker/docker-compose-local.yml up -d mysql
+# 선행: docker-compose -f docker/docker-compose-local.yml up -d mysql redis
 
 spring:
   application:
@@ -25,6 +25,23 @@ spring:
       connection-timeout: 10000
       # 측정 중 커넥션이 재생성되면 그 지연이 응답시간에 섞인다.
       max-lifetime: 1800000
+
+  data:
+    redis:
+      # docker-compose-local.yml의 redis. 호스트 포트는 6379다.
+      host: 127.0.0.1
+      port: 6379
+      # Redis가 멈추면 이 시간 안에 실패로 돌려 캐시 오류 핸들러가 원본(DB)으로 넘긴다. 기본 60s면 요청마다 그만큼 멈춘다.
+      timeout: 1s
+      connect-timeout: 1s
+
+  cache:
+    type: redis
+    redis:
+      # Phase 8이 actuator의 cache_gets_total{result="hit"|"miss"}로 hit / miss를 읽는다. 없으면 캐시 지표가 안 뜬다.
+      enable-statistics: true
+      # 정적 강의 목록의 안전망. 매일 새벽 재적재가 정상이면 만료 전에 덮어써져 발동하지 않는다.
+      time-to-live: 25h
 
   jpa:
     hibernate:
@@ -53,6 +70,12 @@ inu:
     base-url: http://localhost/unused-in-perf-profile
     auth-key: unused
     mod-date: "20260101"
+
+cache:
+  major-courses:
+    # CourseCacheWarmer가 전 학과 정적 목록을 다시 채우는 시각. 피크를 피한 새벽으로 둔다.
+    refresh-cron: "0 0 4 * * *"
+    refresh-zone: Asia/Seoul
 
 security:
   jwt:

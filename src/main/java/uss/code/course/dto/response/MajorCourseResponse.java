@@ -2,7 +2,7 @@ package uss.code.course.dto.response;
 
 import lombok.Builder;
 import uss.code.course.domain.Course;
-import uss.code.course.infra.CourseScheduleFormatter;
+import uss.code.course.dto.common.CachedMajorCourse;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -29,26 +29,33 @@ public record MajorCourseResponse(
         boolean isRegisterable
 ) {
     public static MajorCourseResponse from(final Course course) {
+        return MajorCourseResponse.of(CachedMajorCourse.from(course), course.isRegisterable());
+    }
+
+    public static MajorCourseResponse of(
+            final CachedMajorCourse course,
+            final boolean isRegisterable
+    ) {
         return MajorCourseResponse.builder()
-                .id(course.getId())
-                .grade(course.getGradeName())
-                .classification(course.getClassificationName())
-                .courseCode(course.getCourseCode())
-                .haksuCode(course.getHaksuCode())
-                .titleKr(course.getTitleKr())
-                .titleEn(course.getTitleEn())
-                .credits(course.getCredits())
+                .id(course.id())
+                .grade(course.grade())
+                .classification(course.classification())
+                .courseCode(course.courseCode())
+                .haksuCode(course.haksuCode())
+                .titleKr(course.titleKr())
+                .titleEn(course.titleEn())
+                .credits(course.credits())
                 .isEnglishCourse(course.isEnglishCourse())
-                .englishCourseName(course.isEnglishCourse() ? course.getEnglishName() : null)
-                .schedule(CourseScheduleFormatter.format(course.getSchedules()))
+                .englishCourseName(course.englishCourseName())
+                .schedule(course.schedule())
                 .is75MinLesson(course.is75MinLesson())
-                .suupTypeCode(course.getTypeCode())
-                .suupTypeName(course.getTypeName())
-                .cnctrIsuCode(course.getConcentrationCode())
-                .cnctrIsuName(course.getConcentrationName())
+                .suupTypeCode(course.suupTypeCode())
+                .suupTypeName(course.suupTypeName())
+                .cnctrIsuCode(course.cnctrIsuCode())
+                .cnctrIsuName(course.cnctrIsuName())
                 .isHussCourse(course.isHussCourse())
-                .department(course.getDepartment().getName())
-                .isRegisterable(course.isRegisterable())
+                .department(course.department())
+                .isRegisterable(isRegisterable)
                 .build();
     }
 }

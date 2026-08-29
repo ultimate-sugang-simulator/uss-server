@@ -8,6 +8,7 @@ import uss.code.course.domain.Course;
 import uss.code.course.domain.CourseArea;
 import uss.code.course.domain.CourseDepartment;
 import uss.code.course.domain.CourseTerm;
+import uss.code.course.dto.common.CourseCapacity;
 import uss.code.course.dto.common.CourseCategory;
 import uss.code.course.dto.common.CourseTermInfo;
 
@@ -32,6 +33,14 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         ORDER BY c.gradeCode, c.classificationCode, c.haksuCode
     """)
     List<Course> findByDepartmentIn(@Param("departments") final List<CourseDepartment> departments);
+
+    @Query("""
+        SELECT new uss.code.course.dto.common.CourseCapacity(c.id, c.currentEnrollment, c.maxCapacity)
+        FROM Course c
+        WHERE c.department IN :departments
+          AND c.status = uss.code.course.domain.CourseStatus.ACTIVE
+    """)
+    List<CourseCapacity> findCapacitiesByDepartmentIn(@Param("departments") final List<CourseDepartment> departments);
 
     @Query("""
         SELECT c
