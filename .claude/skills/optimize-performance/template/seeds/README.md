@@ -63,10 +63,10 @@ cat $PERF_DIR/seeds.sql $SEEDS/member.sql $SEEDS/course.sql $SEEDS/enrollment.sq
 | `@member_count` | member, enrollment | 시드 회원 수. k6의 `USER_COUNT`, `mint-tokens.sh`의 `--count`와 맞춘다 | |
 | `@student_id_start` | member | 학번 시작값 (영숫자 1~20자) | |
 | `@pw_hash` | member | 회원 전원이 공유할 `password` 값. 토큰을 `mint-tokens.sh`로 만들면 로그인을 안 타므로 아무 문자열이나 된다. **로그인 경로를 측정할 때만** Phase 3-A에서 가입 API로 뽑은 BCrypt 해시를 넣는다 | |
-| `@member_dept_count` | member | 회원이 퍼질 학과 수 | 5 |
+| `@member_dept_count` | member | 회원이 퍼질 학과 수. 앞 5개는 `CourseDepartment`를 1개씩 소유하고(전공 조회의 `IN` 목록 1개), 6~8번은 각각 4, 3, 2개를 소유한다 | 8 |
 | `@course_start` | course, enrollment | 시드 강의 id 시작값 | |
 | `@course_count` | course, enrollment | 시드 강의 수 | |
-| `@course_dept_count` | course | 강의가 퍼질 학과 수. 앞 5개가 member의 학과와 같아 전공 조회가 0건이 되지 않는다 | 20 |
+| `@course_dept_count` | course | 강의가 퍼질 학과 수. 앞 14개가 member의 학과 8개가 소유한 `CourseDepartment` 전부라 전공 조회가 0건이 되지 않는다 | 29 |
 | `@course_area_count` | course | 강의가 퍼질 영역 수. 앞 3개는 전공 영역, 4번째부터 교양 영역이다. 교양 조회를 재면 4 이상 | 8 |
 | `@schedules_per_course` | course | 강의당 시간표 행 수 | |
 | `@course_term_year` | course | 학년도. `uk_year_term_haksu`의 첫 컬럼 | |
