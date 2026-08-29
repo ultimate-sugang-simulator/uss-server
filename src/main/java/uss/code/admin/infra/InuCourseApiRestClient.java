@@ -129,7 +129,7 @@ public class InuCourseApiRestClient implements InuCourseApiClient {
             final Exception e
     ) {
         if (page > FIRST_PAGE) {
-            log.warn("연계 API 다음 페이지를 해석하지 못해 수집을 멈춘다. path={}, page={}, message={}", path, page, e.getMessage());
+            log.warn("Course API page fetch failed, stopping collection. path={}, page={}, message={}", path, page, e.getMessage());
             return null;
         }
 

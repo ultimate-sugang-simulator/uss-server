@@ -26,13 +26,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RestApiException.class)
     public ResponseEntity<ErrorResponse> handleRestApiException(final RestApiException e) {
-        log.error("예외 발생: {}", e.getMessage());
+        log.warn("Business exception. code={}, message={}", e.getExceptionCode().getCode(), e.getMessage());
         return makeExceptionResponse(e.getExceptionCode());
     }
 
     @ExceptionHandler(JwtAuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleJwtAuthenticationException(final JwtAuthenticationException e) {
-        log.error("예외 발생: {}", e.getMessage());
+        log.warn("Authentication failed. code={}, message={}", e.getCode(), e.getMessage());
         return ResponseEntity.status(UNAUTHORIZED).body(ErrorResponse.of(e.getCode(), e.getMessage()));
     }
 
@@ -50,18 +50,21 @@ public class GlobalExceptionHandler {
                     .append(" ]\n");
         }
 
-        return makeExceptionResponse(errorMessages.toString().trim());
+        final String message = errorMessages.toString().trim();
+        log.warn("Request validation failed. errors={}", message);
+
+        return makeExceptionResponse(message);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(final ConstraintViolationException e) {
-        log.error("예외 발생: {}", e.getMessage());
+        log.warn("Request parameter invalid. message={}", e.getMessage());
         return makeExceptionResponse(INVALID_REQUEST_PARAMETER);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(final HttpMessageNotReadableException e) {
-        log.error("예외 발생: {}", e.getMessage());
+        log.warn("Request body unreadable. message={}", e.getMessage());
 
         if (isEnumConversionFailure(e)) {
             return makeExceptionResponse(INVALID_ENUM_TYPE);
@@ -72,7 +75,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(final Exception e){
-        log.error("예외 발생: {}", e.getMessage());
+        log.error("Unexpected exception. message={}", e.getMessage(), e);
         return makeExceptionResponse(ExceptionCode.UNEXPECTED_SERVER_ERROR);
     }
 

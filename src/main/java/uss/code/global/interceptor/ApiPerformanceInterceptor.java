@@ -2,15 +2,14 @@ package uss.code.global.interceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+@Log4j2(topic = "API_PERF")
 @Component
 public class ApiPerformanceInterceptor implements HandlerInterceptor {
 
-    private static final Logger API_PERF = LoggerFactory.getLogger("API_PERF");
     private static final String LOG_FORMAT = "type=API_PERFORMANCE method={} uri={} response_time={} status={}";
 
     private static final String START_TIME_ATTRIBUTE = "start-time";
@@ -47,10 +46,10 @@ public class ApiPerformanceInterceptor implements HandlerInterceptor {
         final int status = response.getStatus();
 
         if (responseTime > RESPONSE_TIME_THRESHOLD_MS) {
-            API_PERF.warn(LOG_FORMAT, method, uri, responseTime, status);
+            log.warn(LOG_FORMAT, method, uri, responseTime, status);
             return;
         }
 
-        API_PERF.info(LOG_FORMAT, method, uri, responseTime, status);
+        log.info(LOG_FORMAT, method, uri, responseTime, status);
     }
 }

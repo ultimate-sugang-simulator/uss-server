@@ -56,7 +56,7 @@ public class CourseSyncExecutor {
 
             courseSyncJobService.succeed(jobId, result);
         } catch (final Exception e) {
-            log.error("강의 동기화에 실패했다. jobId={}, message={}", jobId, e.getMessage(), e);
+            log.error("Course sync failed. jobId={}, message={}", jobId, e.getMessage(), e);
             courseSyncJobService.fail(jobId, e.getMessage(), applied);
         }
     }
