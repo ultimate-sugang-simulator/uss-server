@@ -9,6 +9,6 @@ import java.lang.reflect.Method;
 public class AsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
     @Override
     public void handleUncaughtException(Throwable ex, Method method, Object... parmas) {
-        log.error("비동기 처리중 예외 발생. 예외: {} | 메서드: {}", ex.getMessage(), method.getName());
+        log.error("Uncaught async exception. method={}, message={}", method.getName(), ex.getMessage(), ex);
     }
 }

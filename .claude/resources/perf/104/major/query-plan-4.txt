@@ -1,0 +1,102 @@
+=== [세트 A / IN 1개 / COMPUTER_ENGINEERING / capacity] EXPLAIN ANALYZE ===
+*************************** 1. row ***************************
+EXPLAIN: -> Filter: (c1_0.`status` = 'ACTIVE')  (cost=229 rows=87.9) (actual time=0.0679..1.29 rows=879 loops=1)
+    -> Index lookup on c1_0 using idx_department_sort (department='COMPUTER_ENGINEERING')  (cost=229 rows=879) (actual time=0.0661..1.18 rows=879 loops=1)
+
+=== [세트 A / IN 1개 / COMPUTER_ENGINEERING / capacity] EXPLAIN FORMAT=JSON ===
+*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "307.65"
+    },
+    "table": {
+      "table_name": "c1_0",
+      "access_type": "ref",
+      "possible_keys": [
+        "idx_department_sort"
+      ],
+      "key": "idx_department_sort",
+      "used_key_parts": [
+        "department"
+      ],
+      "key_length": "202",
+      "ref": [
+        "const"
+      ],
+      "rows_examined_per_scan": 879,
+      "rows_produced_per_join": 87,
+      "filtered": "10.00",
+      "cost_info": {
+        "read_cost": "219.75",
+        "eval_cost": "8.79",
+        "prefix_cost": "307.65",
+        "data_read_per_join": "411K"
+      },
+      "used_columns": [
+        "id",
+        "department",
+        "max_capacity",
+        "current_enrollment",
+        "status"
+      ],
+      "attached_condition": "(`uss_db`.`c1_0`.`status` = 'ACTIVE')"
+    }
+  }
+}
+=== [세트 A / IN 1개 / COMPUTER_ENGINEERING / capacity] STATUS COUNTERS ===
+Handler_commit	1
+Handler_external_lock	2
+Handler_read_key	1
+Handler_read_next	879
+=== [세트 B / IN 4개 / ELECTRONICS_ENGINEERING_SCHOOL / capacity] EXPLAIN ANALYZE ===
+*************************** 1. row ***************************
+EXPLAIN: -> Filter: (c1_0.`status` = 'ACTIVE')  (cost=1521 rows=338) (actual time=0.168..14.4 rows=3378 loops=1)
+    -> Index range scan on c1_0 using idx_department_sort over (department = 'ELECTRONICS_ENGINEERING') OR (department = 'ELECTRONICS_ENGINEERING_MAJOR') OR (2 more), with index condition: (c1_0.department in ('ELECTRONICS_ENGINEERING_SCHOOL','ELECTRONICS_ENGINEERING_MAJOR','ELECTRONICS_ENGINEERING','SEMICONDUCTOR_CONVERGENCE_MAJOR'))  (cost=1521 rows=3378) (actual time=0.167..13.6 rows=3378 loops=1)
+
+=== [세트 B / IN 4개 / ELECTRONICS_ENGINEERING_SCHOOL / capacity] EXPLAIN FORMAT=JSON ===
+*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "1521.11"
+    },
+    "table": {
+      "table_name": "c1_0",
+      "access_type": "range",
+      "possible_keys": [
+        "idx_department_sort"
+      ],
+      "key": "idx_department_sort",
+      "used_key_parts": [
+        "department"
+      ],
+      "key_length": "202",
+      "rows_examined_per_scan": 3378,
+      "rows_produced_per_join": 337,
+      "filtered": "10.00",
+      "index_condition": "(`uss_db`.`c1_0`.`department` in ('ELECTRONICS_ENGINEERING_SCHOOL','ELECTRONICS_ENGINEERING_MAJOR','ELECTRONICS_ENGINEERING','SEMICONDUCTOR_CONVERGENCE_MAJOR'))",
+      "cost_info": {
+        "read_cost": "1487.33",
+        "eval_cost": "33.78",
+        "prefix_cost": "1521.11",
+        "data_read_per_join": "1M"
+      },
+      "used_columns": [
+        "id",
+        "department",
+        "max_capacity",
+        "current_enrollment",
+        "status"
+      ],
+      "attached_condition": "(`uss_db`.`c1_0`.`status` = 'ACTIVE')"
+    }
+  }
+}
+=== [세트 B / IN 4개 / ELECTRONICS_ENGINEERING_SCHOOL / capacity] STATUS COUNTERS ===
+Handler_commit	1
+Handler_external_lock	2
+Handler_read_key	4
+Handler_read_next	3378

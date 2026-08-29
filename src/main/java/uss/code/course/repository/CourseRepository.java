@@ -8,6 +8,7 @@ import uss.code.course.domain.Course;
 import uss.code.course.domain.CourseArea;
 import uss.code.course.domain.CourseDepartment;
 import uss.code.course.domain.CourseTerm;
+import uss.code.course.dto.common.CourseCapacity;
 import uss.code.course.dto.common.CourseCategory;
 import uss.code.course.dto.common.CourseTermInfo;
 
@@ -16,9 +17,8 @@ import java.util.Optional;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query("""
-        SELECT DISTINCT c
+        SELECT c
         FROM Course c
-        LEFT JOIN FETCH c.schedules
         WHERE c.department = :department
           AND c.status = uss.code.course.domain.CourseStatus.ACTIVE
         ORDER BY c.gradeCode, c.classificationCode, c.haksuCode
@@ -26,9 +26,8 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findByDepartment(@Param("department") final CourseDepartment department);
 
     @Query("""
-        SELECT DISTINCT c
+        SELECT c
         FROM Course c
-        LEFT JOIN FETCH c.schedules
         WHERE c.department IN :departments
           AND c.status = uss.code.course.domain.CourseStatus.ACTIVE
         ORDER BY c.gradeCode, c.classificationCode, c.haksuCode
@@ -36,9 +35,16 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findByDepartmentIn(@Param("departments") final List<CourseDepartment> departments);
 
     @Query("""
-        SELECT DISTINCT c
+        SELECT new uss.code.course.dto.common.CourseCapacity(c.id, c.currentEnrollment, c.maxCapacity)
         FROM Course c
-        LEFT JOIN FETCH c.schedules
+        WHERE c.department IN :departments
+          AND c.status = uss.code.course.domain.CourseStatus.ACTIVE
+    """)
+    List<CourseCapacity> findCapacitiesByDepartmentIn(@Param("departments") final List<CourseDepartment> departments);
+
+    @Query("""
+        SELECT c
+        FROM Course c
         WHERE c.area = :area
           AND c.status = uss.code.course.domain.CourseStatus.ACTIVE
         ORDER BY c.gradeCode, c.classificationCode, c.haksuCode
@@ -87,9 +93,8 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     List<CourseDepartment> findDepartmentsIn(@Param("departments") final List<CourseDepartment> departments);
 
     @Query("""
-        SELECT DISTINCT c
+        SELECT c
         FROM Course c
-        LEFT JOIN FETCH c.schedules
         WHERE c.isHussCourse = true
           AND c.status = uss.code.course.domain.CourseStatus.ACTIVE
         ORDER BY c.gradeCode, c.classificationCode, c.haksuCode
@@ -108,7 +113,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     );
 
     @Query("""
-        SELECT DISTINCT c
+        SELECT c
         FROM Course c
         LEFT JOIN FETCH c.schedules
         WHERE c.academicYear = :academicYear

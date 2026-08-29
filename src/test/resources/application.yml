@@ -21,6 +21,9 @@ spring:
       host: localhost
       port: 6379
 
+  cache:
+    type: none
+
 security:
   jwt:
     secret-key: test-secret-key-for-unit-testing-purposes-only

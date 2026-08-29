@@ -19,6 +19,8 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --ngram_token_size=2
+      - --performance-schema-max-digest-length=4096
+      - --performance-schema-max-sql-text-length=4096
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s

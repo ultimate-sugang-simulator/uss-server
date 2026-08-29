@@ -1,6 +1,6 @@
 -- 회원 시드: members
 --
--- 필요한 변수: @member_start, @member_count, @student_id_start, @pw_hash, @member_dept_count (상한 5)
+-- 필요한 변수: @member_start, @member_count, @student_id_start, @pw_hash, @member_dept_count (상한 8)
 --
 -- id를 명시 삽입한다. mint-tokens.sh의 --start / --count가 이 범위와 맞아야 한다.
 -- 이메일은 perf{id}@inu.ac.kr, 학번은 @student_id_start부터 1씩 증가한다.
@@ -24,12 +24,16 @@ SELECT @member_start + n,
        -- college와 department는 같은 인덱스로 골라 단과대학-학과 쌍이 맞는다.
        ELT(1 + (n % @member_dept_count),
            'INFORMATION_TECHNOLOGY', 'ENGINEERING', 'NATURAL_SCIENCES',
-           'BUSINESS', 'COMMERCE_PUBLIC_AFFAIRS'),
-       -- 전공 조회(/api/v1/courses/major)가 이 값을 CourseDepartment로 그대로 변환한다.
-       -- course.sql의 department 목록 앞 5개와 같다.
+           'BUSINESS', 'COMMERCE_PUBLIC_AFFAIRS',
+           'ENGINEERING', 'LIFE_SCIENCES_BIOENGINEERING', 'COMMERCE_PUBLIC_AFFAIRS'),
+       -- 전공 조회(/api/v1/courses/major)가 이 값을 CourseDepartment.ownedBy로 변환한다.
+       -- 앞 5개는 소유한 CourseDepartment가 1개씩이라 department IN 목록이 1개고,
+       -- 뒤 3개는 각각 4개, 3개, 2개를 소유해 IN 목록이 여러 개가 된다.
+       -- 소유분은 전부 course.sql의 department 목록 앞 14개에 들어 있다.
        ELT(1 + (n % @member_dept_count),
            'COMPUTER_ENGINEERING', 'MECHANICAL_ENGINEERING', 'MATHEMATICS',
-           'BUSINESS_ADMINISTRATION', 'ECONOMICS'),
+           'BUSINESS_ADMINISTRATION', 'ECONOMICS',
+           'ELECTRONICS_ENGINEERING_SCHOOL', 'LIFE_SCIENCE_SCHOOL', 'GLOBAL_TRADE_SERVICE'),
        ELT(1 + (n % 4), 'FRESHMAN', 'SOPHOMORE', 'JUNIOR', 'SENIOR'),
        -- 휴학생을 섞어 학적 상태 분기가 생겼을 때 그대로 쓸 수 있게 한다.
        IF(n % 10 = 0, 'LEAVE_OF_ABSENCE', 'ENROLLED'),

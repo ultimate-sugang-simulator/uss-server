@@ -1,0 +1,64 @@
+{
+  "phase": "measure",
+  "target": "major",
+  "endpoint": "GET /api/v1/courses/major",
+  "condition": {
+    "vus": 30,
+    "steady_state_duration": "1m",
+    "ramp_up": "30s",
+    "ramp_down": "30s",
+    "total_duration": "2m",
+    "db_cache": "warm",
+    "app_cache": "없음",
+    "user_count": 1000
+  },
+  "requests": 6350,
+  "rps": 52.91244733992837,
+  "failed_rate": 0,
+  "checks_rate": 1,
+  "checks": [
+    {
+      "name": "status is 200",
+      "passes": 6350,
+      "fails": 0
+    },
+    {
+      "name": "body is not empty",
+      "passes": 6350,
+      "fails": 0
+    },
+    {
+      "name": "majorCourseResponses에 강의가 실려 있다",
+      "passes": 6350,
+      "fails": 0
+    }
+  ],
+  "duration_ms": {
+    "med": 431.2765,
+    "p95": 766.3679499999996,
+    "p99": 1084.5673199999999,
+    "max": 1453.664
+  },
+  "waiting_ms": {
+    "med": 424.481,
+    "p95": 755.25875,
+    "p99": 1076.12053,
+    "max": 1441.482
+  },
+  "bytes_received": 4798345074,
+  "delta_vs_prev": {
+    "from": "k6-test-summary-3.json",
+    "rps": {
+      "before": 21.370335865922097,
+      "after": 52.91244733992837
+    },
+    "duration_p95_ms": {
+      "before": 2110.25,
+      "after": 766.3679499999996
+    },
+    "duration_p99_ms": {
+      "before": 2602.2771199999997,
+      "after": 1084.5673199999999
+    }
+  }
+}

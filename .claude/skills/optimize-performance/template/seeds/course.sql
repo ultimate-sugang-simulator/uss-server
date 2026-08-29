@@ -1,6 +1,6 @@
 -- 강의 시드: courses, course_schedules
 --
--- 필요한 변수: @course_start, @course_count, @course_dept_count (상한 20), @course_area_count (상한 8),
+-- 필요한 변수: @course_start, @course_count, @course_dept_count (상한 29), @course_area_count (상한 8),
 --              @schedules_per_course, @course_term_year, @course_term, @course_title_mode ('plain' | 'search')
 --
 -- id를 명시 삽입한다. @course_start는 SELECT MAX(id) FROM courses; 보다 커야 한다.
@@ -45,10 +45,16 @@ SELECT @course_start + n,
        ELT(1 + (n % 8),
            'HUMANITIES', 'NATURAL_SCIENCES', 'SOCIAL_SCIENCES', 'COMMERCE_PUBLIC_AFFAIRS',
            'ENGINEERING', 'INFORMATION_TECHNOLOGY', 'BUSINESS', 'ARTS_PHYSICAL_EDUCATION'),
-       -- 앞 5개는 member.sql의 department와 같다 (CourseDepartment, MemberDepartment 양쪽에 있는 상수).
+       -- 앞 14개는 member.sql의 학과 8개가 소유한 CourseDepartment 전부다.
+       -- 1~5는 소유자가 1개씩, 6~9는 ELECTRONICS_ENGINEERING_SCHOOL(4개),
+       -- 10~12는 LIFE_SCIENCE_SCHOOL(3개), 13~14는 GLOBAL_TRADE_SERVICE(2개) 소유다.
        ELT(1 + (n % @course_dept_count),
            'COMPUTER_ENGINEERING', 'MECHANICAL_ENGINEERING', 'MATHEMATICS',
            'BUSINESS_ADMINISTRATION', 'ECONOMICS',
+           'ELECTRONICS_ENGINEERING', 'ELECTRONICS_ENGINEERING_SCHOOL',
+           'ELECTRONICS_ENGINEERING_MAJOR', 'SEMICONDUCTOR_CONVERGENCE_MAJOR',
+           'LIFE_SCIENCE_SCHOOL', 'LIFE_SCIENCE_MAJOR', 'MOLECULAR_LIFE_SCIENCE_MAJOR',
+           'TRADE', 'GLOBAL_TRADE_SERVICE',
            'KOREAN_LITERATURE', 'ENGLISH_LITERATURE', 'GERMAN_STUDIES', 'FRENCH_STUDIES',
            'JAPANESE_LITERATURE', 'CHINESE_STUDIES', 'PHYSICS', 'CHEMISTRY',
            'FASHION_INDUSTRY', 'MARINE_SCIENCE', 'SOCIAL_WELFARE', 'MEDIA_COMMUNICATION',

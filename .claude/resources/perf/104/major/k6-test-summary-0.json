@@ -1,0 +1,49 @@
+{
+  "phase": "measure",
+  "target": "major",
+  "endpoint": "GET /api/v1/courses/major",
+  "condition": {
+    "vus": 30,
+    "steady_state_duration": "1m",
+    "ramp_up": "30s",
+    "ramp_down": "30s",
+    "total_duration": "2m",
+    "db_cache": "warm",
+    "app_cache": "없음",
+    "user_count": 1000
+  },
+  "requests": 1364,
+  "rps": 11.361679173551456,
+  "failed_rate": 0,
+  "checks_rate": 1,
+  "checks": [
+    {
+      "name": "status is 200",
+      "passes": 1364,
+      "fails": 0
+    },
+    {
+      "name": "body is not empty",
+      "passes": 1364,
+      "fails": 0
+    },
+    {
+      "name": "majorCourseResponses에 강의가 실려 있다",
+      "passes": 1364,
+      "fails": 0
+    }
+  ],
+  "duration_ms": {
+    "med": 1824.5304999999998,
+    "p95": 4217.297049999999,
+    "p99": 8610.90285,
+    "max": 11885.935
+  },
+  "waiting_ms": {
+    "med": 1816.719,
+    "p95": 4191.455649999999,
+    "p99": 8598.41704,
+    "max": 11824.946
+  },
+  "bytes_received": 1029584776
+}

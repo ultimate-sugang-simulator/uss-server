@@ -1,0 +1,19 @@
+=== BEFORE ===
+      60
+cache_gets_total{application="uss-server-perf",cache="major-courses",cache_manager="cacheManager",name="major-courses",result="hit"} 1427.0
+cache_gets_total{application="uss-server-perf",cache="major-courses",cache_manager="cacheManager",name="major-courses",result="miss"} 0.0
+cache_gets_total{application="uss-server-perf",cache="major-courses",cache_manager="cacheManager",name="major-courses",result="pending"} 0.0
+cache_lock_duration_seconds{application="uss-server-perf",cache="major-courses",cache_manager="cacheManager",name="major-courses"} 0.0
+cache_puts_total{application="uss-server-perf",cache="major-courses",cache_manager="cacheManager",name="major-courses"} 60.0
+OK
+=== AFTER ===
+cache_gets_total{application="uss-server-perf",cache="major-courses",cache_manager="cacheManager",name="major-courses",result="hit"} 7777.0
+cache_gets_total{application="uss-server-perf",cache="major-courses",cache_manager="cacheManager",name="major-courses",result="miss"} 0.0
+cache_gets_total{application="uss-server-perf",cache="major-courses",cache_manager="cacheManager",name="major-courses",result="pending"} 0.0
+cache_lock_duration_seconds{application="uss-server-perf",cache="major-courses",cache_manager="cacheManager",name="major-courses"} 0.0
+cache_puts_total{application="uss-server-perf",cache="major-courses",cache_manager="cacheManager",name="major-courses"} 60.0
+total_commands_processed:6365
+total_net_output_bytes:4583067865
+keyspace_hits:6350
+keyspace_misses:0
+      60
