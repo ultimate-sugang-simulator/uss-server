@@ -51,6 +51,10 @@ cat $PERF_DIR/seeds.sql $SEEDS/member.sql $SEEDS/course.sql $SEEDS/enrollment.sq
 | `member.sql` | `members` | 없음 |
 | `course.sql` | `courses`, `course_schedules` | 없음 |
 | `enrollment.sql` | `carts`, `registrations` (+ `courses.current_enrollment` 동기화) | `member`, `course` |
+| `cart-by-grade.sql` | `carts` (+ `members.grade`를 id 구간 순으로 재배정) | `member`, `course` |
+
+`enrollment.sql`은 회원 전체에 담기 수 하나를 전 강의에 균등하게 뿌린다. 학년별로 담기 수가 다르거나, 교양/전공 구성과
+인기 강의 집중(풀 상한)이 필요하면 `cart-by-grade.sql`을 대신 쓴다. 둘을 같은 회원 범위에 함께 쓰지 마라.
 
 ## 변수
 
@@ -74,6 +78,11 @@ cat $PERF_DIR/seeds.sql $SEEDS/member.sql $SEEDS/course.sql $SEEDS/enrollment.sq
 | `@course_title_mode` | course | `plain`이면 `성능측정강의{n}`, `search`면 아래 **검색 제목 설계**의 조합 제목 | |
 | `@cart_per_member` | enrollment | 회원당 장바구니 강의 수. 담기 상한이 10이라 넘기면 담기 API가 항상 실패한다 | 10 |
 | `@registration_per_member` | enrollment | 회원당 수강신청 강의 수 | |
+| `@grade1_count` ~ `@grade4_count` | cart-by-grade | 1학년→4학년 인원. 회원 id 구간 순으로 배정하고 `members.grade`를 덮어쓴다. 합은 `@member_count` | |
+| `@ge_carts_g1` ~ `@ge_carts_g4` | cart-by-grade | 학년별 교양 담기 수 | 전공과 합쳐 10 |
+| `@major_carts_g1` ~ `@major_carts_g4` | cart-by-grade | 학년별 전공 담기 수 | 교양과 합쳐 10 |
+| `@ge_pool` | cart-by-grade | 교양 담기가 퍼지는 강의 수 (학년당). 풀은 교양 영역 ∩ 회원 학년 또는 전학년, id 순 | 풀 크기 |
+| `@major_pool` | cart-by-grade | 전공 담기가 퍼지는 강의 수 (회원 학과와 학년당). 풀은 소유 학과의 전공 영역 ∩ 회원 학년 또는 전학년, id 순 | 풀 크기 |
 
 **쓰기 엔드포인트를 측정할 때.** `POST /carts/{courseId}`나 `POST /registration/{courseId}`가 대상이면 부하가 담으려는 강의를
 미리 채워두면 전부 중복 실패다. `@cart_per_member` 또는 `@registration_per_member`를 0으로 둔다.
