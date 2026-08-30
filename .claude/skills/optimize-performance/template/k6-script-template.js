@@ -47,7 +47,7 @@ const CONDITION = {
     ramp_down: '30s',
     total_duration: '{ramp_up + duration + ramp_down}',
     db_cache: 'warm',
-    app_cache: '없음',
+    app_cache: '{Redis warm / 없음}',
     user_count: USER_COUNT,
 };
 

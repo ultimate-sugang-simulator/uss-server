@@ -63,5 +63,5 @@ GitHub 저장소 Settings > Secrets and variables > Actions 에서 삭제한다.
 - 시크릿 값을 코드, 설정 파일, 계획서, PR 본문, 커밋 메시지에 적지 마라. **이름만 적는다**
 - `application-prod.yml`은 워크플로가 값을 덮어쓰는 자리다. 실제 값을 커밋해 두지 마라
 - 워크플로 로그에 시크릿을 `echo` 하지 마라. GitHub가 마스킹하지만 가공된 형태는 새어 나간다
-- 로컬 측정용 `application-perf.yml`에는 실제 시크릿을 넣지 마라.
-  측정 전용 더미 값을 쓴다(`.claude/skills/optimize-performance/template/application-perf.yml` 참조)
+- 로컬 측정용 `src/main/resources/application-perf.yml`에는 실제 시크릿을 넣지 마라.
+  측정 전용 더미 값을 쓴다(파일 안 주석 참조)
