@@ -19,13 +19,13 @@
    - 앞선 상태의 파일을 덮어쓰지 마라.
    - 조건이 달라졌으면 기록에 명시하고 비교 가능한 범위를 좁혀 해석한다.
 
-2. 끝나면 `k6-test-summary-{n}.json`과 `query-plan-{n}.txt`를 개선 전 파일(`-{n-1}`)과 함께 Read한다.
-   최초 상태와의 누적 변화가 필요하면 `-0`도 읽는다. 쿼리 통계는 3의 위임이 끝난 뒤 가공본을 읽는다.
+2. 끝나면 `k6-test-summary-{n}.json`, `jvm-metrics-{n}.md`, `query-plan-{n}.txt`, 1차 출력 `query-stats-summary-{n}.md`를 개선 전 파일(`-{n-1}`)과 함께 Read한다.
+   최초 상태와의 누적 변화가 필요하면 `-0`도 읽는다.
    - `checks_rate`가 떨어졌으면 응답 내용이 달라진 것이다. 수치 비교보다 이 사실을 먼저 보고한다.
 
 3. 가공본을 만든다.
-   - `query-stats-summary-{n}.md`: `query-source-mapper`에 위임한다. 프롬프트에 넘길 것(전체 경로): 1차 출력, 템플릿, `record.md`,
-     상태 번호 `n`, `k6-test-summary-{n}.json`, 직전 가공본 `query-stats-summary-{n-1}.md`. 헤더의 **직전 상태 대비**는 에이전트가 적는다.
+   - `query-stats-summary-{n}.md`: Phase 4의 3과 같은 방법으로 메인이 쓴다. `n >= 1`이므로 직전 가공본 `query-stats-summary-{n-1}.md`를 Read해
+     헤더의 **직전 상태 대비**를 채운다.
    - `k6-test-summary-{n}.json`: 최상위에 `delta_vs_prev`를 덧붙인다. 다른 필드는 손대지 마라. 값은 각 파일의 것을 자릿수 그대로 옮긴다.
 
      ```json
@@ -38,8 +38,10 @@
      ```
 
 4. 전후를 두 축으로 제시하고 **개선 여부 판정을 묻는다** (`SKILL.md`의 **역할 경계**).
-   - 하드웨어 의존 증거: p95, p99, RPS. 로컬 절대값은 믿지 말고 상대 변화만 쓴다.
-   - 하드웨어 독립 증거: 요청당 쿼리 수, `examined_per_sent`, Handler / Sort 카운터, 접근 방식과 사용 인덱스.
+   - 하드웨어 의존 증거: p95, p99, RPS, 쿼리 전체 소요(EXPLAIN ANALYZE 루트), heap 최대, GC 일시정지 합과 최장 정지, HikariCP pending 최대, 커넥션 보유 평균, process CPU 최대.
+     로컬 절대값은 믿지 말고 상대 변화만 쓴다.
+   - 하드웨어 독립 증거: 요청당 쿼리 수, `examined_per_sent`, Handler / Sort 카운터, 접근 방식과 사용 인덱스, 요청당 리포지토리 호출 수, 요청당 할당량,
+     캐시 적중률 (구획이 있을 때).
    - 실행계획은 Phase 6과 같은 노드별 표로, 칼럼 설명을 함께 붙인다.
    - 물을 것: "이 변화가 기법의 효과라고 보십니까, 측정 편차라고 보십니까?"
    - 개선이 없거나 나빠졌으면 그대로 제시한다. 유리하게 해석하지 마라.
@@ -59,7 +61,7 @@
    판정만 하고, 계속할지는 호출자에게 확인한다.
 
 ### 출력
-- `k6-test-summary-{n}.json` (`delta_vs_prev` 포함), `query-stats-summary-{n}.md` (가공본), `query-plan-{n}.txt` (원본)
+- `k6-test-summary-{n}.json` (`delta_vs_prev` 포함), `jvm-metrics-{n}.md`, `query-stats-summary-{n}.md` (가공본), `query-plan-{n}.txt` (원본)
 - `record.md`의 사이클 {n} **개선 후 지표**와 **판정**, 진행 상태 Phase 8 ✅
 
 ### 실패 처리

@@ -20,11 +20,11 @@ export PERF_DIR=.claude/resources/perf/$1
 export TARGET_DIR=$PERF_DIR/$2
 export SEEDS=.claude/skills/optimize-performance/template/seeds
 
-# 주석 줄을 건너뛰고 키 값만 집는다. 파일은 Phase 2가 만든다. 그 전에는 비어 있어도 된다.
+# 주석 줄을 건너뛰고 키 값만 집는다.
 PERF_JWT_SECRET=$(grep -E '^[[:space:]]*secret-key:' src/main/resources/application-perf.yml 2>/dev/null | awk '{print $2}')
 export PERF_JWT_SECRET
 if [ -z "$PERF_JWT_SECRET" ]; then
-    echo "경고: application-perf.yml의 secret-key를 읽지 못했다. Phase 2에서 파일을 만든 뒤 다시 source하라." >&2
+    echo "경고: src/main/resources/application-perf.yml의 secret-key를 읽지 못했다. 레포 루트에서 source했는지 확인하라." >&2
 fi
 
 # uss_db 접속. 네 요소 모두 필요하다.

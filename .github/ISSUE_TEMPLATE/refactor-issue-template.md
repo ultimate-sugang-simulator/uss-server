@@ -2,8 +2,7 @@
 name: Refactor issue template
 about: For refactor issue
 title: ''
-labels: "\U0001F9D1\U0001F3FB‍\U0001F4BB Refactor"
-assignees: xunxxoie
+labels: "Refactor"
 
 ---
 

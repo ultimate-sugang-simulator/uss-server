@@ -21,7 +21,8 @@ description: 커밋, 브랜치, PR 등 Git 작업 시 적용되는 규칙
 | analysis | 코드 동작 분석, 조사 | `Analysis` |
 
 > `type`은 커밋 접두사(`{type}:`), 브랜치 접두사(`{type}/`), GitHub 이슈 라벨에 공통으로 쓰인다.
-> 라벨 이름은 위 표기 그대로 써야 한다. 이모지 뒤 공백까지 일치해야 `gh issue create --label`이 통과한다.
+> 라벨 이름은 위 표기 그대로 써야 한다. 한 글자라도 다르면 `gh issue create --label`이 실패한다.
+> `.github/ISSUE_TEMPLATE/{type}-issue-template.md`의 frontmatter 라벨도 같은 표기를 쓴다.
 > 현재 레포에 실제로 등록된 목록은 `gh label list`로 확인한다.
 
 예시: `feat: 강의 검색 기능 구현(#123)`
