@@ -5,7 +5,7 @@ description: |
   Trigger: "/optimize-performance {엔드포인트}", "이 API 성능 개선하자", "느린 API 최적화하자"
   Do NOT use for: 구현 계획 수립(→ write-plan), 계획 기반 구현(→ implement)
   Boundary: 측정 설계, 관측 결과 정리, 기법 제시, 호출자와의 설계 협의, 확정된 설계의 적용, 기록까지 수행한다. 부하 테스트와 DB 조회 실행은 호출자가 직접 한다. 무엇이 병목인지, 어떤 기법을 쓸지, 어떻게 설계할지는 스킬이 단독으로 정하지 않는다.
-allowed-tools: Read, Grep, Glob, Edit, Write, Skill, Bash(git *), Bash(gh *), Agent(query-source-mapper)
+allowed-tools: Read, Grep, Glob, Edit, Write, Skill, Bash(git *), Bash(gh *)
 model: opus
 effort: xhigh
 ---
@@ -52,13 +52,15 @@ MySQL 8.0 / InnoDB, 컨테이너 `uss-mysql`, 호스트 포트 3307. PostgreSQL 
 | 접근 방식별 실제 작업량 | `FLUSH STATUS` → 쿼리 → `SHOW SESSION STATUS` (`Handler_%`, `Sort_%`) |
 | 옵티마이저 통계 갱신 | `ANALYZE TABLE` |
 | 인덱스 카디널리티 | `SHOW INDEX FROM` |
+| JVM, 커넥션 풀, 캐시, Redis | `/actuator/prometheus` 주기 샘플링 (`_shared/jvm-sampler.sh`) |
 
 PostgreSQL과 달라서 측정에 영향을 주는 것:
 
 - `TIMER_WAIT` 계열은 **피코초**다. ms는 `/1e9`.
 - `EXPLAIN ANALYZE`에 `BUFFERS`가 없다. 읽은 페이지 대신 `Handler_%` 카운터로 **읽은 행 수**를 본다.
 - `VACUUM`이 없다. 갱신할 것은 옵티마이저 통계(`ANALYZE TABLE`)뿐이다.
-- InnoDB 버퍼 풀은 재기동 없이 비울 수 없고 애플리케이션 캐시도 없다. 측정은 **warm으로 통일**하고 매번 같은 워밍업으로 상태를 맞춘다.
+- InnoDB 버퍼 풀은 재기동 없이 비울 수 없고, Redis 캐시(`major-courses`)는 워밍업이 채운다. 측정은 **warm으로 통일**하고 매번 같은 워밍업으로 상태를 맞춘다.
+  캐시를 비운 상태를 재려면 그 사실과 방법(`redis-cli FLUSHDB`)을 `record.md` 측정 환경에 적는다.
 
 **셸 환경.** 호출자가 새 터미널마다 한 번 source한다. 경로 변수, 서명키, `mysqlp` 접속 함수가 여기서 정의된다.
 접속 옵션의 이유는 스크립트 주석에 있다. 명령 블록에 이 정의를 다시 적지 마라.
@@ -110,6 +112,7 @@ Phase 4, 6, 8이 제시하는 명령은 `template/commands.md`에 있다. phase 
     ├── record.md
     ├── test-script.js
     ├── k6-test-summary-{n}.json
+    ├── jvm-metrics-{n}.md
     ├── query-stats-summary-{n}.md
     └── query-plan-{n}.txt
 ```
@@ -121,6 +124,7 @@ Phase 4, 6, 8이 제시하는 명령은 `template/commands.md`에 있다. phase 
 | `record.md` | 1 | `template/PERF-template.md` |
 | `test-script.js` | 3-B | `template/k6-script-template.js` |
 | `k6-test-summary-{n}.json` | 4, 8 | k6 `handleSummary` 출력 |
+| `jvm-metrics-{n}.md` | 4, 8 | `_shared/jvm-sampler.sh summarize` 출력 |
 | `query-stats-summary-{n}.md` | 4, 8 | `template/query-stats-template.md` |
 | `query-plan-{n}.txt` | 6, 8 | 원본 그대로 |
 
@@ -136,6 +140,8 @@ Read와 Write의 대상 경로에는 셸 변수가 통하지 않는다. 전체 �
 - `k6-test-summary-{n}.json`과 `query-stats-summary-{n}.md`는 **가공본**이다. 1차 출력을 읽고 같은 경로에 소비 가능한 형태로 다시 쓴다.
   1차 출력은 따로 보존하지 않되, 원문 없이는 재현할 수 없는 것(쿼리 원문)은 가공본에 포함한다.
 - `query-plan-{n}.txt`는 **원본 그대로** 둔다. 노드 트리 전체가 근거다. 가공은 대화의 표로만 한다.
+- `jvm-metrics-{n}.md`는 스크립트가 만든 완성본이다. 스킬은 읽기만 하고 다시 쓰지 않는다.
+  캐시, Redis, 리포지토리 구획은 측정 구간에 증분이 있을 때만 나타난다. 구획이 없다는 것은 그 대상이 거기 닿지 않았다는 관측이다.
 - 수치를 임의로 반올림하지 마라. 앞선 상태의 파일을 덮어쓰지 마라.
 - `record.md`에는 원본을 옮기지 않고 해석과 판정만 적는다.
 - 일회성 조회(행 수 확인, `SHOW CREATE TABLE`, `SHOW INDEX`)는 파일로 남기지 않는다.

@@ -9,22 +9,21 @@
 - Phase 1 완료
 
 ### 참조 파일
-- `.claude/skills/optimize-performance/template/application-perf.yml`
+- `src/main/resources/application-perf.yml`
 - `.claude/skills/optimize-performance/template/perf-env.sh`
 
 ### 절차
 
-1. `src/main/resources/application-perf.yml`을 Glob으로 확인한다.
-   - 없으면 `template/application-perf.yml` 내용 그대로 생성하고, 만들었다는 사실을 알린다.
-   - 있으면 Read해 `maximum-pool-size`, `show_sql`, 드라이버를 확인한다. SQL 로깅이나 p6spy가 켜져 있으면 끄도록 요청한다.
-     요청당 수십 줄을 찍는 로깅은 측정값을 통째로 바꾼다.
+1. `src/main/resources/application-perf.yml`을 Read해 `maximum-pool-size`, `show_sql`, 드라이버, Redis 접속을 확인한다.
+   이 파일이 perf 프로파일의 유일한 정의다. SQL 로깅이나 p6spy가 켜져 있으면 끄도록 요청한다.
+   요청당 수십 줄을 찍는 로깅은 측정값을 통째로 바꾼다.
 
 2. 셸 환경과 서버 기동을 제시한다. 애플리케이션은 별도 터미널에서 띄우게 하고, 기동 완료를 확인받은 뒤 3으로 간다.
 
    ```bash
    # 측정 터미널 (레포 루트)
    source .claude/skills/optimize-performance/template/perf-env.sh {이슈번호} {슬러그}
-   docker-compose -f docker/docker-compose-local.yml up -d mysql
+   docker-compose -f docker/docker-compose-local.yml up -d mysql redis
 
    # 애플리케이션 터미널
    ./gradlew bootRun --args='--spring.profiles.active=perf'
@@ -65,10 +64,19 @@
 
    # 7) 버퍼 풀 크기. 데이터가 이보다 크면 디스크 I/O가 측정에 섞인다
    mysqlp -e "SELECT @@innodb_buffer_pool_size / 1024 / 1024 AS buffer_pool_mib;"
+
+   # 8) Redis (PONG). 없으면 CacheErrorHandler가 DB로 폴백해 캐시 없는 상태를 재게 된다
+   docker exec uss-redis redis-cli ping
+
+   # 9) JVM 샘플러가 긁을 지표가 다 있는가 (게이트 7개 모두 "있음")
+   bash .claude/skills/_shared/jvm-sampler.sh check
    ```
 
 4. 실패 항목의 조치:
    - 3)이 0 → 설정을 의심하기 전에 2)를 메인 포트로 보냈는지 확인한다.
+   - 8) 실패 → `docker-compose -f docker/docker-compose-local.yml up -d redis`.
+   - 9)에서 `hikari`, `http_active` 없음 → 2)를 메인 포트로 보냈는지 확인한다. `gc` 없음 → 아직 GC가 없던 것이니 2)를 몇 번 더 보내고 재시도한다.
+     그 외가 없음 → 1)로 돌아가 perf 프로파일로 떴는지 확인한다.
    - 4)의 `ps`가 0 → `docker/docker-compose-local.yml`의 mysql `command`에 `--performance-schema=ON`을 추가하고 컨테이너를 재기동한다.
    - 소비자가 `NO` → 재기동 없이 켠다.
 
@@ -83,14 +91,13 @@
      MySQL 8.0.28+는 digest에서 `IN` 목록을 `IN (...)`로 접으므로 `@BatchSize`의 자리표시자 1000개도 100자 미만이다.
      실측 길이가 닿지 않으면 올리지 마라.
 
-5. 결과를 `record.md`의 **측정 환경**에 적는다. 프로파일, 커넥션 풀 크기(`maximum-pool-size`), 버퍼 풀 크기, 캐시 상태(warm 고정).
-   cold 측정을 설계하지 마라. Phase 4와 8이 같은 워밍업으로 버퍼 풀 상태를 맞춘다.
+5. 결과를 `record.md`의 **측정 환경**에 적는다. 프로파일, 커넥션 풀 크기(`maximum-pool-size`), 버퍼 풀 크기, 캐시 상태(warm 고정, Redis 캐시는 워밍업으로 적재).
+   cold 측정을 설계하지 마라. Phase 4와 8이 같은 워밍업으로 버퍼 풀과 Redis 상태를 맞춘다.
 
 ### 출력
-- `src/main/resources/application-perf.yml` 존재
 - `record.md`의 **측정 환경**에 프로파일, 풀 크기, 버퍼 풀 크기, 캐시 상태, 진행 상태 Phase 2 ✅
 
-> 다음 Phase 조건: 3의 여덟 항목이 모두 통과했을 때 → Phase 3
+> 다음 Phase 조건: 3의 열 항목이 모두 통과했을 때 → Phase 3
 >
 > Skip 조건: 같은 이슈의 다른 대상에서 통과했고 그 사이에 애플리케이션과 컨테이너를 재기동하지 않았으면,
 > 앞선 대상의 **측정 환경**을 옮겨 적고 ⏭️로 표기한다.

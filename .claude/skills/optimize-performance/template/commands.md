@@ -14,7 +14,7 @@ bash .claude/skills/_shared/mint-tokens.sh \
   --out $PERF_DIR/tokens.json
 python3 -c "import json;print(len(json.load(open('$PERF_DIR/tokens.json'))))"   # USER_COUNT와 같아야 한다
 
-# 2) 워밍업 (JIT, 커넥션 풀, InnoDB 버퍼 풀). 이 실행의 결과는 쓰지 않는다
+# 2) 워밍업 (JIT, 커넥션 풀, InnoDB 버퍼 풀, Redis 캐시). 이 실행의 결과는 쓰지 않는다
 k6 run -e PHASE=warmup $TARGET_DIR/test-script.js
 
 # 3) 되돌리기. 쓰기 엔드포인트면 record.md의 되돌리기 SQL을 여기서 실행한다. 읽기면 없음
@@ -29,14 +29,24 @@ UNION ALL SELECT 'enrolled', COALESCE(sum(current_enrollment), 0) FROM courses;"
 # 5) 쿼리 통계 리셋
 mysqlp -e "TRUNCATE TABLE performance_schema.events_statements_summary_by_digest;"
 
-# 6) 측정
+# 6) JVM 샘플러. 측정과 함께 돌고 8)에서 멈춘다
+bash .claude/skills/_shared/jvm-sampler.sh sample --out $TARGET_DIR/jvm-samples-{n}.csv &
+SAMPLER_PID=$!
+
+# 7) 측정
 k6 run -e PHASE=measure -e SUMMARY_OUT=$TARGET_DIR/k6-test-summary-{n}.json $TARGET_DIR/test-script.js
 
-# 7) 쿼리 통계 수집. 요청 수를 분모로 넘겨 요청당 호출 수까지 뽑는다
+# 8) 샘플러 정지, 요청 수 확인, 가공. 원본은 가공본에 전부 들어가므로 지운다
+kill $SAMPLER_PID; wait $SAMPLER_PID 2>/dev/null
 REQS=$(jq -r '.requests // empty' $TARGET_DIR/k6-test-summary-{n}.json)
 if ! [ "$REQS" -gt 0 ] 2>/dev/null; then
-  echo "요청 수가 '$REQS'다. 측정이 실패했으므로 통계를 수집하지 않는다. 원인을 확인하고 재측정하라."
+  echo "요청 수가 '$REQS'다. 측정이 실패했으므로 가공과 통계 수집을 하지 않는다. 원인을 확인하고 재측정하라."
 else
+bash .claude/skills/_shared/jvm-sampler.sh summarize \
+  --in $TARGET_DIR/jvm-samples-{n}.csv --out $TARGET_DIR/jvm-metrics-{n}.md --requests $REQS \
+  && rm $TARGET_DIR/jvm-samples-{n}.csv $TARGET_DIR/jvm-samples-{n}.csv.first.prom $TARGET_DIR/jvm-samples-{n}.csv.last.prom
+
+# 9) 쿼리 통계 수집. 요청 수를 분모로 넘겨 요청당 호출 수까지 뽑는다
 mysqlp -B -e "
 SELECT COUNT_STAR                                          AS calls,
        COUNT_STAR / $REQS                                  AS per_req,
@@ -59,8 +69,13 @@ fi
 
 | 요소 | 이유 |
 |---|---|
+| 워밍업에 Redis | `major-courses` 같은 캐시는 첫 요청이 채운다. 워밍업 없이 재면 miss 구간이 측정에 섞인다 |
 | 워밍업 → 되돌리기 → `ANALYZE` 순서 | 되돌리기 `DELETE` 뒤에 통계를 갱신해야 옵티마이저가 같은 계획을 고른다. Phase 4와 8의 계획이 달라지면 전후 비교가 아니다 |
 | 리셋 뒤에 곧바로 측정 | digest는 인스턴스 전역이다. 사이에 다른 부하가 끼면 통계가 섞이고 `per_req`가 틀린다 |
+| 샘플러를 리셋 뒤, 측정 앞에 띄움 | 워밍업의 GC와 heap이 섞이지 않는다. 샘플의 `offset_s` 0이 측정 시작이고 `.first.prom`이 증분의 기준점이다 |
+| `kill` 뒤 `wait` | 마지막 행과 `.last.prom`을 다 쓴 뒤에 가공한다 |
+| `REQS`를 가공 앞으로 | 샘플러 가공본의 "요청당" 칼럼과 쿼리 통계의 `per_req`가 같은 분모를 쓴다 |
+| 원본 CSV, prom 삭제 | 산출물 규약대로 1차 출력은 남기지 않는다. 타임라인과 증분이 가공본에 전부 있다 |
 | `-B` | 기본 박스 출력은 `DIGEST_TEXT`를 잘라 출처를 매핑할 수 없게 한다 |
 | `/1e9` | `TIMER_WAIT`는 피코초다 |
 | 반올림 없음 | `per_req`를 둘째 자리에서 자르면 0.005 미만 쿼리가 `0.00`으로 사라진다. 반올림은 대화의 표에서만 한다 |
