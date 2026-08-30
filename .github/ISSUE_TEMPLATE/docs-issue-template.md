@@ -2,8 +2,7 @@
 name: Docs issue template
 about: For docs issue
 title: ''
-labels: "\U0001F4DA Docs"
-assignees: xunxxoie
+labels: "Docs"
 
 ---
 

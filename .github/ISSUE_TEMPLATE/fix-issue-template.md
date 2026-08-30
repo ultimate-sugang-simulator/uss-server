@@ -2,8 +2,7 @@
 name: Fix issue template
 about: For fix issue
 title: ''
-labels: "\U0001F528 Fix"
-assignees: xunxxoie
+labels: "Fix"
 
 ---
 

@@ -2,8 +2,7 @@
 name: Test issue template
 about: For test issue
 title: ''
-labels: "\U0001F646\U0001F3FB‍♂️ Test"
-assignees: xunxxoie
+labels: "Test"
 
 ---
 
