@@ -51,6 +51,14 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     """)
     List<Course> findByArea(@Param("area") final CourseArea area);
 
+    @Query("""
+        SELECT new uss.code.course.dto.common.CourseCapacity(c.id, c.currentEnrollment, c.maxCapacity)
+        FROM Course c
+        WHERE c.area = :area
+          AND c.status = uss.code.course.domain.CourseStatus.ACTIVE
+    """)
+    List<CourseCapacity> findCapacitiesByArea(@Param("area") final CourseArea area);
+
     @Query(value = """
         SELECT DISTINCT c.*
         FROM courses c

@@ -6,6 +6,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import uss.code.course.domain.CourseArea;
 import uss.code.course.domain.CourseDepartment;
 import uss.code.member.domain.MemberDepartment;
 
@@ -24,5 +25,13 @@ public class CourseCacheWarmer {
         Arrays.stream(MemberDepartment.values())
                 .filter(department -> !CourseDepartment.ownedBy(department).isEmpty())
                 .forEach(courseCacheLoader::refreshMajorCourses);
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    @Scheduled(cron = "${cache.general-education-courses.refresh-cron}", zone = "${cache.general-education-courses.refresh-zone}")
+    public void warmGeneralEducationCourses() {
+        Arrays.stream(CourseArea.values())
+                .filter(CourseArea::isGeneralEducationArea)
+                .forEach(courseCacheLoader::refreshGeneralEducationCourses);
     }
 }

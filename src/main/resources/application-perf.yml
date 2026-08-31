@@ -76,6 +76,10 @@ cache:
     # CourseCacheWarmer가 전 학과 정적 목록을 다시 채우는 시각. 피크를 피한 새벽으로 둔다.
     refresh-cron: "0 0 4 * * *"
     refresh-zone: Asia/Seoul
+  general-education-courses:
+    # 교양 영역별 정적 목록 재적재. major와 10분 시차를 둬 재적재 DB 조회가 겹치지 않게 한다.
+    refresh-cron: "0 10 4 * * *"
+    refresh-zone: Asia/Seoul
 
 security:
   jwt:

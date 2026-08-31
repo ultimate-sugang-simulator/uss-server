@@ -75,7 +75,7 @@ public enum CourseArea {
         return area;
     }
 
-    private boolean isGeneralEducationArea() {
+    public boolean isGeneralEducationArea() {
         return this == BASIC_SCIENCE_ENGINEERING ||
                 this == ACADEMIC_FOUNDATION ||
                 this == CORE_INU_SEMINAR ||
