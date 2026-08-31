@@ -40,7 +40,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
     private void setErrorResponse(
             final HttpServletResponse response,
             final int status,
-            final int code,
+            final String code,
             final String message
     )throws IOException {
         response.setContentType("application/json;charset=UTF-8");

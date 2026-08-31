@@ -30,7 +30,7 @@ public interface AdminAuthControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "로그인 실패",
-                                            value = "{\"code\" : 5000, \"message\" : \"아이디나 비밀번호가 맞지 않아요.\"}"
+                                            value = "{\"code\" : \"ADM-001\", \"message\" : \"아이디나 비밀번호가 맞지 않아요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -49,11 +49,11 @@ public interface AdminAuthControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "액세스 토큰 누락",
-                                            value = "{\"code\" : 1000, \"message\" : \"액세스 토큰이 누락되었습니다.\"}"
+                                            value = "{\"code\" : \"AUTH-001\", \"message\" : \"액세스 토큰이 누락됐어요.\"}"
                                     ),
                                     @ExampleObject(
                                             name = "액세스 토큰 서명 오류",
-                                            value = "{\"code\" : 1003, \"message\" : \"액세스 토큰 서명이 유효하지 않습니다.\"}"
+                                            value = "{\"code\" : \"AUTH-004\", \"message\" : \"액세스 토큰 서명이 유효하지 않아요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -63,7 +63,7 @@ public interface AdminAuthControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "관리자 권한 없음",
-                                            value = "{\"code\" : 5002, \"message\" : \"관리자 권한이 없어요.\"}"
+                                            value = "{\"code\" : \"ADM-003\", \"message\" : \"관리자 권한이 없어요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -73,7 +73,7 @@ public interface AdminAuthControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "관리자 조회 실패",
-                                            value = "{\"code\" : 5001, \"message\" : \"관리자를 찾을 수 없어요.\"}"
+                                            value = "{\"code\" : \"ADM-002\", \"message\" : \"관리자를 찾을 수 없어요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
