@@ -21,4 +21,4 @@
 - **응답 품질**: 정원 초과 거절 {n}건이 {상태 코드}/{에러 코드}로 응답, 5xx {n}건
 - **운영 반영**: {추가한 마이그레이션과 영향 / "스키마 변경 없음"}, {인프라 추가 여부}, {다중 인스턴스 성립 여부}
 - **기록**: `.claude/resources/concurrency/{이슈번호}/{슬러그}/record.md`
-- **다음**: `commit-push` → `open-pr`
+- **다음**: `write-test` → `commit-push` → `open-pr`
