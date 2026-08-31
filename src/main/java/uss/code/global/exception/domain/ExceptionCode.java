@@ -39,6 +39,7 @@ public enum ExceptionCode {
     COURSE_SCHEDULE_CONFLICT(CONFLICT, 3002, "과목 시간표가 겹칩니다."),
     COURSE_TYPE_LIMIT_EXCEEDED(BAD_REQUEST, 3003, "해당 과목 유형의 등록 제한을 초과했습니다."),
     COURSE_ALREADY_IN_CART(BAD_REQUEST, 3004, "이미 장바구니에 담긴 과목입니다."),
+    CARTED_COURSE_DELETE_CONFLICT(CONFLICT, 3005, "장바구니 삭제를 반영할 수 없습니다. 다시 확인해주세요."),
 
     // 수강신청
     COURSE_MAX_CAPACITY_EXCEEDED(BAD_REQUEST, 4000, "수강 정원이 마감되었습니다."),

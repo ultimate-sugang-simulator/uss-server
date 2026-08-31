@@ -1,0 +1,58 @@
+{
+  "phase": "measure",
+  "target": "carts",
+  "endpoint": "GET /api/v1/carts",
+  "condition": {
+    "vus": 30,
+    "steady_state_duration": "1m",
+    "ramp_up": "30s",
+    "ramp_down": "30s",
+    "total_duration": "2m",
+    "db_cache": "warm",
+    "app_cache": "없음",
+    "user_count": 11247
+  },
+  "requests": 75103,
+  "rps": 625.8508857077934,
+  "failed_rate": 0,
+  "checks_rate": 1,
+  "checks": [
+    {
+      "name": "status is 200",
+      "passes": 75103,
+      "fails": 0
+    },
+    {
+      "name": "body is not empty",
+      "passes": 75103,
+      "fails": 0
+    },
+    {
+      "name": "cartedCourseResponses가 실려 있다",
+      "passes": 75103,
+      "fails": 0
+    }
+  ],
+  "duration_ms": {
+    "med": 33.83,
+    "p95": 73.391,
+    "p99": 128.1489,
+    "max": 1216.704
+  },
+  "waiting_ms": {
+    "med": 33.725,
+    "p95": 73.20989999999999,
+    "p99": 127.78845999999996,
+    "max": 1216.575
+  },
+  "bytes_received": 172587214,
+  "delta_vs_prev": {
+    "from": "k6-test-summary-0.json",
+    "requests": { "before": 47812, "after": 75103 },
+    "rps": { "before": 398.41921933248847, "after": 625.8508857077934 },
+    "duration_p95_ms": { "before": 113.78829999999998, "after": 73.391 },
+    "duration_p99_ms": { "before": 233.37065999999996, "after": 128.1489 },
+    "duration_med_ms": { "before": 51.4005, "after": 33.83 },
+    "duration_max_ms": { "before": 1227.054, "after": 1216.704 }
+  }
+}

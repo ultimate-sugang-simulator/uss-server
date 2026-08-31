@@ -3,6 +3,7 @@ package uss.code.course.dto.response;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
 import uss.code.cart.dto.response.CartedCourseResponse;
 import uss.code.course.domain.Course;
 import uss.code.course.domain.CourseDay;
@@ -92,9 +93,10 @@ class CourseResponseTest {
         void 장바구니_응답도_학수번호를_담는다() {
             //given
             final Course course = createCourse();
+            ReflectionTestUtils.setField(course, "cartCount", 3);
 
             //when
-            final CartedCourseResponse response = CartedCourseResponse.of(course, 3L);
+            final CartedCourseResponse response = CartedCourseResponse.of(course);
 
             //then
             assertThat(response.haksuCode()).isEqualTo("CSE2010001");

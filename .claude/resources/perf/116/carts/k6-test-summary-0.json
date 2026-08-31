@@ -1,0 +1,49 @@
+{
+  "phase": "measure",
+  "target": "carts",
+  "endpoint": "GET /api/v1/carts",
+  "condition": {
+    "vus": 30,
+    "steady_state_duration": "1m",
+    "ramp_up": "30s",
+    "ramp_down": "30s",
+    "total_duration": "2m",
+    "db_cache": "warm",
+    "app_cache": "없음",
+    "user_count": 11247
+  },
+  "requests": 47812,
+  "rps": 398.41921933248847,
+  "failed_rate": 0,
+  "checks_rate": 1,
+  "checks": [
+    {
+      "name": "status is 200",
+      "passes": 47812,
+      "fails": 0
+    },
+    {
+      "name": "body is not empty",
+      "passes": 47812,
+      "fails": 0
+    },
+    {
+      "name": "cartedCourseResponses가 실려 있다",
+      "passes": 47812,
+      "fails": 0
+    }
+  ],
+  "duration_ms": {
+    "med": 51.4005,
+    "p95": 113.78829999999998,
+    "p99": 233.37065999999996,
+    "max": 1227.054
+  },
+  "waiting_ms": {
+    "med": 51.3275,
+    "p95": 113.68424999999999,
+    "p99": 233.27064999999988,
+    "max": 1226.908
+  },
+  "bytes_received": 108565790
+}

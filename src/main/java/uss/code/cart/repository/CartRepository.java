@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import uss.code.cart.domain.Cart;
-import uss.code.cart.dto.common.CartCount;
 import uss.code.course.domain.CourseTerm;
 
 import java.util.List;
@@ -21,14 +20,6 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
         ORDER BY c.createdAt
     """)
     List<Cart> findByMemberId(@Param("memberId") final long memberId);
-
-    @Query("""
-        SELECT new uss.code.cart.dto.common.CartCount(c.course.id, COUNT(c))
-        FROM Cart c
-        WHERE c.course.id IN :courseIds
-        GROUP BY c.course.id
-    """)
-    List<CartCount> countCartedCoursesByCourseId(@Param("courseIds") final List<Long> courseIds);
 
     @Query("""
         SELECT c

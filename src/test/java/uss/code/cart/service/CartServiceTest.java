@@ -1,5 +1,6 @@
 package uss.code.cart.service;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,8 @@ import static uss.code.global.exception.domain.ExceptionCode.*;
 @IntegrationTest
 class CartServiceTest {
 
+    @Autowired
+    private EntityManager entityManager;
     @Autowired
     private CartService cartService;
     @Autowired
@@ -770,6 +773,10 @@ class CartServiceTest {
             courseRepository.save(course);
             cartService.addCart(testMemberId, course.getId());
 
+            // addCart의 카운터 갱신은 벌크 UPDATE라 영속성 컨텍스트에 반영되지 않는다.
+            // 새로고침 없이 course를 저장하면 더티 체킹이 낡은 cart_count로 덮어쓴다.
+            entityManager.refresh(course);
+
             course.close();
             courseRepository.save(course);
 
@@ -778,6 +785,146 @@ class CartServiceTest {
 
             //then
             assertThat(cartRepository.findByMemberIdAndCourseId(testMemberId, course.getId())).isEmpty();
+        }
+    }
+
+    @Nested
+    class 담기_수_카운터_테스트 {
+
+        private Long testMemberId;
+        private Long otherMemberId;
+        private Long courseId;
+
+        @BeforeEach
+        void setUp() {
+            final Member testMember = MemberFixture.createMember();
+            final Member otherMember = MemberFixture.createMember();
+            memberRepository.saveAll(List.of(testMember, otherMember));
+            testMemberId = testMember.getId();
+            otherMemberId = otherMember.getId();
+
+            final Course course = CourseFixture.createCourseWithDetails(
+                    "자료구조", "Data Structure", "CSE101", "CSE101001", CourseGrade.SOPHOMORE
+            );
+            courseRepository.save(course);
+            courseId = course.getId();
+        }
+
+        // 카운터 갱신은 벌크 UPDATE라 영속성 컨텍스트를 거치지 않는다.
+        // 컨텍스트를 비우고 다시 읽어야 DB에 실제로 반영된 값을 본다.
+        private int cartCountOf(final Long id) {
+            entityManager.flush();
+            entityManager.clear();
+
+            return courseRepository.findById(id).orElseThrow().getCartCount();
+        }
+
+        @Test
+        void 장바구니에_담으면_담기_수가_1_올라간다() {
+            //given
+            assertThat(cartCountOf(courseId)).isZero();
+
+            //when
+            cartService.addCart(testMemberId, courseId);
+
+            //then
+            assertThat(cartCountOf(courseId)).isEqualTo(1);
+        }
+
+        @Test
+        void 여러_회원이_같은_강의를_담으면_담기_수가_누적된다() {
+            //given
+
+            //when
+            cartService.addCart(testMemberId, courseId);
+            cartService.addCart(otherMemberId, courseId);
+
+            //then
+            assertThat(cartCountOf(courseId)).isEqualTo(2);
+        }
+
+        @Test
+        void 장바구니에서_빼면_담기_수가_1_내려간다() {
+            //given
+            cartService.addCart(testMemberId, courseId);
+            cartService.addCart(otherMemberId, courseId);
+
+            //when
+            cartService.deleteCartedCourse(testMemberId, courseId);
+
+            //then
+            assertThat(cartCountOf(courseId)).isEqualTo(1);
+        }
+
+        @Test
+        void 담았다_빼면_담기_수가_원래대로_돌아온다() {
+            //given
+
+            //when
+            cartService.addCart(testMemberId, courseId);
+            cartService.deleteCartedCourse(testMemberId, courseId);
+
+            //then
+            assertThat(cartCountOf(courseId)).isZero();
+        }
+
+        @Test
+        void 다른_회원이_뺀_것은_내_담기_수에_영향을_주지_않는다() {
+            //given
+            cartService.addCart(testMemberId, courseId);
+            cartService.addCart(otherMemberId, courseId);
+
+            //when
+            cartService.deleteCartedCourse(otherMemberId, courseId);
+
+            //then
+            assertThat(cartCountOf(courseId)).isEqualTo(1);
+            assertThat(cartRepository.findByMemberIdAndCourseId(testMemberId, courseId)).isPresent();
+        }
+
+        @Test
+        void 담기_수가_실제_담긴_행과_어긋나면_삭제_시_예외가_발생한다() {
+            //given
+            cartService.addCart(testMemberId, courseId);
+            // 담기 행은 그대로 두고 카운터만 0으로 되돌려 어긋난 상태를 만든다
+            courseRepository.decreaseCartCountAboveZero(courseId);
+
+            //when & then
+            assertThatThrownBy(() -> cartService.deleteCartedCourse(testMemberId, courseId))
+                    .isInstanceOf(RestApiException.class)
+                    .hasFieldOrPropertyWithValue("exceptionCode", CARTED_COURSE_DELETE_CONFLICT);
+        }
+
+        @Test
+        void 담기_수가_어긋나_삭제에_실패하면_담기_행도_남는다() {
+            //given
+            cartService.addCart(testMemberId, courseId);
+            courseRepository.decreaseCartCountAboveZero(courseId);
+
+            //when
+            assertThatThrownBy(() -> cartService.deleteCartedCourse(testMemberId, courseId))
+                    .isInstanceOf(RestApiException.class);
+
+            //then
+            assertThat(cartRepository.findByMemberIdAndCourseId(testMemberId, courseId)).isPresent();
+        }
+
+        @Test
+        void 갱신된_담기_수가_장바구니_조회_응답에_실린다() {
+            //given
+            cartService.addCart(testMemberId, courseId);
+            cartService.addCart(otherMemberId, courseId);
+            entityManager.flush();
+            entityManager.clear();
+
+            //when
+            final CartedCoursesResponse response = cartService.getCartedCourse(testMemberId);
+
+            //then
+            assertThat(response.cartedCourseResponses())
+                    .singleElement()
+                    .extracting(CartedCourseResponse::cartCount)
+                    .isEqualTo(2);
         }
     }
 

@@ -113,6 +113,16 @@ public interface CartControllerDocs {
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "409", description = "🚨 장바구니 삭제 반영 실패",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            examples = {
+                                    @ExampleObject(
+                                            name = "장바구니 삭제 반영 실패",
+                                            value = "{\"code\" : 3005, \"message\" : \"장바구니 삭제를 반영할 수 없습니다. 다시 확인해주세요.\"}"
+                                    )
+                            },
+                            schema = @Schema(implementation = ErrorResponse.class))
             )
     })
     @DeleteMapping("/{courseId}")

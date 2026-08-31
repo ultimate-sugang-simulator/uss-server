@@ -33,6 +33,7 @@ import static uss.code.course.domain.CourseStatus.CLOSED;
 public class Course {
 
     private static final int INITIAL_ENROLLMENT = 0;
+    private static final int INITIAL_CART_COUNT = 0;
 
     private static final String FIELD_TITLE_KR = "titleKr";
     private static final String FIELD_TITLE_EN = "titleEn";
@@ -137,6 +138,9 @@ public class Course {
     @Column(nullable = false, name = "current_enrollment")
     private int currentEnrollment;
 
+    @Column(nullable = false, name = "cart_count")
+    private int cartCount;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "status")
     private CourseStatus status;
@@ -172,6 +176,7 @@ public class Course {
         this.isHussCourse = snapshot.isHussCourse();
         this.maxCapacity = maxCapacity;
         this.currentEnrollment = INITIAL_ENROLLMENT;
+        this.cartCount = INITIAL_CART_COUNT;
         this.status = ACTIVE;
     }
 
