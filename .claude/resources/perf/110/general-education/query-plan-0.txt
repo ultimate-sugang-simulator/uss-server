@@ -1,0 +1,75 @@
+=== EXPLAIN ANALYZE ===
+*************************** 1. row ***************************
+EXPLAIN: -> Sort: c1_0.grade_code, c1_0.classification_code, c1_0.haksu_code  (cost=2715 rows=25951) (actual time=39.2..40 rows=3249 loops=1)
+    -> Filter: ((c1_0.area = 'ACADEMIC_FOUNDATION') and (c1_0.`status` = 'ACTIVE'))  (cost=2715 rows=25951) (actual time=0.482..29.1 rows=3249 loops=1)
+        -> Table scan on c1_0  (cost=2715 rows=25951) (actual time=0.0502..26.4 rows=26439 loops=1)
+
+=== EXPLAIN FORMAT=JSON ===
+*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "2974.86"
+    },
+    "ordering_operation": {
+      "using_filesort": true,
+      "cost_info": {
+        "sort_cost": "259.51"
+      },
+      "table": {
+        "table_name": "c1_0",
+        "access_type": "ALL",
+        "rows_examined_per_scan": 25951,
+        "rows_produced_per_join": 259,
+        "filtered": "1.00",
+        "cost_info": {
+          "read_cost": "2689.40",
+          "eval_cost": "25.95",
+          "prefix_cost": "2715.35",
+          "data_read_per_join": "1M"
+        },
+        "used_columns": [
+          "id",
+          "academic_year",
+          "term",
+          "title_kr",
+          "title_en",
+          "course_code",
+          "haksu_code",
+          "college",
+          "department",
+          "classification_code",
+          "classification_name",
+          "area",
+          "area_code",
+          "area_name",
+          "type_code",
+          "type_name",
+          "grade_code",
+          "grade_name",
+          "concentration_code",
+          "concentration_name",
+          "credits",
+          "is_english_course",
+          "english_code",
+          "english_name",
+          "is_huss_course",
+          "max_capacity",
+          "current_enrollment",
+          "status"
+        ],
+        "attached_condition": "((`uss_db`.`c1_0`.`area` = 'ACADEMIC_FOUNDATION') and (`uss_db`.`c1_0`.`status` = 'ACTIVE'))"
+      }
+    }
+  }
+}
+=== STATUS COUNTERS ===
+Handler_commit	1
+Handler_external_lock	2
+Handler_read_first	1
+Handler_read_key	1
+Handler_read_rnd_next	26440
+Sort_merge_passes	4
+Sort_rows	3249
+Sort_scan	1

@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uss.code.course.domain.Course;
 import uss.code.course.domain.CourseArea;
 import uss.code.course.domain.CourseDepartment;
+import uss.code.course.dto.common.CachedGeneralEducationCourses;
 import uss.code.course.dto.common.CachedMajorCourses;
 import uss.code.course.dto.common.CourseCapacity;
 import uss.code.course.dto.common.CourseCategory;
@@ -75,10 +76,15 @@ public class CourseService {
 
     @Transactional(readOnly = true)
     public GeneralEducationCoursesResponse getGeneralEducationCourses(final String courseArea) {
-        final List<Course> courses = courseRepository.findByArea(CourseArea.fromGeneralEducation(courseArea));
+        final CourseArea area = CourseArea.fromGeneralEducation(courseArea);
 
-        final List<GeneralEducationCourseResponse> generalEducationCourseResponses = courses.stream()
-                .map(GeneralEducationCourseResponse::from)
+        final CachedGeneralEducationCourses cachedCourses = courseCacheLoader.loadGeneralEducationCourses(area);
+        final Map<Long, CourseCapacity> capacities = courseRepository.findCapacitiesByArea(area).stream()
+                .collect(toMap(CourseCapacity::id, identity()));
+
+        final List<GeneralEducationCourseResponse> generalEducationCourseResponses = cachedCourses.courses().stream()
+                .filter(course -> capacities.containsKey(course.id()))
+                .map(course -> GeneralEducationCourseResponse.of(course, capacities.get(course.id()).isRegisterable()))
                 .toList();
 
         return GeneralEducationCoursesResponse.of(generalEducationCourseResponses);
