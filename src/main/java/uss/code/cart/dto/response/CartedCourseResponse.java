@@ -21,7 +21,7 @@ public record CartedCourseResponse(
         int cartCount,
         boolean isRegisterable
 ) {
-    public static CartedCourseResponse of(final Course course, final Long cartCount) {
+    public static CartedCourseResponse of(final Course course) {
         return CartedCourseResponse.builder()
                 .id(course.getId())
                 .classification(course.getClassificationName())
@@ -33,7 +33,7 @@ public record CartedCourseResponse(
                 .isEnglishCourse(course.isEnglishCourse())
                 .schedule(CourseScheduleFormatter.format(course.getSchedules()))
                 .department(course.getDepartment().getName())
-                .cartCount(cartCount.intValue())
+                .cartCount(course.getCartCount())
                 .isRegisterable(course.isActive() && course.isRegisterable())
                 .build();
     }

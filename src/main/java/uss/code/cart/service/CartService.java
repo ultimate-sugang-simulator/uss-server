@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uss.code.cart.domain.Cart;
-import uss.code.cart.dto.common.CartCount;
 import uss.code.cart.dto.response.CartedCourseResponse;
 import uss.code.cart.dto.response.CartedCoursesResponse;
 import uss.code.cart.repository.CartRepository;
@@ -16,8 +15,6 @@ import uss.code.member.domain.Member;
 import uss.code.member.repository.MemberRepository;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static uss.code.global.exception.domain.ExceptionCode.*;
 
@@ -25,7 +22,7 @@ import static uss.code.global.exception.domain.ExceptionCode.*;
 @RequiredArgsConstructor
 public class CartService {
 
-    private static final long DEFAULT_CART_COUNT = 0L;
+    private static final int NO_AFFECTED_ROW = 0;
 
     private final CartRepository cartRepository;
     private final CourseRepository courseRepository;
@@ -35,16 +32,8 @@ public class CartService {
     public CartedCoursesResponse getCartedCourse(final long memberId) {
         final List<Cart> carts = cartRepository.findByMemberId(memberId);
 
-        if (carts.isEmpty()) {
-            return CartedCoursesResponse.of(List.of());
-        }
-
-        final Map<Long, Long> cartCountMap = getCartCountByCourseId(carts);
         final List<CartedCourseResponse> cartedCourseResponses = carts.stream()
-                .map(cart -> {
-                    final Long count = cartCountMap.getOrDefault(cart.getCourse().getId(), DEFAULT_CART_COUNT);
-                    return CartedCourseResponse.of(cart.getCourse(), count);
-                })
+                .map(cart -> CartedCourseResponse.of(cart.getCourse()))
                 .toList();
 
         return CartedCoursesResponse.of(cartedCourseResponses);
@@ -69,6 +58,8 @@ public class CartService {
         validateCourseScheduleConflict(carts, course);
         validateCourseTypeLimit(carts, course);
 
+        courseRepository.increaseCartCount(courseId);
+
         final Cart cart = Cart.create(member, course);
 
         cartRepository.save(cart);
@@ -82,25 +73,17 @@ public class CartService {
         final Cart cart = cartRepository.findByMemberIdAndCourseId(memberId, courseId)
                 .orElseThrow(() -> new RestApiException(CARTED_COURSE_NOT_FOUND));
 
+        decreaseCartCount(courseId);
+
         cartRepository.delete(cart);
     }
 
-    private Map<Long, Long> getCartCountByCourseId(final List<Cart> carts) {
-        final List<Long> courseIds = extractCourseIds(carts);
+    private void decreaseCartCount(final long courseId) {
+        final int affectedRows = courseRepository.decreaseCartCountAboveZero(courseId);
 
-        return cartRepository.countCartedCoursesByCourseId(courseIds)
-                .stream()
-                .collect(Collectors.toMap(
-                        CartCount::courseId,
-                        CartCount::cartCount
-                ));
-    }
-
-    private List<Long> extractCourseIds(final List<Cart> carts) {
-        return carts.stream()
-                .map(cart -> cart.getCourse().getId())
-                .distinct()
-                .toList();
+        if (affectedRows == NO_AFFECTED_ROW) {
+            throw new RestApiException(CARTED_COURSE_DELETE_CONFLICT);
+        }
     }
 
     private void validateCourseActive(final Course course) {
