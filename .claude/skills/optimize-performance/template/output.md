@@ -16,4 +16,4 @@
 - **종료 사유**: {Phase 8 판정 표의 조건}
 - **운영 반영**: {추가한 마이그레이션과 그 영향 · 없으면 "스키마 변경 없음"}
 - **기록**: `.claude/resources/perf/{이슈번호}/{슬러그}/record.md`
-- **다음**: `commit-push` → `open-pr`
+- **다음**: `write-test` → `commit-push` → `open-pr`
