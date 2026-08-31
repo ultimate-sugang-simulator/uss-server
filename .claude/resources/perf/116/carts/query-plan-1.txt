@@ -1,0 +1,132 @@
+=== [Q2] findByMemberId (cart_count 포함) ===
+=== EXPLAIN ANALYZE ===
+*************************** 1. row ***************************
+EXPLAIN: -> Nested loop left join  (cost=10.8 rows=18.9) (actual time=0.121..0.161 rows=18 loops=1)
+    -> Nested loop inner join  (cost=4.2 rows=6) (actual time=0.112..0.122 rows=6 loops=1)
+        -> Sort: c1_0.created_at  (cost=2.1 rows=6) (actual time=0.0966..0.097 rows=6 loops=1)
+            -> Index lookup on c1_0 using uk_member_course (member_id=907548)  (cost=2.1 rows=6) (actual time=0.0488..0.0524 rows=6 loops=1)
+        -> Single-row index lookup on c2_0 using PRIMARY (id=c1_0.course_id)  (cost=0.267 rows=1) (actual time=0.00378..0.00383 rows=1 loops=6)
+    -> Index lookup on s1_0 using idx_course_id (course_id=c1_0.course_id)  (cost=0.84 rows=3.15) (actual time=0.00532..0.00592 rows=3 loops=6)
+
+=== EXPLAIN FORMAT=JSON ===
+*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "10.81"
+    },
+    "ordering_operation": {
+      "using_filesort": true,
+      "nested_loop": [
+        {
+          "table": {
+            "table_name": "c1_0",
+            "access_type": "ref",
+            "possible_keys": [
+              "uk_member_course",
+              "idx_member_id",
+              "idx_course_id"
+            ],
+            "key": "uk_member_course",
+            "used_key_parts": [
+              "member_id"
+            ],
+            "key_length": "8",
+            "ref": [
+              "const"
+            ],
+            "rows_examined_per_scan": 6,
+            "rows_produced_per_join": 6,
+            "filtered": "100.00",
+            "cost_info": {
+              "read_cost": "1.50",
+              "eval_cost": "0.60",
+              "prefix_cost": "2.10",
+              "data_read_per_join": "192"
+            },
+            "used_columns": [
+              "id",
+              "member_id",
+              "course_id",
+              "created_at"
+            ]
+          }
+        },
+        {
+          "table": {
+            "table_name": "c2_0",
+            "access_type": "eq_ref",
+            "possible_keys": [
+              "PRIMARY"
+            ],
+            "key": "PRIMARY",
+            "used_key_parts": [
+              "id"
+            ],
+            "key_length": "8",
+            "ref": [
+              "uss_db.c1_0.course_id"
+            ],
+            "rows_examined_per_scan": 1,
+            "rows_produced_per_join": 6,
+            "filtered": "100.00",
+            "cost_info": {
+              "read_cost": "1.50",
+              "eval_cost": "0.60",
+              "prefix_cost": "4.20",
+              "data_read_per_join": "28K"
+            },
+            "used_columns": [
+              "id",
+              "title_kr",
+              "max_capacity",
+              "current_enrollment",
+              "status",
+              "cart_count"
+            ]
+          }
+        },
+        {
+          "table": {
+            "table_name": "s1_0",
+            "access_type": "ref",
+            "possible_keys": [
+              "idx_course_id"
+            ],
+            "key": "idx_course_id",
+            "used_key_parts": [
+              "course_id"
+            ],
+            "key_length": "8",
+            "ref": [
+              "uss_db.c1_0.course_id"
+            ],
+            "rows_examined_per_scan": 3,
+            "rows_produced_per_join": 18,
+            "filtered": "100.00",
+            "cost_info": {
+              "read_cost": "4.72",
+              "eval_cost": "1.89",
+              "prefix_cost": "10.81",
+              "data_read_per_join": "42K"
+            },
+            "used_columns": [
+              "id",
+              "course_id",
+              "day_of_week",
+              "start_time"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
+=== STATUS COUNTERS ===
+Handler_commit	1
+Handler_external_lock	6
+Handler_read_key	13
+Handler_read_next	24
+Sort_rows	6
+Sort_scan	1
