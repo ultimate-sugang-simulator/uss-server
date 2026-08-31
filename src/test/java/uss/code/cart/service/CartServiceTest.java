@@ -197,6 +197,73 @@ class CartServiceTest {
 
 
         @Test
+        void 정원에_여유가_있는_과목은_신청_가능으로_조회된다() {
+            //given
+
+            //when
+            final CartedCoursesResponse response = cartService.getCartedCourse(testMemberId);
+
+            //then
+            assertThat(response.cartedCourseResponses())
+                    .extracting(CartedCourseResponse::isRegisterable)
+                    .containsOnly(true);
+        }
+
+        @Test
+        void 정원이_마감된_과목은_신청_불가로_조회된다() {
+            //given
+            final Member testMember = memberRepository.findById(testMemberId).orElseThrow();
+
+            // 정원이 가득 찬 과목 생성 (maxCapacity: 2, currentEnrollment: 2)
+            final Course fullCourse = CourseFixture.createCourse(
+                    "정원마감과목", "Full Course", "CSE999", "CSE999001",
+                    CourseFixture.createCourse().getCollege(),
+                    CourseFixture.createCourse().getDepartment(),
+                    CourseClassification.MAJOR_CORE,
+                    CourseFixture.createCourse().getArea(),
+                    CourseType.LECTURE,
+                    CourseGrade.SOPHOMORE,
+                    3, false, 2, 2
+            );
+            courseRepository.save(fullCourse);
+            cartRepository.save(CartFixture.createCart(testMember, fullCourse));
+
+            //when
+            final CartedCoursesResponse response = cartService.getCartedCourse(testMemberId);
+
+            //then
+            final CartedCourseResponse fullCourseResponse = response.cartedCourseResponses().stream()
+                    .filter(c -> c.courseCode().equals("CSE999"))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(fullCourseResponse.isRegisterable()).isFalse();
+        }
+
+        @Test
+        void 폐강된_과목은_정원에_여유가_있어도_신청_불가로_조회된다() {
+            //given
+            final Member testMember = memberRepository.findById(testMemberId).orElseThrow();
+
+            final Course closedCourse = CourseFixture.createCourseWithDetails(
+                    "폐강과목", "Closed Course", "CSE888", "CSE888001",
+                    CourseGrade.SOPHOMORE
+            );
+            closedCourse.close();
+            courseRepository.save(closedCourse);
+            cartRepository.save(CartFixture.createCart(testMember, closedCourse));
+
+            //when
+            final CartedCoursesResponse response = cartService.getCartedCourse(testMemberId);
+
+            //then
+            final CartedCourseResponse closedCourseResponse = response.cartedCourseResponses().stream()
+                    .filter(c -> c.courseCode().equals("CSE888"))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(closedCourseResponse.isRegisterable()).isFalse();
+        }
+
+        @Test
         void 빈_장바구니를_조회하면_빈_리스트가_반환된다() {
             //given
             final Member emptyMember = MemberFixture.createMember();

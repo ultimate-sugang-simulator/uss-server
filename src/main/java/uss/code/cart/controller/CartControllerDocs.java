@@ -21,6 +21,7 @@ import uss.code.global.exception.dto.response.ErrorResponse;
 public interface CartControllerDocs {
 
     @Operation(summary = "장바구니 조회", description = "사용자의 장바구니에 담긴 과목 목록을 조회합니다.<br>" +
+            "각 과목의 신청 가능 여부(isRegisterable)를 함께 내려줍니다. 폐강되지 않았고 정원이 마감되지 않은 과목만 신청 가능입니다.<br>" +
             "🔐 <strong>Jwt 필요</strong><br>")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "✅ 장바구니 조회 성공")

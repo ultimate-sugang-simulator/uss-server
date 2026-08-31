@@ -18,7 +18,8 @@ public record CartedCourseResponse(
         boolean isEnglishCourse,
         String schedule,
         String department,
-        int cartCount
+        int cartCount,
+        boolean isRegisterable
 ) {
     public static CartedCourseResponse of(final Course course, final Long cartCount) {
         return CartedCourseResponse.builder()
@@ -33,6 +34,7 @@ public record CartedCourseResponse(
                 .schedule(CourseScheduleFormatter.format(course.getSchedules()))
                 .department(course.getDepartment().getName())
                 .cartCount(cartCount.intValue())
+                .isRegisterable(course.isActive() && course.isRegisterable())
                 .build();
     }
 }
