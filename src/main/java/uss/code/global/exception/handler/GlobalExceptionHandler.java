@@ -110,7 +110,7 @@ public class GlobalExceptionHandler {
 
     private ErrorResponse makeErrorResponse(final String message) {
         return ErrorResponse.of(
-                400,
+                INVALID_REQUEST_PARAMETER.getCode(),
                 message
         );
     }

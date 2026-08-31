@@ -30,7 +30,7 @@ public interface AdminSemesterControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "표시 학기 설정 조회 실패",
-                                            value = "{\"code\" : 5100, \"message\" : \"표시 학기 설정을 찾을 수 없어요.\"}"
+                                            value = "{\"code\" : \"ADM-004\", \"message\" : \"표시 학기 설정을 찾을 수 없어요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -49,7 +49,7 @@ public interface AdminSemesterControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "유효하지 않은 열거타입",
-                                            value = "{\"code\" : 8888, \"message\" : \"유효하지 않은 열거타입입니다.\"}"
+                                            value = "{\"code\" : \"GLB-002\", \"message\" : \"유효하지 않은 열거타입이에요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -59,7 +59,7 @@ public interface AdminSemesterControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "표시 학기 설정 조회 실패",
-                                            value = "{\"code\" : 5100, \"message\" : \"표시 학기 설정을 찾을 수 없어요.\"}"
+                                            value = "{\"code\" : \"ADM-004\", \"message\" : \"표시 학기 설정을 찾을 수 없어요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))

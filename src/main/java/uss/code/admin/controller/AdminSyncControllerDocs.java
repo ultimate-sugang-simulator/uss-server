@@ -43,7 +43,7 @@ public interface AdminSyncControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "유효하지 않은 열거타입",
-                                            value = "{\"code\" : 8888, \"message\" : \"유효하지 않은 열거타입입니다.\"}"
+                                            value = "{\"code\" : \"GLB-002\", \"message\" : \"유효하지 않은 열거타입이에요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -63,11 +63,11 @@ public interface AdminSyncControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "이미 진행 중",
-                                            value = "{\"code\" : 5200, \"message\" : \"이미 업데이트가 진행 중이에요.\"}"
+                                            value = "{\"code\" : \"ADM-005\", \"message\" : \"이미 업데이트가 진행 중이에요.\"}"
                                     ),
                                     @ExampleObject(
                                             name = "전략 불일치",
-                                            value = "{\"code\" : 5201, \"message\" : \"데이터가 변경됐어요. 다시 확인해주세요.\"}"
+                                            value = "{\"code\" : \"ADM-006\", \"message\" : \"데이터가 변경됐어요. 다시 확인해주세요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -101,7 +101,7 @@ public interface AdminSyncControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "작업 조회 실패",
-                                            value = "{\"code\" : 5202, \"message\" : \"업데이트 작업을 찾을 수 없어요.\"}"
+                                            value = "{\"code\" : \"ADM-007\", \"message\" : \"업데이트 작업을 찾을 수 없어요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -120,7 +120,7 @@ public interface AdminSyncControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "유효하지 않은 입력 파라미터",
-                                            value = "{\"code\" : 7777, \"message\" : \"유효하지 않은 입력 파라미터입니다.\"}"
+                                            value = "{\"code\" : \"GLB-003\", \"message\" : \"유효하지 않은 입력 파라미터예요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -130,7 +130,7 @@ public interface AdminSyncControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "작업 조회 실패",
-                                            value = "{\"code\" : 5202, \"message\" : \"업데이트 작업을 찾을 수 없어요.\"}"
+                                            value = "{\"code\" : \"ADM-007\", \"message\" : \"업데이트 작업을 찾을 수 없어요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))

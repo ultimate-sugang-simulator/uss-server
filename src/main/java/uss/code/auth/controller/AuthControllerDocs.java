@@ -34,11 +34,11 @@ public interface AuthControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "존재하지 않는 열거값 (단과대학, 학과, 학년, 학적 상태)",
-                                            value = "{\"code\" : 8888, \"message\" : \"유효하지 않은 열거타입입니다.\"}"
+                                            value = "{\"code\" : \"GLB-002\", \"message\" : \"유효하지 않은 열거타입이에요.\"}"
                                     ),
                                     @ExampleObject(
                                             name = "학과와 단과대학 불일치",
-                                            value = "{\"code\" : 1016, \"message\" : \"학과의 소속 단과대학과 일치하지 않습니다.\"}"
+                                            value = "{\"code\" : \"MEM-004\", \"message\" : \"학과의 소속 단과대학과 일치하지 않아요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -48,7 +48,7 @@ public interface AuthControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "이메일 중복",
-                                            value = "{\"code\" : 1015, \"message\" : \"이미 사용 중인 이메일입니다.\"}"
+                                            value = "{\"code\" : \"MEM-003\", \"message\" : \"이미 사용 중인 이메일이에요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -77,7 +77,7 @@ public interface AuthControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "사용자 조회 실패",
-                                            value = "{\"code\" : 1010, \"message\" : \"사용자를 찾을 수 없습니다.\"}"
+                                            value = "{\"code\" : \"MEM-001\", \"message\" : \"사용자를 찾을 수 없어요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -87,7 +87,7 @@ public interface AuthControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "비밀번호 불일치",
-                                            value = "{\"code\" : 1012, \"message\" : \"비밀번호가 일치하지 않습니다.\"}"
+                                            value = "{\"code\" : \"MEM-002\", \"message\" : \"비밀번호가 일치하지 않아요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -106,19 +106,19 @@ public interface AuthControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "액세스 토큰 누락",
-                                            value = "{\"code\" : 1000, \"message\" : \"액세스 토큰이 누락되었습니다.\"}"
+                                            value = "{\"code\" : \"AUTH-001\", \"message\" : \"액세스 토큰이 누락됐어요.\"}"
                                     ),
                                     @ExampleObject(
                                             name = "액세스 토큰 유효하지 않음",
-                                            value = "{\"code\" : 1001, \"message\" : \"액세스 토큰이 유효하지 않습니다.\"}"
+                                            value = "{\"code\" : \"AUTH-002\", \"message\" : \"액세스 토큰이 유효하지 않아요.\"}"
                                     ),
                                     @ExampleObject(
                                             name = "액세스 토큰 형식 오류",
-                                            value = "{\"code\" : 1002, \"message\" : \"액세스 토큰 형식이 올바르지 않습니다.\"}"
+                                            value = "{\"code\" : \"AUTH-003\", \"message\" : \"액세스 토큰 형식이 올바르지 않아요.\"}"
                                     ),
                                     @ExampleObject(
                                             name = "액세스 토큰 서명 오류",
-                                            value = "{\"code\" : 1003, \"message\" : \"액세스 토큰 서명이 유효하지 않습니다.\"}"
+                                            value = "{\"code\" : \"AUTH-004\", \"message\" : \"액세스 토큰 서명이 유효하지 않아요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))
@@ -128,7 +128,7 @@ public interface AuthControllerDocs {
                             examples = {
                                     @ExampleObject(
                                             name = "사용자 조회 실패",
-                                            value = "{\"code\" : 1010, \"message\" : \"사용자를 찾을 수 없습니다.\"}"
+                                            value = "{\"code\" : \"MEM-001\", \"message\" : \"사용자를 찾을 수 없어요.\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))

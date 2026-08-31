@@ -34,8 +34,8 @@ description: Swagger API 문서(ControllerDocs 인터페이스) 작성 규칙
 | 실패 | `"🚨 {에러 설명}"` | `schema = @Schema(implementation = ErrorResponse.class)` |
 
 - `@ExampleObject`의 value는 **실제 응답 본문과 같은 형태**여야 한다.
-  `ErrorResponse`는 `code`(정수)와 `message` 두 필드를 가지므로 형식은 `{"code" : 1010, "message" : "사용자를 찾을 수 없습니다."}`다.
-  - `code`는 따옴표 없는 정수다. enum 상수명을 문자열로 적지 마라 (`"MEMBER_1010"` 같은 값은 실제로 내려가지 않는다)
+  `ErrorResponse`는 `code`(문자열)와 `message` 두 필드를 가지므로 형식은 `{"code" : "MEM-001", "message" : "사용자를 찾을 수 없어요."}`다.
+  - `code`는 `{도메인 접두사}-{세 자리 순번}` 문자열이다. 따옴표를 빼거나 정수로 적지 마라. enum 상수명을 그대로 적지도 마라 (`"MEMBER_NOT_FOUND"`는 실제로 내려가지 않는다)
   - `code`와 `message`는 `ExceptionCode` enum에 정의된 값을 **그대로** 옮긴다. 문구를 다듬지 마라
 - `ErrorResponse`는 `uss.code.global.exception.dto.response.ErrorResponse`를 사용하라
 
@@ -83,7 +83,7 @@ public interface {Controller}Docs {
                             examples = {
                                     @ExampleObject(
                                             name = "{에러명}",
-                                            value = "{\"code\" : {코드}, \"message\" : \"에러 메시지\"}"
+                                            value = "{\"code\" : \"{코드}\", \"message\" : \"에러 메시지\"}"
                                     )
                             },
                             schema = @Schema(implementation = ErrorResponse.class))

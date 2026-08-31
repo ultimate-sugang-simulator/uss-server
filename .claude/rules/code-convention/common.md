@@ -15,6 +15,9 @@ Controller → Service → Repository 순서를 따른다 (Facade 레이어 없�
 
 - `throw new RestApiException(ExceptionCode.XXX)` 패턴을 사용하라
 - 새 에러코드는 `ExceptionCode` enum에 추가하되, 카테고리별 주석 그룹을 유지하라
+- 코드 값은 `{도메인 접두사}-{세 자리 순번}` 문자열이다 (`GLB`, `AUTH`, `MEM`, `CRS`, `CART`, `REG`, `ADM`). 새 코드는 속한 그룹의 마지막 순번 +1을 쓴다
+- 여러 도메인이 함께 던지는 코드는 검증 대상의 도메인에 둬라. 시간표 충돌은 장바구니와 수강신청 양쪽에서 던지지만 과목 검증이므로 `CRS`다
+- 메시지는 "-요"체로 쓴다 (`찾을 수 없습니다.`가 아니라 `찾을 수 없어요.`)
 - `ExceptionCode` 상수는 static import로 식별자만 노출하라 (`ExceptionCode.XXX` 표기 대신 `XXX`). 단 `ExceptionCode` 타입 자체를 참조할 때(파라미터 타입 등)는 일반 import를 사용한다 (예: `GlobalExceptionHandler`)
 
 ## 객체 생성
