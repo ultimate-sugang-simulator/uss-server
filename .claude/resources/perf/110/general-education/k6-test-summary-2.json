@@ -1,0 +1,65 @@
+{
+  "phase": "measure",
+  "target": "general-education",
+  "endpoint": "GET /api/v1/courses/general-education?course-area={영역}",
+  "condition": {
+    "vus": 30,
+    "steady_state_duration": "1m",
+    "ramp_up": "30s",
+    "ramp_down": "30s",
+    "total_duration": "2m",
+    "db_cache": "warm",
+    "app_cache": "없음",
+    "user_count": 1000,
+    "area_rotation": "교양 13개 영역 순환 (성능 시드 5개 3,015~3,249건 + 앱 시드만 8개 8~56건)"
+  },
+  "requests": 7268,
+  "rps": 60.52426739987747,
+  "failed_rate": 0,
+  "checks_rate": 1,
+  "checks": [
+    {
+      "name": "status is 200",
+      "passes": 7268,
+      "fails": 0
+    },
+    {
+      "name": "body is not empty",
+      "passes": 7268,
+      "fails": 0
+    },
+    {
+      "name": "generalEducationCourseResponses가 실려 있다",
+      "passes": 7268,
+      "fails": 0
+    }
+  ],
+  "duration_ms": {
+    "med": 377.02,
+    "p95": 590.11135,
+    "p99": 806.3974199999997,
+    "max": 1560.874
+  },
+  "waiting_ms": {
+    "med": 374.928,
+    "p95": 582.53145,
+    "p99": 795.8919099999998,
+    "max": 1550.285
+  },
+  "bytes_received": 4160488030,
+  "delta_vs_prev": {
+    "from": "k6-test-summary-1.json",
+    "rps": {
+      "before": 25.757994056249306,
+      "after": 60.52426739987747
+    },
+    "duration_p95_ms": {
+      "before": 1709.5907999999997,
+      "after": 590.11135
+    },
+    "duration_p99_ms": {
+      "before": 2255.4168799999998,
+      "after": 806.3974199999997
+    }
+  }
+}

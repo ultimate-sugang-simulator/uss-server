@@ -1,0 +1,78 @@
+=== EXPLAIN ANALYZE ===
+*************************** 1. row ***************************
+EXPLAIN: -> Filter: (c1_0.`status` = 'ACTIVE')  (cost=419 rows=585) (actual time=0.13..6.52 rows=3249 loops=1)
+    -> Index lookup on c1_0 using idx_area_sort (area='ACADEMIC_FOUNDATION')  (cost=419 rows=5846) (actual time=0.128..6.1 rows=3249 loops=1)
+
+=== EXPLAIN FORMAT=JSON ===
+*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "945.35"
+    },
+    "ordering_operation": {
+      "using_filesort": false,
+      "table": {
+        "table_name": "c1_0",
+        "access_type": "ref",
+        "possible_keys": [
+          "idx_area_sort"
+        ],
+        "key": "idx_area_sort",
+        "used_key_parts": [
+          "area"
+        ],
+        "key_length": "202",
+        "ref": [
+          "const"
+        ],
+        "rows_examined_per_scan": 5846,
+        "rows_produced_per_join": 584,
+        "filtered": "10.00",
+        "cost_info": {
+          "read_cost": "360.75",
+          "eval_cost": "58.46",
+          "prefix_cost": "945.35",
+          "data_read_per_join": "2M"
+        },
+        "used_columns": [
+          "id",
+          "academic_year",
+          "term",
+          "title_kr",
+          "title_en",
+          "course_code",
+          "haksu_code",
+          "college",
+          "department",
+          "classification_code",
+          "classification_name",
+          "area",
+          "area_code",
+          "area_name",
+          "type_code",
+          "type_name",
+          "grade_code",
+          "grade_name",
+          "concentration_code",
+          "concentration_name",
+          "credits",
+          "is_english_course",
+          "english_code",
+          "english_name",
+          "is_huss_course",
+          "max_capacity",
+          "current_enrollment",
+          "status"
+        ],
+        "attached_condition": "(`uss_db`.`c1_0`.`status` = 'ACTIVE')"
+      }
+    }
+  }
+}
+=== STATUS COUNTERS ===
+Handler_commit	1
+Handler_external_lock	2
+Handler_read_key	1
+Handler_read_next	3249
