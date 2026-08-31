@@ -99,8 +99,6 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
         return path + "?" + maskSensitiveParams(query);
     }
 
-    // 인코딩된 원본 쿼리를 먼저 쪼갠 뒤 키·값을 개별 디코딩한다.
-    // 통째로 디코딩하면 값에 담긴 %26(&)·%3D(=)가 구분자로 둔갑해 파라미터가 잘못 쪼개진다.
     private String maskSensitiveParams(final String query) {
         final StringBuilder masked = new StringBuilder();
         final String[] params = query.split(QUERY_DELIMITER);

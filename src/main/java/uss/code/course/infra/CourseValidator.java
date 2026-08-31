@@ -27,14 +27,12 @@ public class CourseValidator {
             return true;
         }
 
-        // 추가하려는 과목의 시간표 가져오기
         List<CourseSchedule> newCourseSchedules = newCourse.getSchedules();
 
         if (newCourseSchedules.isEmpty()) {
             return true;
         }
 
-        // 현재 등록된 과목들의 시간표와 겹치는지 확인
         for (final Course existingCourse : existingCourses) {
             List<CourseSchedule> existingCourseSchedules = existingCourse.getSchedules();
 
@@ -48,7 +46,6 @@ public class CourseValidator {
                     final LocalTime existingStartTime = existingSchedule.getStartTime();
                     final LocalTime existingEndTime = existingSchedule.getEndTime();
 
-                    // 같은 요일이고 시간이 겹치는지 확인
                     if (newCourseDay == existingCourseDay && isTimeOverlap(newStartTime, newEndTime, existingStartTime, existingEndTime)) {
                         return false;
                     }
