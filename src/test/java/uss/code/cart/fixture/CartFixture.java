@@ -22,6 +22,13 @@ public class CartFixture {
         ReflectionTestUtils.setField(cart, "member", member);
         ReflectionTestUtils.setField(cart, "course", course);
         ReflectionTestUtils.setField(cart, "createdAt", createdAt);
+
+        increaseCartCount(course);
+
         return cart;
+    }
+
+    private static void increaseCartCount(final Course course) {
+        ReflectionTestUtils.setField(course, "cartCount", course.getCartCount() + 1);
     }
 }
